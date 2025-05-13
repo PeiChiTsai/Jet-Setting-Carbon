@@ -1,0 +1,31 @@
+/* css/arrow_style.css */
+.arrow-container {
+  position: absolute;
+  bottom: 100px;              /* 离底部 20px，可根据需要再调 */
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 3;                /* 确保比遮罩 (.video-section::before z-index:1) 高 */
+}
+
+#more-arrows {
+  width: 75px;
+  height: 65px;
+  cursor: pointer;
+}
+
+#more-arrows polygon {
+  fill: #FFF;
+  transition: all 0.2s ease-out;
+}
+#more-arrows polygon.arrow-middle { opacity: 0.75; }
+#more-arrows polygon.arrow-top    { opacity: 0.5; }
+
+#more-arrows:hover polygon.arrow-bottom {
+  transform: translateY(-18px);
+}
+#more-arrows:hover polygon.arrow-top {
+  transform: translateY(18px);
+}

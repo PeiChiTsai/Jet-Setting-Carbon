@@ -1,0 +1,142 @@
+Country,logGDP_capita,Carbon_footprint_t_capita,adjusted_by_travel_percentage
+Afghanistan,2.79,0.29,10.25
+Albania,3.73,0.28,7.65
+Algeria,3.60,0.17,1.26
+Angola,3.13,0.04,0.80
+Argentina,4.00,0.30,1.50
+Australia,4.74,1.31,2.86
+Austria,4.49,1.04,1.95
+Azerbaijan,3.84,0.03,0.20
+Bahamas,4.53,1.76,2.27
+Bahrain,4.43,2.27,11.93
+Bangladesh,3.33,0.11,4.82
+Belarus,3.89,0.44,1.39
+Belgium,4.37,1.01,1.67
+Belize,3.79,0.48,3.07
+Benin,3.02,0.03,1.39
+Bhutan,3.43,0.14,1.35
+Bolivia,3.78,0.43,3.06
+Bosnia and Herzegovina,3.78,0.41,4.64
+Botswana,3.82,0.43,1.84
+Brazil,3.95,0.09,1.86
+Brunei Darussalam,4.59,3.77,9.87
+Bulgaria,3.92,0.21,1.00
+Burkina Faso,2.80,0.02,1.00
+Burundi,2.34,0.01,22.38
+Cambodia,3.29,0.10,1.14
+Cameroon,3.19,0.04,1.36
+Canada,4.63,1.76,2.60
+Central African Republic,2.63,0.02,2.14
+Chad,2.87,0.02,1.45
+Chile,4.21,0.38,2.11
+Colombia,3.81,0.12,1.35
+Congo,3.36,0.06,1.36
+Costa Rica,4.10,0.29,1.47
+Cote d'Ivoire,3.35,0.05,1.17
+Croatia,4.19,0.54,2.99
+Cuba,0.0,0.17,0.84
+Cyprus,4.30,0.84,4.86
+Czechia,4.27,0.70,1.15
+Denmark,4.78,1.92,1.92
+Dominican Republic,3.91,0.20,4.07
+Ecuador,3.76,0.15,0.92
+Egypt,3.66,0.09,1.44
+El Salvador,3.61,0.28,1.23
+Estonia,4.37,1.38,1.58
+Ethiopia,2.92,0.02,0.94
+Finland,4.69,1.65,1.65
+France,4.61,1.01,2.24
+Gabon,3.96,0.84,1.79
+Georgia,3.67,0.75,0.75
+Germany,4.67,1.58,1.58
+Ghana,3.43,0.05,0.75
+Greece,4.28,0.56,0.74
+Guatemala,3.57,0.10,1.31
+Guinea,3.02,0.02,1.07
+Haiti,3.12,0.06,2.97
+Honduras,3.41,0.22,2.30
+Hungary,4.22,0.50,0.52
+Iceland,4.84,2.68,2.68
+India,3.31,0.05,2.36
+Indonesia,3.82,0.10,2.31
+Iran,3.75,0.26,2.24
+Iraq,3.95,0.06,1.80
+Ireland,4.91,1.90,1.90
+Israel,4.55,1.20,2.80
+Italy,4.53,0.79,1.37
+Jamaica,3.75,0.33,1.17
+Japan,4.55,0.67,3.37
+Jordan,3.82,0.44,3.28
+Kazakhstan,3.99,0.67,0.67
+Kenya,3.29,0.10,2.50
+Kuwait,4.59,2.80,4.58
+Kyrgyzstan,3.41,0.48,1.29
+Laos,3.41,0.06,1.42
+Latvia,4.25,1.10,1.47
+Lebanon,3.95,0.46,1.84
+Libya,4.02,0.43,1.44
+Lithuania,4.29,1.19,0.88
+Luxembourg,5.05,3.02,3.02
+Madagascar,2.77,0.01,0.94
+Malaysia,4.05,0.92,3.97
+Mali,2.92,0.04,2.04
+Malta,4.43,1.19,0.71
+Mexico,4.01,0.43,0.92
+Moldova,3.65,0.96,2.72
+Mongolia,3.64,0.11,10.98
+Morocco,3.54,0.31,0.80
+Mozambique,2.71,0.07,6.86
+Myanmar,3.11,0.33,12.20
+Namibia,3.73,0.24,2.25
+Nepal,3.07,0.06,3.01
+Netherlands,4.72,2.93,2.93
+New Zealand,4.63,1.91,2.93
+Nicaragua,3.38,0.17,0.82
+Niger,2.74,0.02,1.74
+Nigeria,3.34,0.03,0.66
+North Macedonia,3.78,0.71,5.61
+Norway,4.98,2.11,2.11
+Pakistan,3.16,0.06,2.02
+Panama,4.20,0.32,1.09
+Papua New Guinea,3.41,0.06,1.93
+Paraguay,3.74,0.27,1.25
+Peru,3.84,0.12,1.21
+Philippines,3.53,0.20,2.90
+Poland,4.20,0.43,1.21
+Portugal,4.23,0.84,3.04
+Qatar,4.80,0.80,0.80
+Rest of Africa,4.37,1.05,2.80
+Rest of Asia-Pacific,4.38,2.12,2.92
+Rest of Europe,3.95,0.65,3.12
+Romania,4.13,0.48,0.48
+Russia,4.06,0.12,1.01
+Saudi Arabia,4.35,0.77,1.46
+Senegal,3.17,0.05,1.60
+Republic of Serbia,3.70,0.09,4.89
+Singapore,4.82,4.89,4.89
+Slovakia,4.29,0.84,0.88
+Slovenia,4.42,1.06,1.06
+South Africa,3.83,0.14,1.94
+Spain,4.47,0.66,1.56
+Sri Lanka,3.61,0.16,2.49
+Sudan,3.24,0.06,1.47
+Sweden,4.72,1.52,1.52
+Switzerland,4.92,2.66,2.66
+Syrian Arab Republic,3.36,0.19,4.11
+Tajikistan,2.95,0.35,24.90
+Tanzania,3.02,0.04,1.09
+Thailand,3.88,0.32,2.16
+Togo,2.94,0.04,3.34
+Tunisia,3.64,0.18,1.16
+Turkey,3.96,0.15,1.26
+Uganda,2.92,0.04,3.55
+Ukraine,3.44,0.24,0.94
+United Arab Emirates,4.66,1.94,1.94
+England,4.63,1.55,1.55
+USA,4.81,0.60,1.98
+Uruguay,4.25,0.30,1.09
+Venezuela,4.20,0.19,5.15
+Vietnam,3.54,0.25,3.37
+Yemen,2.85,0.05,2.36
+Zambia,3.10,0.05,0.94
+Zimbabwe,3.35,0.05,1.66 

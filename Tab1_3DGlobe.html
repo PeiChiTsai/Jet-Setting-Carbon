@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <!--AFrame version 1.7.0-->
+    <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
+    <!--Orbit Control version 1.3.2-->
+    <script src="https://unpkg.com/aframe-orbit-controls@1.3.2/dist/aframe-orbit-controls.min.js"></script>
+    <!--Globe Component-->
+    <script src="https://unpkg.com/aframe-globe-component/dist/aframe-globe-component.min.js"></script>
+    <!--D3 Library https://d3js.org/-->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <!--module to parse CSV and fetch data https://runebook.dev/en/docs/d3/d3-fetch-->
+    <script src="https://cdn.jsdelivr.net/npm/d3-fetch@3"></script>
+    <!--AFrame Troika Text-->
+    <script src="https://unpkg.com/aframe-troika-text/dist/aframe-troika-text.min.js"></script>
+    <!--Look At component-->
+    <script src="https://unpkg.com/aframe-look-at-component@0.8.0/dist/aframe-look-at-component.min.js"></script>
+    
+    <!-- Custom Component -->
+    <script src="./resources/js/Tab1_Earth.js"></script>
+
+
+    <!-- Google Fonnts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+
+
+    <script src="https://d3js.org/d3.v7.js"></script>
+    <script src="https://unpkg.com/d3-simple-slider"></script>
+
+    <!-- CSS Stylesheets -->
+    <link rel="stylesheet" href="css/main-styles.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- d3-simple-slider CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/d3-simple-slider@1.7.4/dist/d3-simple-slider.min.css" />
+    <!-- d3-simple-slider JS -->
+    <script src="https://cdn.jsdelivr.net/npm/d3-simple-slider@1.7.4/dist/d3-simple-slider.min.js"></script>
+
+
+    <style>
+      .d3-slider .track,
+      .d3-slider .track-inset,
+      .d3-slider .track-overlay {
+        stroke: #ccc;
+      }
+    
+      .d3-slider .handle {
+        fill: #fff;
+        stroke: #666;
+      }
+    
+      .d3-slider text {
+        fill: white;
+        font-weight: bold;
+      }
+
+
+      .switch {
+        position: relative;
+        display: inline-block;
+        width: 46px;
+        height: 28px;
+      }
+
+      .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      .slider.round {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        border-radius: 28px;
+        transition: 0.4s;
+      }
+
+      .slider.round:before {
+        position: absolute;
+        content: "";
+        height: 22px;
+        width: 22px;
+        left: 3px;
+        top: 3px;
+        background-color: white;
+        border-radius: 50%;
+        transition: 0.4s;
+      }
+
+      .switch input:checked + .slider.round {
+        background-color: #4CAF50;
+      }
+
+      .switch input:checked + .slider.round:before {
+        transform: translateX(18px);
+      }
+
+
+
+
+      .row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px; 
+        margin-top: 8px;
+        width: 102%;
+      }
+
+      .label-text {
+        flex: 1;
+        margin-right: 14px;
+        min-width: 0;
+        max-width: calc(100% - 60px);
+        font-size: 14px;
+        line-height: 1.4;
+        white-space: nowrap;
+        /* overflow: hidden; */
+        text-overflow: ellipsis;
+      }
+
+      .switch-wrapper {
+        flex-shrink: 0;           /* 不被壓縮 */
+        width: 55px;              /* ✅ 固定寬度，保持對齊 */
+      }
+
+      </style>
+
+
+
+
+
+  </head>
+
+
+
+
+
+  <body>
+
+
+    <!-- Header Section with Title & Logo and Menu -->
+                <ul class="navbar">
+                <li class="logo">
+                    <a href="#Home">
+                        <img src="images/logo.svg" alt="Logo" class="logo-image">
+                        <span class="logo-text">AVIATION NETWORK</span>
+                    </a>
+                </li>
+                <li><a href="#Home">Home</a></li>
+                <li><a href="#Introduction-1">Intro-1</a></li>
+                <li><a href="#Introduction-2">Intro-2</a></li>
+                <li><a href="#Introduction-3">Intro-3</a></li>
+                <li><a href="#chartArea">Map</a></li>
+                <li><a href="#Navigator">Navigator</a></li>
+            </ul>
+
+
+
+
+
+    <div id="control-panel" style="
+      position: absolute;
+      bottom: 10%;
+      left: 20px;
+      z-index: 20;
+      font-family: sans-serif;
+      color: white;
+      width: 340px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    ">
+
+      <!-- Section 1: year slider -->
+      <div id="slider" style="
+        background: rgba(255, 255, 255, 0.1);
+        padding: 12px;
+        border-radius: 8px;
+      ">
+        <label style="display: block; margin: 12px 0 8px 0; font-weight: bold;">
+          1. Select the year
+        </label>
+
+      </div>
+
+      <!-- Section 2: CO2 emission map -->
+      <div id="aviation-emission-toggle" style="
+      background: rgba(255, 255, 255, 0.1);
+      padding: 12px;
+      border-radius: 8px;
+      ">
+        <label style="display: block; margin-bottom: 6px; font-weight: bold;">
+          2. Where emit the most from aviation?
+        </label>
+
+        <div class="row">
+          <span class="label-text">Annual CO₂ emissions from aviation</span>
+            <div class="switch-wrapper">
+              <label class="switch">
+                <input type="checkbox" id="toggle-emissions" checked>
+                <span class="slider round"></span>
+              </label>
+            </div>
+        </div>
+        
+      </div>
+
+
+
+      <!-- Section 3: aircraft registered amount -->
+      <div id="aircraft-amount-toggle" style="
+        background: rgba(255, 255, 255, 0.1);
+        padding: 12px;
+        border-radius: 8px;">
+
+        <label style="display: block; margin-bottom: 6px; font-weight: bold;">
+          3. Which countries holds the most airplane?
+        </label>
+
+        <div class="row">
+          <span class="label-text">Top 15 aircraft registered countries (2020)</span>
+            <div class="switch-wrapper">
+              <label class="switch">
+                <input type="checkbox" id="toggle-reg-1" >
+                <span class="slider round"></span>
+              </label>
+            </div>          
+        </div>
+        
+        <div class="row">
+          <span class="label-text">Top 11 Private jet registered (2019)</span>
+            <div class="switch-wrapper">
+              <label class="switch">
+                <input type="checkbox" id="toggle-reg-2" >
+                <span class="slider round"></span>
+              </label>
+            </div>   
+        </div>      
+      </div>  
+
+      <!-- Section 4: flight path -->
+      <div id="flight-path"style="
+        background: rgba(255, 255, 255, 0.1);
+        padding: 12px;
+        border-radius: 8px;">
+
+        <label style="display: block; margin-bottom: 6px; font-weight: bold;">
+          4. Where do people fly?
+        </label>
+        <span class="label-text">Flight Type:</span>
+        
+        <select id="flightSelect">
+          <option value="">None</option>          
+          <option value="commercial">Top Popular Commercial Flight Path</option>
+          <option value="private">Top 2500 Popular Private Flight Path</option>
+        </select>
+      </div>
+
+      <!-- Section 4: line chart -->
+      <div id="line-chart-section" style="
+      background: rgba(255, 255, 255, 0.1);
+      padding: 12px;
+      border-radius: 8px;">
+
+        <label style="display: block; margin-bottom: 6px; font-weight: bold;">
+          5. What is the aerial emission trend?
+        </label>
+
+        <p style="font-size: 14px; margin-bottom: 10px;">
+          Annual CO₂ emissions from aviation by year
+        </p>
+        <p id="line-chart-title" style="font-size: 14px; margin-bottom: 10px; font-style: italic;">
+          Country: <span id="chart-country-name">World</span>
+        </p>
+
+        <!-- D3 將會 append svg 到這裡 -->
+        <div id="line-chart-container">
+          <svg width="300" height="160" style="background: rgba(255,255,255,0.05); border-radius: 4px;"></svg>
+        </div>
+      </div>
+
+
+    </div>
+
+
+    <div id="introduction-panel" style="
+    position: absolute;
+    top: 20%;
+    right: 30px;
+    z-index: 20;
+    font-family: sans-serif;
+    color: white;
+    width: 340px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;">
+
+      <!-- Section 1: intro-story -->
+      <div id="intro-story" style="
+        background: rgba(255, 255, 255, 0.1);
+        padding: 12px;
+        border-radius: 8px;
+      ">
+        <h3 style="margin-top: 0; margin-bottom: 8px; color: white">Why Private Jets Matter</h3>
+        <p style="font-size: 14px; line-height: 1.5;">
+          Though they account for a small portion of total flights, private jets emit disproportionately high levels of carbon per passenger.
+          <br><br>
+          This interactive dashboard explores how private aviation contributes to global emissions, who benefits most, and how its impact varies across regions and time.
+        </p>
+      </div>
+    </div>
+
+
+
+    <div id="legend-panel" style="
+      position: absolute;
+      bottom: 80px;
+      right: 40px;
+      z-index: 20;
+      font-family: sans-serif;
+      color: white;
+      width: 250px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;">
+
+
+
+      <!-- Annual Emission  -->
+      <div id="legend-emission" style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px;opacity: 0; transition: opacity 0.4s;">
+        <div style="font-size: 14px; margin-bottom: 4px;">Annual Emission</div>
+        
+        <div style="height: 12px; border-radius: 6px;
+          background: linear-gradient(to right,
+            rgba(255, 255, 178, 0.4),
+            rgba(77, 59, 0, 0.571)
+          );">
+        </div>
+
+        <div style="display: flex; justify-content: space-between; font-size: 12px;">
+          <span>0</span>
+          <span>150k</span>
+          <span>300k t</span>
+        </div>
+
+        <div style="display: flex; align-items: center; font-size: 12px; margin-top: 12px;">
+        <div style="width: 14px; height: 14px; background: rgba(114, 114, 114, 0.55); border-radius: 3px; margin-right: 6px;"></div>
+          <span>No Data</span>
+        </div>
+      </div>
+
+
+      <!-- Aircraft Amount  -->
+      <div id="legend-aircraft" style="display: flex; flex-direction: column; gap: 6px;opacity: 0; transition: opacity 0.4s;">
+
+          <div id="legend-aircraft-label" style="font-size: 14px; margin-bottom: 4px; color: #ddd;">
+            Total Registered Aircraft
+          </div>
+
+        <div id="legend-aircraft-gradient" style="height: 10px; width: 100%; border-radius: 7px;
+          background: linear-gradient(to right,
+            rgb(53, 182, 230),
+            rgb(59, 47, 199)
+          );">
+        </div>
+
+        <div style="display: flex; justify-content: space-between; font-size: 12px; margin-top: 4px;">
+          <span>Low</span>
+          <span>High</span>
+        </div>
+      </div>
+
+      <!-- Flight Path Legend -->
+      <div id="legend-flightpath" style="display: flex; flex-direction: column; gap: 6px; opacity: 0; transition: opacity 0.4s;">
+
+          <!-- 小字 -->
+        <div id="legend-flightpath-label" style="font-size: 14px; margin-bottom: 4px; color: #ddd;">
+          Private Flight Path Intensity
+        </div>
+
+        <div id="legend-gradient" style="height: 3px; width: 100%; border-radius: 7px;
+            background: linear-gradient(to right, white, red);">
+        </div>
+
+        <div style="display: flex; justify-content: space-between; font-size: 12px;">
+          <span>Low</span>
+          <span>High</span>
+        </div>
+      </div>
+    </div>
+
+
+
+    <!-- <button id="toggle-rotation" style="
+      position: absolute;
+      bottom: 20px;
+      right: 100px;
+      z-index: 100;
+      padding: 8px 14px;
+      font-size: 14px;
+      background: rgba(0,0,0,0.6);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;">
+        Pause Rotation
+    </button> -->
+
+
+  </div>
+
+
+    <div id="country-tooltip" style="
+      position: absolute;
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 6px 10px;
+      font-size: 13px;
+      border-radius: 4px;
+      pointer-events: none;
+      opacity: 0;
+      z-index: 10000;
+    "></div>
+
+    <div id="marker-tooltip" style="
+      position: absolute;
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 6px 10px;
+      font-size: 13px;
+      border-radius: 4px;
+      pointer-events: none;
+      opacity: 0;
+      z-index: 10001;
+    "></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <a-scene renderer="antialias: true; colorManagement: true; sortTransparentObjects: true;">
+
+      <a-asset>
+        <img id="sky" src="./resources/imgs/8k_stars_milky_way.jpg">
+      </a-asset>
+
+      <a-entity id="globeID" position="0 -0.05 0" scale="0.004 0.004 0.004" class="collidable" globe="
+        globe-image-url: ./resources/imgs/8k_earth_nightmap.jpg;
+        bump-image-url: https://upload.wikimedia.org/wikipedia/commons/f/fb/Solarsystemscope_texture_8k_earth_normal_map.tif;">
+        <!--Scale of the second Globe is 1 1 1 as it is relative to the parent entity -->
+        <a-entity id="globeID2" class="not-collidable" scale="1 1 1" globe="show-globe:false"></a-entity>
+      </a-entity>
+
+
+      <a-entity private-flight-path="globe:#globeID; globeB:#globeID2"></a-entity>
+      <a-entity world-countries="globe:#globeID"></a-entity>
+      <a-entity world-airport="globe:#globeID; globeB:#globeID2"></a-entity>
+
+      <a-entity cursor="rayOrigin: mouse; mouseCursorStylesEnabled: true;" raycaster="objects: .collidable; interval: 100"> </a-entity>
+      <a-entity id="ref" geometry="" static-body="shape: box" scale="0.0 0.0 0.0"  ></a-entity>
+      <!-- <a-troika-text id="globe-tooltip" look-at="#ref" position="0 0.45 0" font-size="0.03" align="center"></a-troika-text> -->
+
+
+      <a-entity id="aircraftMarkers" position="0 -0.05 0" scale="0.004 0.004 0.004" aircraft-markers="globe: #globeID"></a-entity>
+
+
+      <a-sky radius="1.6" src="#sky"></a-sky>
+
+
+      <a-entity id="user" 
+        camera 
+        look-controls="enabled:false"
+        orbit-controls="
+          dampingFactor:0.1;  
+          target: 0 0 0;  
+          minDistance: 0;  
+          maxDistance: 0.8;  
+          initialPosition: 0 0 0.8; 
+          rotateSpeed:0.5;
+          autoRotate: true; 
+          autoRotateSpeed: 0.2">
+      </a-entity>
+
+      
+
+
+
+
+    </a-scene>
+
+
+    <script>
+      window.currentYear = "2022";
+      var slider = d3
+        .sliderHorizontal()
+        .min(2022)
+        .max(2024)
+        .step(1)
+        .width(200)
+        .ticks(2)
+        .tickFormat(d3.format("d"))
+        .default(2022)
+        .displayValue(false)
+        .on('onchange', val => {
+          window.currentYear = val.toString();
+          d3.select('#value').text(val);
+
+          const component = document.querySelector('[world-countries]').components['world-countries'];
+          if (component && component.updateMapByYear) {
+            component.updateMapByYear(val.toString());
+          }
+
+          const flightComp = document.querySelector('[private-flight-path]')?.components['private-flight-path'];
+          if (flightComp && flightComp.updateFlightPath) {
+            flightComp.currentYear = val.toString(); 
+            flightComp.updateFlightPath();   // ✈ ✨ 加這行！！同步更新航線！！
+          }
+        });
+    
+      d3.select('#slider')
+        .append('svg')
+        .attr('width', 340)
+        .attr('height', 70)
+        .append('g')
+        .attr('transform', 'translate(30,30)')
+        .call(slider);
+
+        
+    </script>
+
+    <script>
+      // 網站一開啟時自動觸發預設年份
+      window.addEventListener("load", () => {
+        const component = document.querySelector('[world-countries]').components['world-countries'];
+        if (component && component.updateMapByYear) {
+          component.updateMapByYear("2022");
+        }
+      });
+    </script>
+
+
+    <script>
+      document.addEventListener("mousemove", function (e) {
+        const tooltipEl = document.querySelector("#country-tooltip");
+        if (tooltipEl && tooltipEl.style.opacity !== "0") {
+          tooltipEl.style.left = e.clientX + 15 + "px";
+          tooltipEl.style.top = e.clientY + 15 + "px";
+        }
+      });
+    </script>
+
+    <script>
+      // 和 country-tooltip 同樣的滑鼠移動邏輯
+      document.addEventListener('mousemove', e => {
+        const tt = document.getElementById('marker-tooltip');
+        if (tt.style.opacity !== '0') {
+          tt.style.left = e.clientX + 15 + 'px';
+          tt.style.top = e.clientY + 15 + 'px';
+        }
+      });
+    </script>
+
+    
+
+    <script>
+      let emissionData = {};
+      d3.csv("resources/dataset/01_CO2_emission_2013-2024/aviation_emission_wide.csv").then(rawData => {
+        // 整理成每個國家的資料：{ Code: [ {year: 2013, value: ...}, ... ] }
+        rawData.forEach(row => {
+          const code = row.Code;
+          const yearlyData = Object.entries(row)
+            .filter(([key, val]) => key !== "Code" && val !== "")
+            .map(([year, val]) => ({
+              year: +year,
+              value: +val
+            }));
+          emissionData[code] = yearlyData;
+        });
+
+        // 初始化折線圖：顯示 OWID_WRL
+        updateLineChart("OWID_WRL");
+      });
+    </script>
+
+    <script>
+      function updateLineChart(countryCode, countryName = "World") {
+        const data = emissionData[countryCode];
+        if (!data) return;
+        
+        document.getElementById("chart-country-name").textContent = countryName;
+
+
+        const svg = d3.select("#line-chart-container svg");
+        svg.selectAll("*").remove(); // 清空原圖
+
+        const margin = {top: 10, right: 20, bottom: 25, left: 40},
+              width = 300 - margin.left - margin.right,
+              height = 160 - margin.top - margin.bottom;
+
+        const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+        const x = d3.scaleLinear()
+                    .domain([2013, 2024])
+                    .range([0, width]);
+
+        const y = d3.scaleLinear()
+                    .domain([0, d3.max(data, d => d.value)])
+                    .range([height, 0]);
+
+        const line = d3.line()
+                      .x(d => x(d.year))
+                      .y(d => y(d.value))
+                      .curve(d3.curveMonotoneX);
+
+        g.append("g").attr("transform", `translate(0,${height})`).call(d3.axisBottom(x).ticks(6).tickFormat(d3.format("d")));
+        g.append("g").call(
+        d3.axisLeft(y)
+          .ticks(4)
+          .tickFormat(d => d3.format(".0s")(d).replace("k", "k t"))  // 保留 k, 可加自定義字尾
+          .tickFormat(d => d3.format(".0s")(d).replace("M", "M t"))  // 保留 k, 可加自定義字尾
+        );
+
+        g.append("path")
+          .datum(data)
+          .attr("fill", "none")
+          .attr("stroke", "#4fc3f7")
+          .attr("stroke-width", 2)
+          .attr("d", line);
+      }
+    </script>
+
+    <script>
+      document.getElementById("toggle-emissions").addEventListener("change", function (e) {
+        const enabled = e.target.checked;
+        const globeEl = document.querySelector("#globeID");
+        const component = document.querySelector("[world-countries]")?.components["world-countries"];
+
+        if (!component || !globeEl) return;
+
+        if (enabled) {
+          // 重新設定 polygon 資料並上色
+          d3.json("./resources/ne_110m_admin_0_countries.geojson").then(data => {
+            globeEl.setAttribute('globe', 'polygonsData', data.features);
+            component.updateMapByYear(window.currentYear || "2022");
+          });
+        } else {
+          // 移除所有 polygons（讓地圖不顯示任何色塊）
+          globeEl.setAttribute("globe", {
+              polygonCapColor: () => "rgba(255, 255, 255, 0.04)"
+            });
+          
+        }
+      });
+    </script>
+
+    <script>
+      const markersEl = document.querySelector('#aircraftMarkers');
+      const sw1 = document.getElementById('toggle-reg-1');
+      const sw2 = document.getElementById('toggle-reg-2');
+
+      function updateAircraft() {
+        let ds = '';             // 預設關閉
+        if (sw1.checked) ds = 'total';
+        else if (sw2.checked) ds = 'private';
+
+        // 一旦改 dataset，就會觸發 component.update() → updateMarkers()
+        markersEl.setAttribute('aircraft-markers', 'dataset', ds);
+      }
+
+      // 兩個 switch 都用同一個 handler
+      sw1.addEventListener('change', () => {
+        if (sw1.checked) sw2.checked = false;
+        updateAircraft();
+      });
+      sw2.addEventListener('change', () => {
+        if (sw2.checked) sw1.checked = false;
+        updateAircraft();
+      });
+    </script>
+
+    <script>
+      function setLegendVisibility(el, visible) {
+        if (visible) {
+          el.style.display = 'flex'; // 顯示出來（flex 讓 layout保持）
+          requestAnimationFrame(() => {
+            el.style.opacity = '1';  // 下一個 frame 再淡入，避免直接跳
+          });
+        } else {
+          el.style.opacity = '0';
+          // 等 transition 動畫跑完再隱藏
+          setTimeout(() => {
+            if (el.style.opacity === '0') {
+              el.style.display = 'none';
+            }
+          }, 400); // 和你的 CSS transition: opacity 0.4s 對齊
+        }
+      }
+
+      function updateLegend() {
+        const emissionOn = document.getElementById('toggle-emissions')?.checked;
+        const reg1On = document.getElementById('toggle-reg-1')?.checked;
+        const reg2On = document.getElementById('toggle-reg-2')?.checked;
+        const flightType = document.getElementById('flightSelect')?.value;
+
+        const legendEmission = document.getElementById('legend-emission');
+        const legendAircraft = document.getElementById('legend-aircraft');
+        const legendFlightpath = document.getElementById('legend-flightpath');
+
+        setLegendVisibility(legendEmission, emissionOn);
+        setLegendVisibility(legendAircraft, reg1On || reg2On);
+        setLegendVisibility(legendFlightpath, flightType === 'private'|| flightType === 'commercial');
+      }
+
+      document.getElementById('toggle-emissions')?.addEventListener('change', updateLegend);
+      document.getElementById('toggle-reg-1')?.addEventListener('change', updateLegend);
+      document.getElementById('toggle-reg-2')?.addEventListener('change', updateLegend);
+      document.getElementById('flightSelect')?.addEventListener('change', updateLegend);
+
+      window.addEventListener('load', updateLegend);
+    </script>
+
+    <!-- <script>
+    let autoRotatePausedByUser = false;
+    let autoRotateTimeout = null;
+    let orbitControls = null;
+
+    // 初始化找到 orbit-controls
+    window.addEventListener('load', () => {
+      const userEntity = document.getElementById('user');
+      orbitControls = userEntity.components['orbit-controls']?.controls;
+
+      const toggleBtn = document.getElementById('toggle-rotation');
+
+      // ⭐ 點按鈕手動暫停/啟動
+      toggleBtn.addEventListener('click', () => {
+        if (!orbitControls) return;
+        
+        autoRotatePausedByUser = !autoRotatePausedByUser;
+        orbitControls.autoRotate = !autoRotatePausedByUser;
+        toggleBtn.textContent = autoRotatePausedByUser ? "Resume Rotation" : "Pause Rotation";
+      });
+
+      // ⭐ 使用者滑鼠操作時暫停（10秒內恢復）
+      function userInteracted() {
+        if (!orbitControls) return;
+
+        orbitControls.autoRotate = false;
+        if (autoRotateTimeout) clearTimeout(autoRotateTimeout);
+
+        if (!autoRotatePausedByUser) {
+          autoRotateTimeout = setTimeout(() => {
+            orbitControls.autoRotate = true;
+          }, 10000); // 10秒後自動恢復
+        }
+      }
+
+      // 監聽滑鼠點擊和觸控
+      document.addEventListener('mousedown', userInteracted);
+      document.addEventListener('touchstart', userInteracted);
+    });
+    </script> -->
+
+    
+<script>
+document.querySelector('#flightSelect')?.addEventListener('change', e => {
+  const selected = e.target.value || "";
+
+  const legend = document.getElementById('legend-flightpath');
+  const gradientBar = document.getElementById('legend-gradient');
+  const label = document.getElementById('legend-flightpath-label'); // ⭐ 小字
+
+  if (!legend || !gradientBar || !label) return; // 保險
+
+  if (selected === 'private') {
+    legend.style.display = "flex";
+    gradientBar.style.background = "linear-gradient(to right, white, red)";
+    gradientBar.style.height = "3px";
+    gradientBar.style.width = "100%";
+    gradientBar.style.borderRadius = "7px";
+    label.textContent = "Private Flight Path Intensity"; // ⭐小字
+  } else if (selected === 'commercial') {
+    legend.style.display = "flex";
+    gradientBar.style.background = "linear-gradient(to right, white, blue)";
+    gradientBar.style.height = "3px";
+    gradientBar.style.width = "100%";
+    gradientBar.style.borderRadius = "7px";
+    label.textContent = "Commercial Flight Path Intensity"; // ⭐小字
+  } else {
+    legend.style.display = "none"; // None時隱藏
+  }
+});
+
+
+// 🔥 監聽兩個開關 toggle-reg-1 / toggle-reg-2
+document.getElementById('toggle-reg-1')?.addEventListener('change', e => {
+  updateAircraftLegend();
+});
+document.getElementById('toggle-reg-2')?.addEventListener('change', e => {
+  updateAircraftLegend();
+});
+
+// 🔥 實作 updateAircraftLegend
+function updateAircraftLegend() {
+  const legend = document.getElementById('legend-aircraft');
+  const gradientBar = document.getElementById('legend-aircraft-gradient');
+  const label = document.getElementById('legend-aircraft-label'); // ⭐️小字
+
+  if (!legend || !gradientBar || !label) return; // 防錯
+
+  const isTotalOn = document.getElementById('toggle-reg-1')?.checked;
+  const isPrivateOn = document.getElementById('toggle-reg-2')?.checked;
+
+  if (isTotalOn) {
+    legend.style.display = "flex";
+    gradientBar.style.background = "linear-gradient(to right, white, rgb(53, 182, 230))"; // total藍色
+    label.textContent = "Total Registered Aircraft Amount"; // ⭐️小字改成total
+  } else if (isPrivateOn) {
+    legend.style.display = "flex";
+    gradientBar.style.background = "linear-gradient(to right, white, red)"; // private紅色
+    label.textContent = "Registered Private Jets Amount"; // ⭐️小字改成private
+  } else {
+    legend.style.display = "none";
+  }
+}
+
+
+</script>
+   
+  </body>
+
+</html>

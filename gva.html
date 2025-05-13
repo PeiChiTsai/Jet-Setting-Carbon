@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset='utf-8' />
+  <title>Geneva Airport Flight Network</title>
+  <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet" />
+  <style>
+    body { margin:0; padding:0; }
+    #map { position:absolute; top:0; bottom:0; width:100%; }
+    .legend {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      background: #111;
+      color: #fff;
+      padding: 10px;
+      font-size: 12px;
+      border-radius: 8px;
+      z-index: 10;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    }
+    .legend .line-sample {
+      width: 40px;
+      height: 3px;
+      margin: 4px 0;
+      display: inline-block;
+    }
+    .legend label {
+      display: block;
+      margin: 5px 0;
+    }
+    #chart-box {
+      position: absolute;
+      left: 20px;
+      bottom: 20px;
+      width: 500px;
+      background: #111;
+      color: white;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 13px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+      z-index: 10;
+    }
+    #chart-select {
+      background: #222;
+      color: #fff;
+      padding: 4px;
+      margin-bottom: 8px;
+      width: 100%;
+    }
+    svg { width: 100%; height: 300px; }
+    .axis-label, .tick text { font-size: 11px; fill: #eee; }
+  </style>
+</head>
+<body>
+<div id="map"></div>
+<div class="legend">
+  <label><input type="checkbox" id="toggleCivil" checked> Civil Flights</label>
+  <label><input type="checkbox" id="togglePrivate"> Private Flights</label>
+<button onclick="toggleChart()">Toggle Chart</button>
+
+  <hr>
+  <div><b>Legend</b></div>
+  <div><span class="line-sample" style="background:#66c2a5;"></span> Civil Route</div>
+  <div><span class="line-sample" style="background:#fc8d62;"></span> Private Jet</div>
+  <div><span class="line-sample" style="background:#ffff00;"></span> Private > 500</div>
+</div>
+<div id="chart-box">
+  <select id="chart-select">
+    <option value="flight_count">Top 10 by Flight Count</option>
+    <option value="total_emissions_kt">Top 10 by Emissions</option>
+  </select>
+  <div id="bar-chart"></div>
+</div>
+<script>
+mapboxgl.accessToken = 'pk.eyJ1IjoiaWVtb24iLCJhIjoiY201eTJ5OHQ5MDI2azJzc2Myd2tqcjdkdyJ9.HnSzYpnN2ZdrauoEIHL-Pg';
+const map = new mapboxgl.Map({
+  container: 'map',
+  style: 'mapbox://styles/mapbox/dark-v11',
+  center: [6.109, 46.238],
+  zoom: 4.5
+});
+
+map.on('load', () => {
+  map.addSource('civil_routes', { type: 'vector', url: 'mapbox://iemon.bv34j20f' });
+  map.addLayer({
+    id: 'civil-lines', type: 'line', source: 'civil_routes',
+    'source-layer': 'gva_flight_routes-dbz7jr', layout: { visibility: 'visible' },
+    paint: {
+      'line-color': '#66c2a5', 'line-width': ['interpolate', ['linear'], ['get', 'flight_count'], 1, 0.5, 100, 5], 'line-opacity': 0.7
+    }
+  });
+  map.addSource('private_routes', { type: 'vector', url: 'mapbox://iemon.cb9eylv1' });
+  map.addLayer({
+    id: 'private-lines', type: 'line', source: 'private_routes',
+    'source-layer': 'gva_filtered_routes-6ti85l', layout: { visibility: 'none' },
+    filter: ['<', ['get', 'flight_count'], 500],
+    paint: {
+      'line-color': '#fc8d62', 'line-width': ['interpolate', ['linear'], ['get', 'flight_count'], 1, 0.5, 100, 6], 'line-opacity': 0.7
+    }
+  });
+  map.addLayer({
+    id: 'private-lines-500plus', type: 'line', source: 'private_routes',
+    'source-layer': 'gva_filtered_routes-6ti85l', layout: { visibility: 'none' },
+    filter: ['>=', ['get', 'flight_count'], 500],
+    paint: { 'line-color': '#ffff00', 'line-width': 6, 'line-opacity': 0.9 }
+  });
+
+  map.on('click', ['civil-lines', 'private-lines', 'private-lines-500plus'], (e) => {
+    const p = e.features[0].properties;
+    new mapboxgl.Popup().setLngLat(e.lngLat).setHTML(`<strong>${p.origin || 'GVA'} → ${p.destination}</strong><br>Flights: ${p.flight_count}`).addTo(map);
+  });
+
+  document.getElementById('toggleCivil').addEventListener('change', e => map.setLayoutProperty('civil-lines', 'visibility', e.target.checked ? 'visible' : 'none'));
+  document.getElementById('togglePrivate').addEventListener('change', e => {
+    const vis = e.target.checked ? 'visible' : 'none';
+    map.setLayoutProperty('private-lines', 'visibility', vis);
+    map.setLayoutProperty('private-lines-500plus', 'visibility', vis);
+  });
+});
+
+
+function drawBarChart(metric) {
+  d3.csv('https://raw.githubusercontent.com/SkyGarry/03vis/main/Standardized_GVA_Destinations.csv').then(data => {
+    const top = data.map(d => ({
+      destination_city: d.destination_city,
+      value: metric === 'total_emissions_kt' ? (+d[metric] / 1000) : +d[metric]
+    })).sort((a, b) => b.value - a.value).slice(0, 10);
+
+    const xLabel = metric === 'total_emissions_kt' ? 'CO₂ Emissions (kt)' : 'Flight Count';
+
+    d3.select('#bar-chart').selectAll('*').remove();
+    const svg = d3.select('#bar-chart').append('svg'),
+          margin = {top: 20, right: 20, bottom: 40, left: 100},
+          width = 480 - margin.left - margin.right,
+          height = 300 - margin.top - margin.bottom,
+          g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`);
+
+    const x = d3.scaleLinear().domain([0, d3.max(top, d => d.value)]).range([0, width]);
+    const y = d3.scaleBand().domain(top.map(d => d.destination_city)).range([0, height]).padding(0.2);
+
+    g.append('g').call(d3.axisLeft(y));
+    g.append('g')
+      .attr('transform', `translate(0,${height})`)
+      .call(d3.axisBottom(x))
+      .append('text')
+      .attr('x', width)
+      .attr('y', 30)
+      .attr('fill', '#fff')
+      .attr('text-anchor', 'end')
+      .text(xLabel);  
+
+    g.selectAll('rect')
+      .data(top)
+      .enter()
+      .append('rect')
+      .attr('y', d => y(d.destination_city))
+      .attr('width', d => x(d.value))
+      .attr('height', y.bandwidth())
+      .attr('fill', '#80b1d3');
+  });
+}
+
+
+
+drawBarChart('flight_count');
+document.getElementById('chart-select').addEventListener('change', e => drawBarChart(e.target.value));
+
+    function toggleChart() {
+  const chartBox = document.getElementById('chart-box');
+  chartBox.style.display = chartBox.style.display === 'none' ? 'block' : 'none';
+}
+
+</script>
+</body>
+</html>

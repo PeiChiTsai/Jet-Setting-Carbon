@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset='utf-8' />
+  <title>Airport Emissions Map (Vector Tileset)</title>
+  <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet" />
+  <style>
+    body { margin:0; padding:0; font-family: sans-serif; }
+    #map { position:absolute; top:0; bottom:0; width:100%; }
+    .map-overlay {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: #111;
+      color: #fff;
+      padding: 14px;
+      border-radius: 10px;
+      font-size: 13px;
+      z-index: 10;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    }
+    .map-overlay h3 {
+      margin: 0 0 10px;
+      font-size: 15px;
+    }
+    .map-overlay label {
+      display: block;
+      margin-bottom: 6px;
+    }
+    .map-overlay input[type=range] {
+      width: 100%;
+    }
+    #chart {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      width: 540px;
+      background: #111;
+      color: white;
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    }
+    #chart-selector {
+      margin-bottom: 10px;
+      background: #222;
+      color: #fff;
+      border: 1px solid #444;
+      padding: 4px;
+    }
+    svg { width: 100%; height: 340px; }
+    .axis-label, .tick text { font-size: 11px; fill: #eee; }
+    .legend-box {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      background: #111;
+      color: #fff;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+      width: 160px;
+      z-index: 10;
+    }
+    .legend-box .gradient-bar {
+      width: 100%;
+      height: 10px;
+      background: linear-gradient(to right, #8dd3c7, #ffffb3, #fb8072);
+      margin: 4px 0;
+    }
+    .legend-box .labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+    }
+  .legend-box .gradient-bar {
+  width: 100%;
+  height: 10px;
+  background: linear-gradient(to right, #8dd3c7, #ffffb3, #fb8072);
+  margin: 4px 0;
+}
+.legend-box .labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+}
+
+  </style>
+</head>
+<body>
+<div id='map'></div>
+<div class='map-overlay'>
+  <h3>CO₂ Emissions</h3>
+  <label>Year: <span id="yearLabel">2019</span></label>
+  <input type="range" id="yearSlider" min="2019" max="2024" value="2019">
+  <label><input type="checkbox" id="toggleHeat" checked> Show Heatmap</label>
+  <label><input type="radio" name="sizeby" value="co2" checked> Size by CO₂</label>
+  <label><input type="radio" name="sizeby" value="FLT_TOT_1"> Size by Flights</label>
+  <button onclick="toggleChart()">Toggle Chart</button>
+</div>
+<div id="chart">
+  <select id="chart-selector">
+    <option value="comm">Commercial CO₂</option>
+    <option value="priv">Private Jet CO₂</option>
+  </select>
+</div>
+<div class="legend-box">
+  <b id="legend-title">Legend</b>
+  <div class="gradient-bar"></div>
+  <div class="labels">
+    <span>Low</span>
+    <span>High</span>
+  </div>
+</div>
+
+<script>
+mapboxgl.accessToken = 'pk.eyJ1IjoiaWVtb24iLCJhIjoiY201eTJ5OHQ5MDI2azJzc2Myd2tqcjdkdyJ9.HnSzYpnN2ZdrauoEIHL-Pg';
+
+const map = new mapboxgl.Map({
+  container: 'map',
+  style: 'mapbox://styles/mapbox/dark-v11',
+  center: [10, 50],
+  zoom: 4
+});
+
+let currentYear = 2019;
+let currentSizeField = 'co2';
+
+map.on('load', () => {
+  map.addSource('airports', {
+    type: 'vector',
+    url: 'mapbox://iemon.25d7i68u'
+  });
+
+  map.addLayer({
+    id: 'heat',
+    type: 'heatmap',
+    source: 'airports',
+    'source-layer': 'europe_airports_co2_verified-blzjja',
+    paint: {
+      'heatmap-weight': ['get', 'co2'],
+      'heatmap-radius': 30,
+      'heatmap-opacity': 0.6,
+      'heatmap-color': [
+        'interpolate', ['linear'], ['heatmap-density'],
+        0, 'rgba(0,0,0,0)',
+        0.2, '#1f78b4',
+        0.4, '#a6cee3',
+        0.6, '#fdbf6f',
+        0.8, '#fb9a99',
+        1, '#e31a1c'
+      ]
+    },
+    layout: { visibility: 'visible' }
+  });
+
+  map.addLayer({
+    id: 'circles',
+    type: 'circle',
+    source: 'airports',
+    'source-layer': 'europe_airports_co2_verified-blzjja',
+    paint: {
+      'circle-radius': [
+        'case',
+        ['==', currentSizeField, 'FLT_TOT_1'],
+        ['interpolate', ['linear'], ['get', 'FLT_TOT_1'], 0, 6, 1000000, 60],
+        ['interpolate', ['linear'], ['get', 'co2'], 0, 8, 1000, 28]
+      ],
+      'circle-color': [
+        'interpolate', ['linear'], ['get', 'co2'],
+        0, '#8dd3c7',
+        500, '#ffffb3',
+        1000, '#fb8072'
+      ],
+      'circle-stroke-color': '#ffffff',
+      'circle-stroke-width': 1.2,
+      'circle-opacity': 0.25
+    },
+    layout: { visibility: 'none' },
+    filter: ['==', ['get', 'YEAR'], currentYear]
+  });
+
+  map.on('click', 'circles', (e) => {
+    const props = e.features[0].properties;
+    new mapboxgl.Popup()
+      .setLngLat(e.lngLat)
+      .setHTML(`<strong>${props.APT_NAME}</strong><br>
+        Country: ${props.STATE_NAME}<br>
+        Year: ${props.YEAR}<br>
+        CO₂: ${props.co2} kt<br>
+        Flights: ${props.FLT_TOT_1}`)
+      .addTo(map);
+  });
+
+  document.getElementById('toggleHeat').addEventListener('change', (e) => {
+    const visible = e.target.checked;
+    map.setPaintProperty('heat', 'heatmap-opacity', visible ? 0.6 : 0);
+    map.setLayoutProperty('circles', 'visibility', visible ? 'none' : 'visible');
+  });
+
+  document.getElementById('yearSlider').addEventListener('input', (e) => {
+    const year = +e.target.value;
+    currentYear = year;
+    document.getElementById('yearLabel').textContent = year;
+    drawChart(year);
+    map.setFilter('heat', ['==', ['get', 'YEAR'], year]);
+    map.setFilter('circles', ['==', ['get', 'YEAR'], year]);
+  });
+
+  document.querySelectorAll('input[name="sizeby"]').forEach(radio => {
+    radio.addEventListener('change', function(e) {
+      currentSizeField = e.target.value;
+      map.setPaintProperty('circles', 'circle-radius',
+        currentSizeField === 'FLT_TOT_1'
+        ? ['interpolate', ['linear'], ['get', 'FLT_TOT_1'], 0, 6, 1000000, 60]
+        : ['interpolate', ['linear'], ['get', 'co2'], 0, 8, 1000, 28]
+      );
+    });
+  });
+
+  document.getElementById("chart-selector").addEventListener("change", function() {
+    drawChart(currentYear);
+  });
+
+  drawChart(currentYear);
+});
+
+function toggleChart() {
+  const chart = document.getElementById('chart');
+  chart.style.display = chart.style.display === 'none' ? 'block' : 'none';
+}
+
+function drawChart(year) {
+  const selected = document.getElementById('chart-selector').value;
+  const url = selected === 'comm'
+    ? 'https://raw.githubusercontent.com/SkyGarry/03vis/main/finalmatched_europe.csv'
+    : 'https://raw.githubusercontent.com/SkyGarry/03vis/main/private_jet_stats_matched_by_year_airport.csv';
+
+  d3.csv(url).then(data => {
+    const filtered = data.filter(d => +d.YEAR === year);
+    const key = selected === 'comm' ? 'co2(kt)' : 'private_co2_emission(kt)';
+    const sorted = filtered.sort((a, b) => +b[key] - +a[key]).slice(0, 10);
+
+    d3.select("#chart").selectAll("svg").remove();
+    const svg = d3.select("#chart").append("svg"),
+          margin = {top: 20, right: 20, bottom: 50, left: 120},
+          width = 520 - margin.left - margin.right,
+          height = 320 - margin.top - margin.bottom;
+
+    const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+    const y = d3.scaleBand()
+      .domain(sorted.map(d => d.APT_NAME))
+      .range([0, height])
+      .padding(0.2);
+
+    const x = d3.scaleLinear()
+      .domain([0, d3.max(sorted, d => +d[key])])
+      .range([0, width]);
+
+    g.append("g")
+      .call(d3.axisLeft(y))
+      .selectAll("text")
+      .style("text-anchor", "end")
+      .attr("dx", "-0.4em");
+
+    g.append("g")
+      .attr("transform", `translate(0,${height})`)
+      .call(d3.axisBottom(x))
+      .append("text")
+      .attr("x", width)
+      .attr("y", -6)
+      .attr("fill", "#fff")
+      .attr("text-anchor", "end")
+      .text("kt CO₂");
+
+    g.selectAll("rect")
+      .data(sorted)
+      .enter()
+      .append("rect")
+      .attr("x", 0)
+      .attr("y", d => y(d.APT_NAME))
+      .attr("width", d => x(+d[key]))
+      .attr("height", y.bandwidth())
+      .attr("fill", selected === 'comm' ? '#80b1d3' : '#fb8072');
+  });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,37 @@
+{
+  "chart": {
+    "title": "Annual CO₂ emissions from aviation",
+    "note": "Data on aviation emissions is missing for some countries, so actual global and regional emissions are higher. Regional emissions are shown to highlight trends over time and should not be compared.",
+    "citation": "OECD (2025)",
+    "originalChartUrl": "https://ourworldindata.org/grapher/annual-co-emissions-from-aviation?v=1&csvType=full&useColumnShortNames=false",
+    "selection": [
+      "Turkey",
+      "Egypt",
+      "Greece",
+      "Portugal"
+    ]
+  },
+  "columns": {
+    "Total annual CO₂ emissions from aviation": {
+      "titleShort": "Total annual CO₂ emissions from aviation",
+      "titleLong": "Total annual CO₂ emissions from aviation",
+      "descriptionShort": "Includes emissions from both domestic and international aviation. International aviation emissions are assigned to the country of departure. CO₂ emissions from commercial passenger flights only.",
+      "descriptionKey": [
+        "This data isn’t seasonally adjusted—summer travel increases emissions, but the actual impact may be lower as Northern Hemisphere plants absorb more CO₂ during this time."
+      ],
+      "shortUnit": "t",
+      "unit": "tonnes",
+      "timespan": "2013-2024",
+      "type": "Numeric",
+      "owidVariableId": 1015486,
+      "shortName": "total_annual_emissions",
+      "lastUpdated": "2025-03-11",
+      "nextUpdate": "2026-03-11",
+      "citationShort": "OECD (2025) – processed by Our World in Data",
+      "citationLong": "OECD (2025) – processed by Our World in Data. “Total annual CO₂ emissions from aviation” [dataset]. OECD, “Air transport CO2 emissions (experimental)” [original data].",
+      "fullMetadata": "https://api.ourworldindata.org/v1/indicators/1015486.metadata.json"
+    }
+  },
+  "dateDownloaded": "2025-04-08",
+  "activeFilters": {}
+}

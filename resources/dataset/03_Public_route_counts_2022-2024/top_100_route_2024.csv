@@ -1,0 +1,101 @@
+city pair,city1,pt1_lat,pt1_lon,country1,region1,city2,pt2_lat,pt2_lon,country2,region2,count
+Jeju-Seoul,Jeju,33.4996,126.5312,South Korea,Asia/Pacific,Seoul,37.5665,126.978,South Korea,Asia/Pacific,226
+Melbourne-Sydney,Melbourne,-37.8136,144.9631,Australia,Asia/Pacific,Sydney,-33.8688,151.2093,Australia,Asia/Pacific,157
+Rio de Janeiro-Sao Paulo,Rio de Janeiro,-22.9068,-43.1729,Brazil,South-Atlantic,Sao Paulo,-23.5505,-46.6333,Brazil,South-Atlantic,152
+Sapporo-Tokyo,Sapporo,43.0667,141.35,Japan,Asia/Pacific,Tokyo,35.6828,139.7595,Japan,Asia/Pacific,147
+Fukuoka-Tokyo,Fukuoka,33.5902,130.4017,Japan,Asia/Pacific,Tokyo,35.6828,139.7595,Japan,Asia/Pacific,137
+Jeddah-Riyadh,Jeddah,21.5433,39.1728,Saudi Arabia,Middle-East,Riyadh,24.7136,46.6753,Saudi Arabia,Middle-East,131
+Chicago-New York,Chicago,41.8781,-87.6298,United States,North Atlantic,New York,40.7128,-74.006,United States,North Atlantic,127
+Bogota-Medellin,Bogota,4.711,-74.0721,Colombia,South-Atlantic,Medellin,6.2442,-75.5812,Colombia,South-Atlantic,121
+Beijing-Shanghai,Beijing,39.9042,116.4074,China,Asia/Pacific,Shanghai,31.2304,121.4737,China,Asia/Pacific,118
+Moscow-St. Petersburg,Moscow,55.7558,37.6173,Russian Federation,Other Europe,St. Petersburg,59.9343,30.3351,Russian Federation,Other Europe,117
+Delhi-Mumbai,Delhi,28.6139,77.209,India,Asia/Pacific,Mumbai,19.076,72.8777,India,Asia/Pacific,116
+Shanghai-Shenzhen,Shanghai,31.2304,121.4737,China,Asia/Pacific,Shenzhen,22.5431,114.0579,China,Asia/Pacific,112
+Hanoi-Ho Chi Minh City,Hanoi,21.0285,105.8542,Vietnam,Asia/Pacific,Ho Chi Minh City,10.8231,106.6297,Vietnam,Asia/Pacific,107
+Beijing-Chengdu,Beijing,39.9042,116.4074,China,Asia/Pacific,Chengdu,30.5728,104.0668,China,Asia/Pacific,106
+Dallas-Houston,Dallas,32.7767,-96.797,United States,North Atlantic,Houston,29.7604,-95.3698,United States,North Atlantic,105
+Cape Town-Johannesburg,Cape Town,-33.9249,18.4241,South Africa,Southern Africa,Johannesburg,-26.2041,28.0473,South Africa,Southern Africa,104
+Osaka-Tokyo,Osaka,34.6937,135.5023,Japan,Asia/Pacific,Tokyo,35.6828,139.7595,Japan,Asia/Pacific,104
+Seoul-Tokyo,Seoul,37.5665,126.978,South Korea,Asia/Pacific,Tokyo,35.6828,139.7595,Japan,Asia/Pacific,103
+Boston-New York,Boston,42.3601,-71.0589,United States,North Atlantic,New York,40.7128,-74.006,United States,North Atlantic,101
+New York-Toronto,New York,40.7128,-74.006,United States,North Atlantic,Toronto,43.6511,-79.347,Canada,North Atlantic,101
+Bangkok-Phuket,Bangkok,13.7563,100.5018,Thailand,Asia/Pacific,Phuket,7.8804,98.3923,Thailand,Asia/Pacific,99
+Guangzhou-Shanghai,Guangzhou,23.1291,113.2644,China,Asia/Pacific,Shanghai,31.2304,121.4737,China,Asia/Pacific,99
+Atlanta-New York,Atlanta,33.749,-84.388,United States,North Atlantic,New York,40.7128,-74.006,United States,North Atlantic,97
+Beijing-Shenzhen,Beijing,39.9042,116.4074,China,Asia/Pacific,Shenzhen,22.5431,114.0579,China,Asia/Pacific,96
+Bangkok-Chiang Mai,Bangkok,13.7563,100.5018,Thailand,Asia/Pacific,Chiang Mai,18.7883,98.9853,Thailand,Asia/Pacific,93
+Kuala Lumpur-Singapore,Kuala Lumpur,3.139,101.6869,Malaysia,Asia/Pacific,Singapore,1.3521,103.8198,Singapore,Asia/Pacific,93
+Dublin-London,Dublin,53.3498,-6.2603,Ireland,ECAC,London,51.5072,-0.1276,United Kingdom,ECAC,91
+Denpasar-Jakarta,Denpasar,-8.65,115.2167,Indonesia,Asia/Pacific,Jakarta,-6.2088,106.8456,Indonesia,Asia/Pacific,89
+Chengdu-Shanghai,Chengdu,30.5728,104.0668,China,Asia/Pacific,Shanghai,31.2304,121.4737,China,Asia/Pacific,89
+New York-Orlando,New York,40.7128,-74.006,United States,North Atlantic,Orlando,28.5383,-81.3792,United States,North Atlantic,88
+Brisbane-Sydney,Brisbane,-27.4698,153.0251,Australia,Asia/Pacific,Sydney,-33.8688,151.2093,Australia,Asia/Pacific,88
+Hong Kong-Taipei,Hong Kong,22.3193,114.1694,Hong Kong,Asia/Pacific,Taipei,25.033,121.5654,"Taiwan, Province of China",Asia/Pacific,87
+Los Angeles-New York,Los Angeles,34.0522,-118.2437,United States,North Atlantic,New York,40.7128,-74.006,United States,North Atlantic,86
+Honolulu-Kahului,Honolulu,21.3069,-157.8583,United States,Asia/Pacific,Kahului,20.889,-156.4729,United States,Asia/Pacific,86
+Miami-New York,Miami,25.7617,-80.1918,United States,North Atlantic,New York,40.7128,-74.006,United States,North Atlantic,85
+Okinawa-Tokyo,Okinawa,26.2124,127.6809,Japan,Asia/Pacific,Tokyo,35.6828,139.7595,Japan,Asia/Pacific,84
+Amsterdam-London,Amsterdam,52.3676,4.9041,Netherlands,ECAC,London,51.5072,-0.1276,United Kingdom,ECAC,84
+New York-Washington,New York,40.7128,-74.006,United States,North Atlantic,Washington,38.8951,-77.0364,United States,North Atlantic,84
+Montreal-Toronto,Montreal,45.5017,-73.5673,Canada,North Atlantic,Toronto,43.6511,-79.347,Canada,North Atlantic,82
+Bogota-Cali,Bogota,4.711,-74.0721,Colombia,South-Atlantic,Cali,3.4516,-76.532,Colombia,South-Atlantic,81
+Brasilia-Sao Paulo,Brasilia,-15.7939,-47.8828,Brazil,South-Atlantic,Sao Paulo,-23.5505,-46.6333,Brazil,South-Atlantic,80
+Belo Horizonte-Sao Paulo,Belo Horizonte,-19.9167,-43.9345,Brazil,South-Atlantic,Sao Paulo,-23.5505,-46.6333,Brazil,South-Atlantic,80
+Jakarta-Surabaya,Jakarta,-6.2088,106.8456,Indonesia,Asia/Pacific,Surabaya,-7.2504,112.7688,Indonesia,Asia/Pacific,79
+Cancun-Mexico City,Cancun,21.1619,-86.8515,Mexico,Mid-Atlantic,Mexico City,19.4326,-99.1332,Mexico,Mid-Atlantic,78
+Beijing-Guangzhou,Beijing,39.9042,116.4074,China,Asia/Pacific,Guangzhou,23.1291,113.2644,China,Asia/Pacific,78
+Bengaluru-Delhi,Bengaluru,12.9716,77.5946,India,Asia/Pacific,Delhi,28.6139,77.209,India,Asia/Pacific,77
+Osaka-Seoul,Osaka,34.6937,135.5023,Japan,Asia/Pacific,Seoul,37.5665,126.978,South Korea,Asia/Pacific,76
+Fort Lauderdale-New York,Fort Lauderdale,26.1224,-80.1373,United States,North Atlantic,New York,40.7128,-74.006,United States,North Atlantic,75
+Dallas-New York,Dallas,32.7767,-96.797,United States,North Atlantic,New York,40.7128,-74.006,United States,North Atlantic,73
+Charlotte-New York,Charlotte,35.2271,-80.8431,United States,North Atlantic,New York,40.7128,-74.006,United States,North Atlantic,73
+Cebu-Manila,Cebu,10.3157,123.8854,Philippines,Asia/Pacific,Manila,14.5995,120.9842,Philippines,Asia/Pacific,73
+Bogota-Cartagena,Bogota,4.711,-74.0721,Colombia,South-Atlantic,Cartagena,10.391,-75.4794,Colombia,South-Atlantic,73
+Beijing-Hangzhou,Beijing,39.9042,116.4074,China,Asia/Pacific,Hangzhou,30.2741,120.1551,China,Asia/Pacific,73
+Bengaluru-Mumbai,Bengaluru,12.9716,77.5946,India,Asia/Pacific,Mumbai,19.076,72.8777,India,Asia/Pacific,71
+Cusco-Lima,Cusco,-13.5319,-71.9675,Peru,South-Atlantic,Lima,-12.0464,-77.0428,Peru,South-Atlantic,70
+Brisbane-Melbourne,Brisbane,-27.4698,153.0251,Australia,Asia/Pacific,Melbourne,-37.8136,144.9631,Australia,Asia/Pacific,70
+Antalya-Istanbul,Antalya,36.8969,30.7133,T��,ECAC,Istanbul,41.0082,28.9784,T��,ECAC,69
+Los Angeles-San Francisco,Los Angeles,34.0522,-118.2437,United States,North Atlantic,San Francisco,37.7749,-122.4194,United States,North Atlantic,68
+Taipei-Tokyo,Taipei,25.033,121.5654,"Taiwan,������",Asia/Pacific,Tokyo,35.6828,139.7595,Japan,Asia/Pacific,68
+Honolulu-Lihue,Honolulu,21.3069,-157.8583,United States,Asia/Pacific,Lihue,21.9811,-159.371,United States,Asia/Pacific,67
+Moscow-Sochi,Moscow,55.7558,37.6173,Russian Federation,Other Europe,Sochi,43.6028,39.7342,Russian Federation,Other Europe,67
+Shanghai-Tokyo,Shanghai,31.2304,121.4737,China,Asia/Pacific,Tokyo,35.6828,139.7595,Japan,Asia/Pacific,67
+Las Vegas-Los Angeles,Las Vegas,36.1699,-115.1398,United States,North Atlantic,Los Angeles,34.0522,-118.2437,United States,North Atlantic,67
+Guadalajara-Mexico City,Guadalajara,20.6597,-103.3496,Mexico,Mid-Atlantic,Mexico City,19.4326,-99.1332,Mexico,Mid-Atlantic,67
+Jakarta-Singapore,Jakarta,-6.2088,106.8456,Indonesia,Asia/Pacific,Singapore,1.3521,103.8198,Singapore,Asia/Pacific,66
+Vancouver-Victoria,Vancouver,49.2827,-123.1207,Canada,North Atlantic,Victoria,48.4284,-123.3656,Canada,North Atlantic,66
+London-New York,London,51.5072,-0.1276,United Kingdom,ECAC,New York,40.7128,-74.006,United States,North Atlantic,65
+Edinburgh-London,Edinburgh,55.9533,-3.1883,United Kingdom,ECAC,London,51.5072,-0.1276,United Kingdom,ECAC,65
+Chicago-Dallas,Chicago,41.8781,-87.6298,United States,North Atlantic,Dallas,32.7767,-96.797,United States,North Atlantic,64
+Cairo-Jeddah,Cairo,30.0444,31.2357,Egypt,North-Africa,Jeddah,21.5433,39.1728,Saudi Arabia,Middle-East,64
+Mexico City-Monterrey,Mexico City,19.4326,-99.1332,Mexico,Mid-Atlantic,Monterrey,25.6866,-100.3161,Mexico,Mid-Atlantic,64
+Honolulu-Lanai,Honolulu,21.3069,-157.8583,United States,Asia/Pacific,Lanai,20.8275,-156.9207,United States,Asia/Pacific,64
+London-Milan,London,51.5072,-0.1276,United Kingdom,ECAC,Milan,45.4642,9.19,Italy,ECAC,64
+Dubai-Riyadh,Dubai,25.2769,55.2962,United Arab Emirates,Middle-East,Riyadh,24.7136,46.6753,Saudi Arabia,Middle-East,63
+Chengdu-Shenzhen,Chengdu,30.5728,104.0668,China,Asia/Pacific,Shenzhen,22.5431,114.0579,China,Asia/Pacific,63
+Anchorage-Kenai,Anchorage,61.2181,-149.9003,United States,North Atlantic,Kenai,60.5544,-151.2583,United States,North Atlantic,63
+Milan-Paris,Milan,45.4642,9.19,Italy,ECAC,Paris,48.8566,2.3522,France,ECAC,62
+Boston-Washington,Boston,42.3601,-71.0589,United States,North Atlantic,Washington,38.8951,-77.0364,United States,North Atlantic,62
+Hangzhou-Shenzhen,Hangzhou,30.2741,120.1551,China,Asia/Pacific,Shenzhen,22.5431,114.0579,China,Asia/Pacific,62
+Gran Canaria-Tenerife,Gran Canaria,28.1235,-15.4363,Spain,ECAC,Tenerife,28.2916,-16.6291,Spain,ECAC,62
+Curitiba-Sao Paulo,Curitiba,-25.4284,-49.2733,Brazil,South-Atlantic,Sao Paulo,-23.5505,-46.6333,Brazil,South-Atlantic,60
+Guangzhou-Hangzhou,Guangzhou,23.1291,113.2644,China,Asia/Pacific,Hangzhou,30.2741,120.1551,China,Asia/Pacific,60
+Chengdu-Guangzhou,Chengdu,30.5728,104.0668,China,Asia/Pacific,Guangzhou,23.1291,113.2644,China,Asia/Pacific,60
+Atlanta-Washington,Atlanta,33.749,-84.388,United States,North Atlantic,Washington,38.8951,-77.0364,United States,North Atlantic,60
+Nice-Paris,Nice,43.7102,7.262,France,ECAC,Paris,48.8566,2.3522,France,ECAC,60
+Busan-Seoul,Busan,35.1796,129.0756,South Korea,Asia/Pacific,Seoul,37.5665,126.978,South Korea,Asia/Pacific,60
+Atlanta-Dallas,Atlanta,33.749,-84.388,United States,North Atlantic,Dallas,32.7767,-96.797,United States,North Atlantic,60
+Beijing-Chongqing,Beijing,39.9042,116.4074,China,Asia/Pacific,Chongqing,29.563,106.5516,China,Asia/Pacific,59
+London-Paris,London,51.5072,-0.1276,United Kingdom,ECAC,Paris,48.8566,2.3522,France,ECAC,59
+Dallas-Denver,Dallas,32.7767,-96.797,United States,North Atlantic,Denver,39.7392,-104.9903,United States,North Atlantic,59
+Chicago-Washington,Chicago,41.8781,-87.6298,United States,North Atlantic,Washington,38.8951,-77.0364,United States,North Atlantic,59
+Chongqing-Shanghai,Chongqing,29.563,106.5516,China,Asia/Pacific,Shanghai,31.2304,121.4737,China,Asia/Pacific,58
+Hong Kong-Tokyo,Hong Kong,22.3193,114.1694,Hong Kong,Asia/Pacific,Tokyo,35.6828,139.7595,Japan,Asia/Pacific,58
+Istanbul-Izmir,Istanbul,41.0082,28.9784,T��,ECAC,Izmir,38.4192,27.1287,T��,ECAC,58
+New York-Raleigh-Durham,New York,40.7128,-74.006,United States,North Atlantic,Raleigh-Durham,35.7796,-78.6382,United States,North Atlantic,58
+Barcelona-London,Barcelona,41.3851,2.1734,Spain,ECAC,London,51.5072,-0.1276,United Kingdom,ECAC,58
+Bangkok-Hong Kong,Bangkok,13.7563,100.5018,Thailand,Asia/Pacific,Hong Kong,22.3193,114.1694,Hong Kong,Asia/Pacific,58
+Chicago-Denver,Chicago,41.8781,-87.6298,United States,North Atlantic,Denver,39.7392,-104.9903,United States,North Atlantic,58
+Honolulu-Kailua-Kona,Honolulu,21.3069,-157.8583,United States,Asia/Pacific,Kailua-Kona,19.6399,-155.9969,United States,Asia/Pacific,58
+Durban-Johannesburg,Durban,-29.8587,31.0218,South Africa,Southern Africa,Johannesburg,-26.2041,28.0473,South Africa,Southern Africa,57

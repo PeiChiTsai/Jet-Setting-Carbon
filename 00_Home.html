@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <title>Jet Setting Carbon</title>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <!-- Google Fonnts -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200;0,400;0,600;0,700;1,200;1,700&family=Cabin+Condensed:wght@400;500;600;700&family=Contrail+One&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+
+
+        <!-- Style -->
+        <link rel="stylesheet" href="css/main-styles.css">
+        <link rel="stylesheet" href="css/jet-title-styles.css">        
+        <link rel="stylesheet" href="css/arrow_style.css">
+        <link rel="stylesheet" href="./js/d3-tip.css">
+        <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+        
+        <link rel="stylesheet" href="css/bubble_style.css">
+
+        <!-- Script -->
+        <script src="./js/click-scroll.js"></script>
+        <script src="./js/d3.min.js"></script>
+        <script src="./js/d3-tip-v6.js"></script>    
+        <script src="https://unpkg.com/flubber@0.3.0"></script>
+        <script src="https://unpkg.com/topojson@3"></script>
+        <!-- Load D3.js and Sankey plugin -->
+        <script src="https://d3js.org/d3.v7.min.js"></script>
+        <script src="https://unpkg.com/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
+        
+
+
+        <!-- lib -->
+        <script src="lib/highcharts.js"></script>
+        <script src="lib/highcharts-more.js"></script>
+        <script src="lib/exporting.js"></script>
+        <script src="lib/export-data.js"></script>
+        <script src="lib/accessibility.js"></script>
+
+        <style>
+            *,
+            *::before,
+            *::after {
+            box-sizing: border-box;
+            }
+
+            html, body, main {
+            overflow: hidden;
+            }
+            
+            /* 1. 禁止 body/page 本身滚动，只由 article 来滚动 */
+            html, body {
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+            }
+
+            /* 2. 让 article 顶在导航下方，并自己滚动 */
+            article {
+            position: relative;
+            top: 50px;                   /* 导航高度，按实际改 */
+            height: calc(100vh );  /* 扣掉导航 */
+            overflow-y: auto;
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+            /* scroll-padding-top 只影响 snap 对齐，不推下初始位置 */
+            }
+
+            /* 3. 每个 section 都是一屏高，成为 snap 点 */
+            article > section {
+            height: 100%;                /* 刚好撑满 article */
+            scroll-snap-align: start;
+            box-sizing: border-box;
+            }
+
+            /* 4. 如果需要给内容顶部一点内边距，防止紧贴 section 顶 */
+            article > section > * {
+            padding-top: 1rem;           /* 可选，看你想要留多少空隙 */
+            }
+
+
+
+            .video-section {
+            position: relative;
+            overflow: hidden;
+            }
+
+            .video-section .bg-video {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: auto;
+            height: auto;
+            min-width: 100%;
+            min-height: 100%;
+            object-fit: cover;
+            z-index: 0;
+            }
+            
+            .video-section::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            pointer-events: none;
+            z-index: 1;
+            }
+
+            .video-section .TitlePage {
+            position: relative;
+            z-index: 2;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;   
+            align-items: flex-start; 
+            padding: 0 5%; 
+            color: #fff; 
+            text-shadow: 0 2px 8px rgba(0,0,0,0.5);  
+            }
+
+            /* —— 标题 —— */
+            .video-section .title {
+            font-size: 3rem;            /* 按需调大 */
+            margin-bottom: 0.5rem;
+            line-height: 1.2;
+            }
+
+            /* —— 副标题 —— */
+            .video-section .mid-text {
+            font-size: 1.5rem;
+            max-width: 700px;           /* 最宽 700px，换行可读 */
+            margin-bottom: 1.5rem;
+            }
+
+
+
+            #chart-intro1 {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            }
+
+            #pieChart, #areaChart {
+            width: 100%;
+            height: 300px;
+            position: relative;
+            }
+
+            #pieChart svg, #areaChart svg {
+            width: 100%;
+            height: 100%;
+            }
+
+
+
+
+            .chart {
+                width: 100%;
+                height: 100vh;
+                display: grid;
+                grid-template-rows: 10% 90%;
+                background-color: #f4f4f4;
+
+            }
+
+            #map {
+                width: 100%;
+            }
+
+            /* svg {
+                background-image: url("./img/world.png");
+                background-size: cover;
+            } */
+
+            .domain {
+                stroke: lightgray;
+            }
+
+            body {
+                margin: 0;
+                box-sizing: content-box;
+                z-index:1;
+            }
+            .title {
+                font-size: 45px;
+                text-align: center;
+                font-weight:lighter;
+                font-family:'Montserrat',sans-serif;
+                font-weight: bold;
+                color:rgb(0, 0, 0);
+            }
+            
+            .maptitle{
+                font-size: 30px;
+                text-align: center;
+                font-weight: lighter;
+                font-family: 'Montserrat',sans-serif;
+                font-weight: bold;
+                color: rgb(0, 0, 0);
+                margin-top:2%;
+                margin-left: 10%;
+
+            }
+
+            text {
+                fill: gray
+
+            }
+
+
+
+            g line {
+                stroke: lightgray;
+            }
+
+            .right-side-div {
+                height: 100vh;
+                margin-left:10px;
+
+            }
+
+            .left-col,
+            .right-col {
+            padding: 0 5rem;
+            }
+
+            .middleThings {
+            display: grid;
+            grid-template-columns: 65% 30%;  /* 左 70% / 右 30% */
+            gap: 1.5rem;                     /* 栏间距，可按需调整 */
+            width: 100%;
+            margin: 0 auto;
+            }
+
+
+            .finalThings {
+            display: grid;
+            justify-content: center; 
+            align-items: center; 
+            gap: 1.5rem;
+            width: 50%;
+            margin: 0 auto;
+            }
+
+
+
+
+
+
+
+            /* 响应式：窄屏时回退成单栏 */
+            @media (max-width: 800px) {
+            .middleThings {
+                grid-template-columns: 1fr;
+            }
+            }
+
+            .midHeader{
+                background-color:gray;
+                margin-top:50px;
+                margin-bottom:10px;
+                text-align: center;
+                color:rgb(255, 255, 255);
+                font-size:25px;
+                font-family:'Montserrat',sans-serif;
+                vertical-align:middle;
+                font-weight:bold;
+                margin-left:10px;
+            }
+            .text{
+                font-size: 20px;
+                text-align: center;
+                font-weight:lighter;
+                font-family:'Montserrat',sans-serif;
+                margin-top:35px;
+                margin-bottom:35px;
+            }
+            .mid-text{
+                font-size: 18px;
+                font-weight:lighter;
+                font-family:'Montserrat',sans-serif;
+                margin-top:35px;
+                margin-bottom:35px;
+                margin-left:10px;
+                width:100%;
+            }
+
+            .right-side-header{
+                background-color:#314563;
+                margin-bottom:10px;
+                color:rgb(255, 255, 255);
+                font-size:15px;
+                font-family:'Montserrat',sans-serif;
+                font-weight:bold;
+            }
+            .right-text {
+                background-color: #f1f1f1;
+                border-left: 2px solid gray;
+                font-family:'Montserrat',sans-serif;
+                padding: 5px;
+            }
+
+            #chartArea {
+            display: grid;
+            grid-template-columns: 70% 25%;
+            height: 99vh;
+            overflow-y: auto;    /* 保留纵向滚动 */
+            overflow-x: hidden;
+            width: 100%;
+            padding-right: 18px;
+
+            /* —— 以下三行隐藏滚动条 —— */
+            -ms-overflow-style: none;  /* IE & Edge */
+            scrollbar-width: none;     /* Firefox */
+            }
+            #chartArea::-webkit-scrollbar {
+            display: none;             /* Chrome, Safari & Opera */
+            }
+
+            
+            #container1 {
+                height: 100%;
+                width: 100%;
+                overflow: hidden;
+
+            }
+
+            .flourish-embed{
+                text-align: center;
+                width: 100%;
+            }
+
+            .rough-box {
+                max-width: 500px;
+                margin: 0 auto;
+                margin-bottom:35px;
+                padding: 20px;
+                color: rgb(255, 255, 255);
+                background-image: paint(rough-painter);
+            }
+            .rough-box {
+                --rough-border-width: 3;
+                --rough-fill: rgb(194, 188, 188);
+                --rough-fill-weight: 9;
+                --rough-fill-style: zigzag;
+            }
+            .rough-box-title {
+                margin: 0 auto;
+                margin-top:70px;
+                margin-bottom:35px;
+                padding: 20px;
+                color: rgb(255, 255, 255);
+                background-image: paint(rough-painter);
+                text-align: center;
+            }
+            .rough-box-title {
+                --rough-border-width: 3;
+                --rough-fill: rgb(219, 219, 219); 
+                --rough-fill-weight: 9;
+                --rough-fill-style: zigzag;
+            }
+
+
+
+
+            .button-container{
+                text-align: center;
+                margin-bottom: 35px;
+            }
+
+
+            /* ===============================
+            SCROLL STEP INDICATOR
+            ================================= */
+            .step-indicator {
+                position: fixed;
+                right: 20px;
+                top: 50%;
+                transform: translateY(-50%);
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .step {
+                width: 12px;
+                height: 12px;
+                border-radius: 50%;
+                background-color: #ccc;
+                cursor: pointer;
+            }
+
+            .step.active {
+                background-color: #314563;
+            }
+
+            
+
+
+
+
+
+
+            /* ======================================
+            全局容器：三行竖直排列，行间留隙
+            ====================================== */
+            /* ── 全局：Flex 容器，3 行垂直排列 ── */
+            #chart-intro1 {
+            padding-top: 0 ;
+            }
+
+            .chart-container {
+            display: flex;
+            flex-direction: column;
+            height: 90vh;       /* 占满整个视口高度 */
+            margin: 0; padding: 0;
+            }
+
+            .chart-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            }
+
+            /* ── 第1行：饼图+图例 ── */
+            .pie-row {
+            flex: 50%; 
+            gap: 1rem; 
+            }
+
+            .chart-cell {
+            height: 100%;          /* 占满行高 */
+            }
+
+            /* 左侧 饼图区 */
+            .chart-cell--chart {
+            flex: 5;               /* 占宽比：5  */
+            
+            
+            }
+
+            /* 右侧 图例区 */
+            .chart-cell--legend {
+            flex: 4%;               /* 占宽比：2  */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;/* 图例列表垂直居中 */
+            padding-left: 0.5rem;
+            }
+
+            /* 图例列表样式 */
+            #pieLegend ul {
+            list-style: none;
+            margin: 0; padding: 0;
+            }
+            #pieLegend li {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.4rem;
+            font-size: 0.9rem;
+            }
+            #pieLegend li .legend-color {
+            width: 12px; height: 12px;
+            margin-right: 0.5rem;
+            }
+
+            /* ── 第3行：面积图 ── */
+            .area-row {
+            flex: 50%;               /* 行高比：5 */
+            }
+            .area-row .chart-cell--chart {
+            width: 100%;
+            }
+
+
+
+
+
+            /* ── SVG 自适应填满容器 ── */
+            #pieChart svg,
+            #areaChart svg {
+            width: 100%;
+            height: 100%;
+            }
+
+
+
+
+            
+        </style>
+
+        <style>
+
+
+
+      
+
+
+        
+        h1 {
+            margin-bottom: 5px;
+            color: #2c3e50;
+            font-size: 24px;
+        }
+        
+        h3 {
+            margin-top: 0;
+            color: #7f8c8d;
+            font-weight: normal;
+            font-size: 18px;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        select, button {
+            padding: 8px 12px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            background-color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        
+        select:focus, button:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            transition: background-color 0.2s;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        .button-group {
+            display: none; /* 隐藏顶部按钮组 */
+        }
+        
+        .year-button {
+            padding: 20px 30px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            background-color: #f0f0f0;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-width: 120px;
+            text-align: center;
+            color: #FFF;
+        }
+        
+        .year-button:not(.active) {
+            background-color: #eee;
+            color: #000;
+        }
+        
+        .year-button.active {
+            background-color: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+        
+        /* 双列布局 */
+        .main-content {
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .left-column {
+            flex: 60%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .right-column {
+            flex: 40%;
+            background-color: #e6f2ff; /* 浅蓝色背景 */
+            padding: 20px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        #sankey-container {
+            width: 100%;
+            height: 650px;
+            position: relative;
+        }
+        
+        /* 新的底部年份选择器样式 */
+        .year-selector {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+            background-color: #f5f5f5;
+            border-radius: 4px;
+            padding: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .year-selector-button {
+            background-color: #f0f0f0;
+            color: #333;
+            border: none;
+            padding: 12px 20px;
+            margin: 0 2px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .year-selector-button.active {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .year-selector-button:first-child {
+            border-top-left-radius: 4px;
+            border-bottom-left-radius: 4px;
+        }
+        
+        .year-selector-button:last-child {
+            border-top-right-radius: 4px;
+            border-bottom-right-radius: 4px;
+        }
+        
+        .loader {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+        }
+        
+        .loader.active {
+            display: block;
+        }
+        
+        .info-heading {
+            font-size: 28px;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            line-height: 1.3;
+        }
+        
+        .info-text {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #34495e;
+            margin-bottom: 20px;
+        }
+        
+        .info-citation {
+            font-size: 12px;
+            font-style: italic;
+            color: #7f8c8d;
+            border-top: 1px solid #dbe9f6;
+            padding-top: 10px;
+            margin-top: 10px;
+            text-align: right;
+        }
+        
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: 20px;
+        }
+        
+        .description {
+            background-color: #f1f8ff;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        
+        .source-link {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 12px;
+        }
+        
+        .source-link a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        
+        .source-link a:hover {
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+            .left-column, .right-column {
+                flex: 100%;
+            }
+            #sankey-container {
+                height: 500px;
+            }
+        }
+    </style>
+
+    </head>
+
+    <body>
+        <main>
+            <!-- Top navigation -->
+            <ul class="navbar">
+                <li class="logo">
+                    <a href="#Home">
+                        <img src="images/logo.svg" alt="Logo" class="logo-image">
+                        <span class="logo-text">AVIATION NETWORK</span>
+                    </a>
+                </li>
+                <li><a href="#Home">Home</a></li>
+                <li><a href="Tab1_3DGlobe.html">Global</a></li>
+                <li><a href="#Introduction-2">Continent</a></li>
+                <li><a href="#Introduction-3">City</a></li>
+                <li><a href="#chartArea">Authors</a></li>
+                <li><a href="#Navigator">Reference</a></li>
+            </ul>
+
+            <!-- Scrollbar indicator for scroll pages -->
+            <div class="scrollbar-indicator">
+                <ul>
+                    <li data-target="#Home" class="active"></li>
+                    <li data-target="#Intro-1"></li>
+                    <li data-target="#Intro-2"></li>
+                    <li data-target="#Intro-3"></li>
+                    <li data-target="#chartArea"></li>
+                    <li data-target="#Navigator"></li>
+                </ul>
+            </div>
+            
+
+
+
+
+        
+            
+            <article>
+                <section id=Home class="video-section">
+                <video class="bg-video" autoplay muted loop playsinline>
+                    <source src="videos/private-jet.MOV" type="video/mp4">
+                </video>
+
+                <div class="TitlePage">
+                    <div class="rough-box-title">
+                        <h1 class="jet-title">Jet-Setting Carbon</h1>
+                        <h1 class="jet-subtitle">The Hidden Link Between Aviation and Climate Change</h2>
+                    </div>
+                </div>
+            
+                <div class="arrow-container">
+                <a href="#Introduction" class="section-link smoothscroll">
+                    <svg id="more-arrows" viewBox="0 0 75 65" xmlns="http://www.w3.org/2000/svg">
+                    <polygon class="arrow-top"    points="37.6,27.9 1.8,1.3 3.3,0 37.6,25.3 71.9,0 73.7,1.3"/>
+                    <polygon class="arrow-middle" points="37.6,45.8 0.8,18.7 4.4,16.4 37.6,41.2 71.2,16.4 74.5,18.7"/>
+                    <polygon class="arrow-bottom" points="37.6,64   0,36.1   5.1,32.8 37.6,56.8 70.4,32.8 75.5,36.1"/>
+                    </svg>
+                </a>
+                </div>
+
+                
+                </section>
+
+
+
+
+
+
+
+
+
+
+
+                <section>
+                    <div id="Intro-1" class="middleThings">
+                        <div class="left-col">
+
+                            <div id="chart-intro1" class="chart-container">
+
+                                
+                                <div class="chart-row pie-row">
+                                    <div id="pieChart" class="chart-cell chart-cell--chart"></div>
+                                    <div id="pieLegend" class="chart-cell chart-cell--legend"></div>
+                                </div>
+
+                                
+                                <div class="chart-row area-row">
+                                    <div id="areaChart" class="chart-cell chart-cell--chart"></div>
+                                </div>
+
+                            </div>
+
+
+                        </div>
+
+                        <div class="right-col">
+                            <div class="midHeader">
+                                <span>
+                                    Air transport is a carbon-intensive luxury.
+
+                                </span>
+                            </div>
+                            <div class="mid-text">
+                            <p>
+                                If flying may seem normal to you, remember that it’s not for everyone. 
+                                In fact, every year, around 90% of the world’s population does not fly. 
+                                Only 1% of the world’s population accounts for 50% of aviation emissions. 
+                                Flying, and flying far, is a habit for only a tiny minority of the world’s population.
+                            </p>
+                            </div>
+                            <div class="mid-text">
+                                <p>
+                                    Currently, aviation accounts for approximately 2.5% of global energy-related CO2 emissions. 
+                                    While it's a relatively small percentage of the overall emissions, 
+                                    aviation's growth rate has been faster than other transport sectors like rail, road, 
+                                    or shipping between 2000 and 2019.
+                                </p>
+                            </div>
+                        </div>
+                </section>
+
+
+
+
+
+
+
+                
+
+                <section>
+                    <div id="Intro-2" >
+                        <div class="left-col">
+                                <div class="container">
+                                    <div class="header">
+                                        <h1 id="chart-title">World Greenhouse Gas Emissions in 2019 (Sector | End Use | Gas)</h1>
+                                        <h3 id="chart-subtitle">Total: 49.8 GtCO₂e</h3>
+                                    </div>
+                                    
+                                    <div class="button-group">
+                                        <button id="year-2016" class="year-button" type="button">2016</button>
+                                        <button id="year-2018" class="year-button" type="button">2018</button>
+                                        <button id="year-2019" class="year-button" type="button">2019</button>
+                                        <button id="year-2020" class="year-button" type="button">2020</button>
+                                    </div>
+
+                                    
+                                    <div class="main-content">
+                                        <div class="left-column">
+                                            <div id="sankey-container">
+                                                <div class="loader" id="chart-loader">Loading...</div>
+                                            </div>
+                                            <div class="year-selector">
+                                                <button id="year-2016" class="year-selector-button" type="button">2016</button>
+                                                <button id="year-2018" class="year-selector-button" type="button">2018</button>
+                                                <button id="year-2019" class="year-selector-button" type="button">2019</button>
+                                                <button id="year-2020" class="year-selector-button" type="button">2020</button>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="right-column">
+                                            <h2 class="info-heading">Its emissions may seem modest at 2.5%, but aviation's true climate impact is twice as large: 5% of global warming.</h2>
+                                            
+                                            <p class="info-text">We often read that aviation is responsible for only 2.5% of greenhouse gas emissions in 2019. In reality, this does not take into account non-CO2 effects.</p>
+                                            
+                                            <p class="info-text">Today we know that non-CO2 effects account for between 1/2 and 2/3 of radiative forcing, which means that the role of commercial aviation accounts for around 5% of global warming between 2000 and 2019.</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="footer">
+                                        <p>Data unit: Percentage of global greenhouse gas emissions (%) | Data source: Climate Watch</p>
+                                    </div>
+                                    
+                                    <div class="source-link">
+                                        <a href="https://www.wri.org/data/world-greenhouse-gas-emissions-2019" target="_blank" rel="noopener" id="data-source-link">
+                                            Data Source: World Resources Institute (<span id="data-source-year">2019</span>)
+                                        </a>
+                                    </div>
+                                </div>
+                            
+                        </div>
+
+
+                        </div>
+                </section>
+
+
+
+
+
+
+
+
+
+
+                <section>
+                    <div id="Intro-3" class="middleThings">
+                        <div class="left-col">
+                            <figure class="highcharts-figure">
+                                <div id="container"></div>
+
+                            </figure>
+                        </div>
+
+                        <div class="right-col">
+                            <div class="midHeader">
+                                <span>
+                                    Title
+
+
+                                </span>
+                            </div>
+                            <div class="mid-text">
+                            
+                                <p class="highcharts-description">
+                                        In this quadrant, <strong>Transport air, land, water</strong> sits in the upper right corner, in the bubble of luxury, high intensity. Its energy intensity (around 20 MJ $) is higher than the median of the full sample. The income elasticity (&gt; 1) is also higher than the average: that is, when income grows, people spend more on transport, grow faster, and hence a larger share of energy consumption.
+                                        The size of this bubble is moderate. The energy footprint of this category is very important in total consumption: the demand of high-income people for air, land and sea transportation is driving more and more, and exacerbating the uneven consumption of social energy.
+                                </p>
+
+                            </div>
+
+                        </div>
+                </section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+                
+                
+                <section id="chartArea">
+                    <section class="chart">
+                        <div class="maptitle">
+                            <h>2024 Global Annual Emission Amount from Aviation</h>
+                        </div>
+                        <div id="map">
+                        </div>
+
+                    </section>
+
+                    <!-- text -->
+                    
+
+
+
+                    <section>
+
+
+
+
+
+                        <div class="right-side-div">
+                            <div class="right-side-header" >
+                                <span style="margin-left:5px;">
+                                    Global Aviation CO₂ Emissions Map
+                                </span>
+                            </div>
+                            <p class="right-text">
+                                This map visualizes the total aviation-related carbon dioxide emissions for each country in 2024. 
+                                The darker the shade, the greater the emissions, 
+                                ranging from near-zero in smaller nations to over one hundred million tonnes in the most active air traffic hubs. 
+                                <br>
+                                By representing each country through the intensity of its emissions, 
+                                this global overview highlights aviation’s critical role in the broader climate impact. 
+                                It offers an immediate spatial understanding of where aviation carbon footprints are most concentrated worldwide.
+                            </p>   
+                        </div>
+
+
+
+                        <div class="right-side-div">                        
+                        </div>
+
+
+                        <div class="right-side-div">
+                            <div class="right-side-header" >
+                                <span style="margin-left:5px;">
+                                    Aviation Emissions: A Direct Cross-National Comparison
+                                </span>
+                            </div>
+                            <p class="right-text">
+                                Transitioning to a scatter plot, countries’ total aviation CO₂ emissions are now arranged horizontally on a linear scale. 
+                                Each point’s position along the axis directly correlates to the country’s total emissions without distortion. 
+                                <br>
+                                This view simplifies the comparison between nations of vastly different emission levels, 
+                                allowing users to observe emission disparities more clearly. 
+                                It facilitates a straightforward understanding of how countries align or diverge when measured solely by their aviation-related carbon output.
+                            </p>
+                        </div>
+
+
+
+                        <div class="right-side-div">                        
+                        </div>
+
+
+
+                        <div class="right-side-div">
+                            <div class="right-side-header" >
+                                <span style="margin-left:5px;">
+                                    Revealing Emission Patterns: A Logarithmic Perspective
+                                </span>
+                            </div>
+                            <p class="right-text">
+                                Applying a logarithmic transformation to the scatter plot reveals deeper patterns across countries with widely varying emission levels. 
+                                The log scale compresses extreme values while expanding smaller differences, making lower and mid-range emitters more visible.
+                                <br> 
+                                This shift uncovers subtle gradations that a linear scale might obscure, 
+                                enabling a more balanced and comprehensive view of the global distribution of aviation emissions. 
+                                Even smaller players in aviation activity now have a clearer presence in the overall picture.
+                            </p>
+                        </div>
+
+
+
+                        <div class="right-side-div">                        
+                        </div>
+
+                        <div class="right-side-div">
+                            <div class="right-side-header" >
+                                <span style="margin-left:5px;">
+                                    Spotlight on Major Aviation Emitters
+                                </span>
+                            </div>
+                            <p class="right-text">
+                                In the final stage, major aviation emitters are brought into focus through a highlighted overlay. 
+                                Select countries with the highest contributions to global aviation CO₂ emissions are visually emphasized with graduated colour tones. 
+                                <br>
+                                This targeted emphasis underscores their disproportionate impact and illustrates how a small group of nations 
+                                significantly shapes the global aviation carbon landscape. By drawing attention to these key players, 
+                                this view encourages deeper reflection on responsibility, policy focus, and potential areas for targeted mitigation efforts.
+                            </p>
+                        </div>
+                    </section>
+                </section>
+                
+                    
+
+
+
+
+
+
+
+
+
+
+
+                <section>
+                    <div class="finalThings">
+                        <div class="midHeader">
+                            <span>
+                                Global Aviation: Emissions and Ownership
+                            </span>
+                        </div>
+                        <div class="mid-text">
+                            <p>
+                                Every year, the aviation industry generates significant carbon emissions — with each country contributing differently based on its flight volume and fleet size.
+                                Beyond emissions, the number of aircraft owned by each country also shapes the global aviation network, influencing travel patterns, connectivity, and environmental impact.
+
+                                <br>
+                                <br>
+                                This dashboard brings together two key indicators:
+                                Annual aviation-related CO₂ emissions and aircraft registration data by country.
+                                Start by exploring the global landscape, then zoom into Europe's regional dynamics, or dive deeper into individual city-level patterns.
+                                Select your journey below to uncover the story behind the skies.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="finalThings">
+                        <div class="button-container">
+                            <a href="Tab1_3DGlobe.html" class="w3-button" style="background-color: gray; color: white;">Global View</a>
+                            <a href="India2.html" class="w3-button" style="background-color: gray; color: white;">Continent View</a>
+                            <a href="India2.html" class="w3-button" style="background-color: gray; color: white;">City View</a>
+                        </div>
+                        
+                    </div>
+                </section>
+
+
+
+
+
+
+
+                
+            </article>
+
+        </main>
+
+
+
+        <script src="js/bubble.js"></script>
+        <script src="./index.js"  type="module"></script>
+        <script type="module" src="./js/chartIntro-1.js"></script>
+
+                <!-- Load custom JS -->
+        <script src="./sankey/advanced_sankey.js"></script>
+        <script>
+            // 使用DOMContentLoaded事件而不是window.onload，以避免某些刷新问题
+            document.addEventListener('DOMContentLoaded', function() {
+                // 避免使用setTimeout，直接初始化
+                initSankeyChart();
+                
+                // 禁用所有链接的默认行为，除非明确需要
+                document.querySelectorAll('a').forEach(link => {
+                    if (!link.hasAttribute('target') || link.getAttribute('target') !== '_blank') {
+                        link.addEventListener('click', function(e) {
+                            // 允许在新窗口打开
+                            if (this.getAttribute('target') === '_blank') return;
+                            
+                            // 其他情况阻止默认点击行为
+                            e.preventDefault();
+                            e.stopPropagation();
+                            console.log('Link click prevented:', this.href);
+                        });
+                    }
+                });
+            });
+        </script>
+
+
+
+    </body>
+
+</html>

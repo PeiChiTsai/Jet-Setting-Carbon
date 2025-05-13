@@ -1,0 +1,54 @@
+flagCode,country,AircraftRegistration_TotalAircraftRegisteredViaAVBuyer_num_2020,AircraftRegistration_PctOfGlobalFleetViaAVBuyer_num_2020,AircraftRegistration_TotalJetsAndTurbopropsRegisteredViaAVBuyer_num_2019,AircraftRegistration_RegisteredPrivateJetsViaCJI_num_2014
+US,United States,46157,42,23575,12051
+CN,China,5366,5,421,203
+CA,Canada,4888,4,1290,483
+BR,Brazil,4539,4,1643,764
+AU,Australia,3379,3,615,154
+MX,Mexico,2468,2,1242,704
+GB,United Kingdom,2442,2,325,241
+DE,Germany,2351,2,750,387
+ZA,South Africa,1930,2,,160
+FR,France,1860,2,,132
+JP,Japan,1799,2,,36
+VE,Venezuela,1246,1,754,168
+IN,India,1234,1,,140
+ES,Spain,1183,1,129,100
+ID,Indonesia,1138,1,,27
+AR,Argentina,,,363,142
+IM,Isle of Man,,,307,264
+MT,Malta,,,190,35
+CH,Switzerland,,,152,123
+KE,Kenya,,,151,
+PH,Philippines,,,113,32
+RU,Russia,,,110,
+CZ,Czech Republic,,,106,34
+TZ,Tanzania,,,95,
+NG,Nigeria,,,76,41
+NZ,New Zealand,,,70,
+UA,Ukraine,,,10,24
+AT,Austria,,,,244
+PT,Portugal,,,,138
+BM,Bermuda,,,,117
+KY,Cayman Islands,,,,114
+TR,Turkey,,,,110
+IT,Italy,,,,99
+DK,Denmark,,,,62
+AE,United Arab Emirates,,,,61
+SA,Saudi Arabia,,,,56
+LU,Luxembourg,,,,48
+BE,Belgium,,,,45
+AW,Aruba,,,,45
+SE,Sweden,,,,36
+HK,Hong Kong,,,,32
+NL,Netherlands,,,,27
+MA,Morocco,,,,26
+FI,Finland,,,,26
+TH,Thailand,,,,25
+EG,Egypt,,,,23
+CL,Chile,,,,20
+RS,Serbia,,,,17
+CO,Colombia,,,,16
+KZ,Kazakhstan,,,,16
+BG,Bulgaria,,,,16
+PK,Pakistan,,,,15
+GR,Greece,,,,15

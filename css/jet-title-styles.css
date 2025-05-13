@@ -1,0 +1,81 @@
+.jet-title {
+  font-family:'Montserrat',sans-serif;
+  color: #ffffff;
+  text-shadow: 1px 1px 0 #888, 
+               2px 2px 0 #888,
+               3px 3px 0 #888,
+               4px 4px 0 #888,
+               5px 5px 8px rgba(0, 0, 0, 0.4);
+  position: relative;
+  font-size: 4rem;
+  letter-spacing: 2px;
+  font-weight: 700;
+  padding: 10px 0;
+  display: inline-block;
+  z-index: 10;
+  text-transform: none;
+  animation: flyText 6s infinite ease-in-out;
+  white-space: nowrap;
+}
+
+
+
+.jet-subtitle {
+  font-family:'Montserrat',sans-serif;
+  color: #ffffff;
+  text-shadow: 1px 1px 0 #888;
+  font-size: 2rem;
+  font-weight: 400;
+  margin-top: 0.5em;
+  display: inline-block;
+  position: relative;
+  z-index: 10;
+  animation: flyText 6s infinite ease-in-out;
+  animation-delay: 0.3s;
+}
+
+
+
+@keyframes flyText {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-8px) rotate(0.8deg);
+  }
+  50% {
+    transform: translateY(0) rotate(0deg);
+  }
+  75% {
+    transform: translateY(8px) rotate(-0.8deg);
+  }
+}
+
+/* 添加飞机图标 */
+.jet-title::after {
+  content: "✈️";
+  position: absolute;
+  font-size: 0.5em;
+  top: 10px;
+  right: -30px;
+  text-shadow: none;
+  animation: flyAround 10s infinite linear;
+}
+
+@keyframes flyAround {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  25% {
+    transform: translate(-20px, -10px) rotate(-20deg);
+  }
+  50% {
+    transform: translate(-30px, 0) rotate(0deg);
+  }
+  75% {
+    transform: translate(-20px, 10px) rotate(20deg);
+  }
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+} 
