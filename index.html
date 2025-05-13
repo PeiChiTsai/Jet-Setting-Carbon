@@ -739,13 +739,17 @@
                         <span class="logo-text">AVIATION NETWORK</span>
                     </a>
                 </li>
-                <li><a href="#Home">Home</a></li>
-                <li><a href="Tab1_3DGlobe.html">Global</a></li>
-                <li><a href="#Introduction-2">Continent</a></li>
-                <li><a href="#Introduction-3">City</a></li>
-                <li><a href="#chartArea">Authors</a></li>
-                <li><a href="#Navigator">Reference</a></li>
+                    <li><a href="#index.html">Home</a></li>
+                    <li><a href="Tab1_3DGlobe.html">Global</a></li>
+                    <li><a href="Tab2_Europe.html">Continent</a></li>
+                    <li><a href="Tab3_City.html">City</a></li>
+                    <li><a href="Authors.html">Authors</a></li>
+                    <li><a href="Reference.html">Reference</a></li>
             </ul>
+
+
+
+
 
             <!-- Scrollbar indicator for scroll pages -->
             <div class="scrollbar-indicator">
@@ -1134,26 +1138,22 @@
                 <!-- Load custom JS -->
         <script src="./sankey/advanced_sankey.js"></script>
         <script>
-            // 使用DOMContentLoaded事件而不是window.onload，以避免某些刷新问题
             document.addEventListener('DOMContentLoaded', function() {
-                // 避免使用setTimeout，直接初始化
                 initSankeyChart();
                 
-                // 禁用所有链接的默认行为，除非明确需要
                 document.querySelectorAll('a').forEach(link => {
-                    if (!link.hasAttribute('target') || link.getAttribute('target') !== '_blank') {
+                    const href = link.getAttribute('href');
+                    // 只有 href 以 # 開頭，才阻止預設行為（例如 #Home）
+                    if (href && href.startsWith('#')) {
                         link.addEventListener('click', function(e) {
-                            // 允许在新窗口打开
-                            if (this.getAttribute('target') === '_blank') return;
-                            
-                            // 其他情况阻止默认点击行为
                             e.preventDefault();
                             e.stopPropagation();
-                            console.log('Link click prevented:', this.href);
+                            console.log('In-page link prevented:', this.href);
                         });
                     }
                 });
             });
+
         </script>
 
 

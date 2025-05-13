@@ -3,6 +3,8 @@
 <head>
   <meta charset='utf-8' />
   <title>Airport Emissions Map (Vector Tileset)</title>
+  
+  <link rel="stylesheet" href="css/main-styles.css">
   <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
   <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
   <script src="https://d3js.org/d3.v7.min.js"></script>
@@ -12,7 +14,7 @@
     #map { position:absolute; top:0; bottom:0; width:100%; }
     .map-overlay {
       position: absolute;
-      top: 20px;
+      top: 60px;
       left: 20px;
       background: #111;
       color: #fff;
@@ -38,7 +40,7 @@
       bottom: 20px;
       left: 20px;
       width: 540px;
-      background: #111;
+      background: rgba(0, 0, 0, 0.595);
       color: white;
       padding: 10px;
       border-radius: 8px;
@@ -92,6 +94,23 @@
   </style>
 </head>
 <body>
+    <!-- Header Section with Title & Logo and Menu -->
+                <ul class="navbar">
+                <li class="logo">
+                    <a href="#Home">
+                        <img src="images/logo.svg" alt="Logo" class="logo-image">
+                        <span class="logo-text">AVIATION NETWORK</span>
+                    </a>
+                </li>
+                  <li><a href="index.html">Home</a></li>
+                  <li><a href="Tab1_3DGlobe.html">Global</a></li>
+                  <li><a href="Tab2_Europe.html">Continent</a></li>
+                  <li><a href="Tab3_City.html">City</a></li>
+                  <li><a href="Authors.html">Authors</a></li>
+                  <li><a href="Reference.html">Reference</a></li>
+            </ul>
+
+
 <div id='map'></div>
 <div class='map-overlay'>
   <h3>CO₂ Emissions</h3>
