@@ -836,7 +836,7 @@
                             </div>
                             <div class="mid-text">
                             <p>
-                                If flying may seem normal to you, remember that it's not for everyone. 
+                                 If flying may seem normal to you, remember that it's not for everyone. 
                                 In fact, every year, around 90% of the world's population does not fly. 
                                 Only 1% of the world's population accounts for 50% of aviation emissions. 
                                 Flying, and flying far, is a habit for only a tiny minority of the world's population.
@@ -844,7 +844,7 @@
                             </div>
                             <div class="mid-text">
                                 <p>
-                                    Currently, aviation accounts for approximately 2.5% of global energy-related CO2 emissions. 
+                                    Currently, aviation accounts for approximately 2.5% of global energy-related CO2 emissions. 
                                     While it's a relatively small percentage of the overall emissions, 
                                     aviation's growth rate has been faster than other transport sectors like rail, road, 
                                     or shipping between 2000 and 2019.
@@ -1111,8 +1111,8 @@
                     <div class="finalThings">
                         <div class="button-container">
                             <a href="Tab1_3DGlobe.html" class="w3-button" style="background-color: gray; color: white;">Global View</a>
-                            <a href="India2.html" class="w3-button" style="background-color: gray; color: white;">Continent View</a>
-                            <a href="India2.html" class="w3-button" style="background-color: gray; color: white;">City View</a>
+                            <a href="Tab2_Europe.html" class="w3-button" style="background-color: gray; color: white;">Continent View</a>
+                            <a href="Tab3_City.html" class="w3-button" style="background-color: gray; color: white;">City View</a>
                         </div>
                         
                     </div>
@@ -1138,26 +1138,22 @@
                 <!-- Load custom JS -->
         <script src="./sankey/advanced_sankey.js"></script>
         <script>
-            // 使用DOMContentLoaded事件而不是window.onload，以避免某些刷新问题
             document.addEventListener('DOMContentLoaded', function() {
-                // 避免使用setTimeout，直接初始化
                 initSankeyChart();
                 
-                // 禁用所有链接的默认行为，除非明确需要
                 document.querySelectorAll('a').forEach(link => {
-                    if (!link.hasAttribute('target') || link.getAttribute('target') !== '_blank') {
+                    const href = link.getAttribute('href');
+                    // 只有 href 以 # 開頭，才阻止預設行為（例如 #Home）
+                    if (href && href.startsWith('#')) {
                         link.addEventListener('click', function(e) {
-                            // 允许在新窗口打开
-                            if (this.getAttribute('target') === '_blank') return;
-                            
-                            // 其他情况阻止默认点击行为
                             e.preventDefault();
                             e.stopPropagation();
-                            console.log('Link click prevented:', this.href);
+                            console.log('In-page link prevented:', this.href);
                         });
                     }
                 });
             });
+
         </script>
 
 
