@@ -457,17 +457,17 @@
             }
 
             /* 图例列表样式 */
-            #pieLegend ul {
+            #legendPlacement ul {
             list-style: none;
             margin: 0; padding: 0;
             }
-            #pieLegend li {
+            #legendPlacement li {
             display: flex;
             align-items: center;
             margin-bottom: 0.4rem;
             font-size: 0.9rem;
             }
-            #pieLegend li .legend-color {
+            #legendPlacement li .legend-color {
             width: 12px; height: 12px;
             margin-right: 0.5rem;
             }
@@ -814,7 +814,7 @@
                                 
                                 <div class="chart-row pie-row">
                                     <div id="pieChart" class="chart-cell chart-cell--chart"></div>
-                                    <div id="pieLegend" class="chart-cell chart-cell--legend"></div>
+                                    <div id="legendPlacement" class="chart-cell chart-cell--legend" style="flex: 1.2; padding-left: 15px;"></div>
                                 </div>
 
                                 
@@ -836,15 +836,15 @@
                             </div>
                             <div class="mid-text">
                             <p>
-                                If flying may seem normal to you, remember that it’s not for everyone. 
-                                In fact, every year, around 90% of the world’s population does not fly. 
-                                Only 1% of the world’s population accounts for 50% of aviation emissions. 
-                                Flying, and flying far, is a habit for only a tiny minority of the world’s population.
+                                If flying may seem normal to you, remember that it's not for everyone. 
+                                In fact, every year, around 90% of the world's population does not fly. 
+                                Only 1% of the world's population accounts for 50% of aviation emissions. 
+                                Flying, and flying far, is a habit for only a tiny minority of the world's population.
                             </p>
                             </div>
                             <div class="mid-text">
                                 <p>
-                                    Currently, aviation accounts for approximately 2.5% of global energy-related CO2 emissions. 
+                                    Currently, aviation accounts for approximately 2.5% of global energy-related CO2 emissions. 
                                     While it's a relatively small percentage of the overall emissions, 
                                     aviation's growth rate has been faster than other transport sectors like rail, road, 
                                     or shipping between 2000 and 2019.
@@ -1002,7 +1002,7 @@
                                 ranging from near-zero in smaller nations to over one hundred million tonnes in the most active air traffic hubs. 
                                 <br>
                                 By representing each country through the intensity of its emissions, 
-                                this global overview highlights aviation’s critical role in the broader climate impact. 
+                                this global overview highlights aviation's critical role in the broader climate impact. 
                                 It offers an immediate spatial understanding of where aviation carbon footprints are most concentrated worldwide.
                             </p>   
                         </div>
@@ -1020,8 +1020,8 @@
                                 </span>
                             </div>
                             <p class="right-text">
-                                Transitioning to a scatter plot, countries’ total aviation CO₂ emissions are now arranged horizontally on a linear scale. 
-                                Each point’s position along the axis directly correlates to the country’s total emissions without distortion. 
+                                Transitioning to a scatter plot, countries' total aviation CO₂ emissions are now arranged horizontally on a linear scale. 
+                                Each point's position along the axis directly correlates to the country's total emissions without distortion. 
                                 <br>
                                 This view simplifies the comparison between nations of vastly different emission levels, 
                                 allowing users to observe emission disparities more clearly. 
@@ -1138,22 +1138,26 @@
                 <!-- Load custom JS -->
         <script src="./sankey/advanced_sankey.js"></script>
         <script>
+            // 使用DOMContentLoaded事件而不是window.onload，以避免某些刷新问题
             document.addEventListener('DOMContentLoaded', function() {
+                // 避免使用setTimeout，直接初始化
                 initSankeyChart();
                 
+                // 禁用所有链接的默认行为，除非明确需要
                 document.querySelectorAll('a').forEach(link => {
-                    const href = link.getAttribute('href');
-                    // 只有 href 以 # 開頭，才阻止預設行為（例如 #Home）
-                    if (href && href.startsWith('#')) {
+                    if (!link.hasAttribute('target') || link.getAttribute('target') !== '_blank') {
                         link.addEventListener('click', function(e) {
+                            // 允许在新窗口打开
+                            if (this.getAttribute('target') === '_blank') return;
+                            
+                            // 其他情况阻止默认点击行为
                             e.preventDefault();
                             e.stopPropagation();
-                            console.log('In-page link prevented:', this.href);
+                            console.log('Link click prevented:', this.href);
                         });
                     }
                 });
             });
-
         </script>
 
 
