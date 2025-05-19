@@ -19,6 +19,7 @@
     // 初始化sticky section标题
     function initStickySectionTitles() {
       const sectionTitles = document.querySelectorAll('.section-title');
+      const navbarHeight = 50; // 导航栏高度
       
       // 检查是否应该应用sticky
       function checkStickyTitles() {
@@ -34,9 +35,9 @@
           const titleTop = titleEl.getBoundingClientRect().top;
           
           // 如果section可见并且标题需要sticky
-          if (sectionTop <= 0 && sectionBottom > 100) {
+          if (sectionTop <= navbarHeight && sectionBottom > 100) {
             // 如果标题即将滚动出视窗，使其sticky
-            if (titleTop <= 10) {
+            if (titleTop <= navbarHeight + 10) {
               if (!titleEl.classList.contains('sticky-title')) {
                 titleEl.classList.add('sticky-title');
                 section.classList.add('section-has-sticky-title');
@@ -258,6 +259,7 @@
         function initStickySectionTitles() {
             // Get all section titles
             const sectionTitles = document.querySelectorAll('.section-title');
+            const navbarHeight = 50; // 导航栏高度
             
             // Function to check if title should be sticky
             function checkStickyTitles() {
@@ -273,9 +275,9 @@
                     const titleTop = titleEl.getBoundingClientRect().top;
                     
                     // If section is visible and title should be sticky
-                    if (sectionTop <= 0 && sectionBottom > 100) {
+                    if (sectionTop <= navbarHeight && sectionBottom > 100) {
                         // If title is about to go off screen, make it sticky
-                        if (titleTop <= 10) {
+                        if (titleTop <= navbarHeight + 10) {
                             if (!titleEl.classList.contains('sticky-title')) {
                                 titleEl.classList.add('sticky-title');
                                 section.classList.add('section-has-sticky-title');

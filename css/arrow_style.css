@@ -17,7 +17,7 @@
 }
 
 #more-arrows polygon {
-  fill: #FFF;
+  fill: #3498db;
   transition: all 0.2s ease-out;
 }
 #more-arrows polygon.arrow-middle { opacity: 0.75; }

@@ -105,10 +105,12 @@
         globe.setAttribute('cx', '50%');
         globe.setAttribute('cy', '50%');
         globe.setAttribute('r', '45%');
-        globe.setAttribute('fill', 'rgba(29, 53, 87, 0.2)');
+        globe.setAttribute('fill', 'transparent');
         globe.setAttribute('stroke', 'rgba(255, 255, 255, 0.3)');
         globe.setAttribute('stroke-width', '1');
         globe.classList.add('world-globe');
+        globe.style.opacity = '0';
+        globe.style.fill = 'transparent';
         
         // Create flight path
         flightPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');

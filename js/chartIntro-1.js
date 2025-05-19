@@ -1,15 +1,15 @@
 const sectorColors = {
-  Transportation: "#584bb4", // Purple for Transportation (similar to Fat in reference)
-  "Electricity/Heat": "#54aef3", // Light blue
-  "Manufacturing/Construction": "#f47142", // Orange
-  Agriculture: "#2ca02c", // Green
-  "Industrial Processes": "#d62728", // Red
-  Building: "#9467bd", // Light purple
-  "Fugitive Emissions": "#8c564b", // Brown
-  Waste: "#e377c2", // Pink
-  "Land-Use Change and Forestry": "#7f7f7f", // Gray
-  "Bunker Fuels": "#bcbd22", // Olive
-  "Other Fuel Combustion": "#17becf" // Cyan
+  "Transportation": "#0d47a1",         // Deep navy blue
+  "Electricity/Heat": "#2196f3",       // Bright blue
+  "Manufacturing/Construction": "#4fc3f7", // Light blue
+  "Agriculture": "#1976d2",            // Medium blue
+  "Industrial Processes": "#5e35b1",   // Deep purple-blue
+  "Building": "#039be5",               // Cerulean blue
+  "Fugitive Emissions": "#00acc1",     // Teal blue
+  "Waste": "#26a69a",                  // Teal green
+  "Land-Use Change and Forestry": "#81d4fa", // Very light blue
+  "Bunker Fuels": "#283593",           // Indigo blue
+  "Other Fuel Combustion": "#64b5f6"   // Sky blue
 };
 
 // Calculate total for percentage display
@@ -35,17 +35,24 @@ function createSharedLegend(data, containerId = "legendContainer") {
       .style("padding", "10px")
       .style("display", "flex")
       .style("flex-direction", "column")
-      .style("justify-content", "center");
+      .style("justify-content", "flex-start")
+      .style("overflow", "visible"); // Ensure parent container doesn't add scrollbar
       
     // Add legend title
     const titleContainer = legendContainer.append("div")
       .style("width", "100%")
       .style("text-align", "center")
-      .style("margin-bottom", "10px");
+      .style("margin-bottom", "15px")
+      .style("margin-top", "0")
+      .style("padding-top", "0");
     
     titleContainer.append("div")
       .style("font-weight", "bold")
-      .style("font-size", "14px")
+      .style("font-size", "16px")
+      .style("color", "#1A2A43")
+      .style("background-color", "rgba(255, 255, 255, 0.7)")
+      .style("padding", "5px")
+      .style("border-radius", "3px")
       .text("Emission Sources");
 
     // Get categories from pie chart data
@@ -56,7 +63,8 @@ function createSharedLegend(data, containerId = "legendContainer") {
       .style("display", "flex")
       .style("flex-direction", "column")
       .style("gap", "5px")
-      .style("overflow-y", "auto");
+      .style("overflow", "visible")
+      .style("max-height", "none"); // Remove any height constraint
     
     // Create legend items for each category
     categories.forEach((category) => {
@@ -68,10 +76,12 @@ function createSharedLegend(data, containerId = "legendContainer") {
         .style("padding", "3px 8px")
         .style("border-radius", "3px")
         .style("transition", "background-color 0.2s")
+        .style("font-weight", category === "Transportation" ? "bold" : "normal") // Transportation默认粗体显示
         .on("mouseover", function() {
           // Only respond if not locked
           if (!activeCategoryLocked) {
             d3.select(this).style("background-color", "#f0f0f0");
+            
             // Highlight pie chart sector
             if (window.highlightPieCategory) {
               window.highlightPieCategory(category);
@@ -79,7 +89,7 @@ function createSharedLegend(data, containerId = "legendContainer") {
             
             // Highlight area chart layer
             if (window.highlightAreaCategory) {
-              window.highlightAreaCategory(category);
+              window.highlightAreaCategory(category, false, false);
             }
             
             // Highlight legend item
@@ -90,6 +100,7 @@ function createSharedLegend(data, containerId = "legendContainer") {
           // Only respond if not locked
           if (!activeCategoryLocked) {
             d3.select(this).style("background-color", "transparent");
+            
             // Reset pie chart highlight
             if (window.highlightPieCategory) {
               window.highlightPieCategory(null);
@@ -102,7 +113,7 @@ function createSharedLegend(data, containerId = "legendContainer") {
             
             // Reset legend item highlight
             if (!d3.select(this).classed("locked")) {
-              d3.select(this).style("font-weight", "normal");
+              d3.select(this).style("font-weight", category === "Transportation" ? "bold" : "normal");
             }
           }
         })
@@ -128,7 +139,10 @@ function createSharedLegend(data, containerId = "legendContainer") {
             // Reset all legend items
             legendContainer.selectAll(".legend-item")
               .classed("locked", false)
-              .style("font-weight", "normal")
+              .style("font-weight", function(d) {
+                const itemCategory = d3.select(this).select("span").text();
+                return itemCategory === "Transportation" ? "bold" : "normal";
+              })
               .style("background-color", "transparent");
           } else {
             // Set new active state
@@ -156,14 +170,15 @@ function createSharedLegend(data, containerId = "legendContainer") {
                 return d3.select(this).select("span").text() === category;
               })
               .style("font-weight", function() {
-                return d3.select(this).select("span").text() === category ? "bold" : "normal";
+                const itemCategory = d3.select(this).select("span").text();
+                return (itemCategory === category || itemCategory === "Transportation") ? "bold" : "normal";
               });
           }
         });
         
       // Add color square
       legendItem.append("div")
-        .style("width", "10px")
+        .style("width", "9px")
         .style("height", "10px")
         .style("background-color", sectorColors[category] || "#999")
         .style("border-radius", "2px")
@@ -181,970 +196,950 @@ function createSharedLegend(data, containerId = "legendContainer") {
 }
 
 function drawPieChart(data) {
+  try {
+    if (!data || !data.length) {
+      console.error("No data provided for pie chart");
+      d3.select("#pieChart").html("").append("div")
+        .style("padding", "20px")
+        .style("color", "red")
+        .text("Error: No data available for pie chart");
+      return;
+    }
+    
   // Calculate total emissions for percentage calculation
   totalEmissions = d3.sum(data, d => d.Emission);
+    
+    // 将总排放量存储在window对象上，以便可以访问
+    window.totalEmissions = totalEmissions;
   
   const container = d3.select("#pieChart");
+    if (container.empty()) {
+      console.error("Pie chart container not found");
+      return;
+    }
+    
+    console.log("Drawing pie chart with data:", data.length, "items");
+    
   const w = parseInt(container.style("width"));
   const h = parseInt(container.style("height"));
   const r = Math.min(w, h) / 2 * 0.8; // Slightly smaller radius for better proportions
   
-  // Apply custom styles
-  d3.select("head").append("style").html(`
-    .slice {
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-    .slice:hover {
-      opacity: 0.8;
-      transform: scale(1.05);
-    }
-    .slice.active {
-      transform: scale(1.08);
-      filter: drop-shadow(0px 0px 10px rgba(0,0,0,0.5));
-    }
-    .transportation-slice {
-      filter: drop-shadow(0px 0px 8px rgba(0,0,0,0.3));
-    }
-    .percentage {
-      opacity: 0;
-      transition: opacity 0.5s ease-in, font-size 0.3s;
-      pointer-events: none;
-    }
-    .percentage.show {
-      opacity: 1;
-    }
-    .labels text, .label-lines polyline {
-      opacity: 0;
-      transition: opacity 0.5s ease-in;
-    }
-    .labels text.show, .label-lines polyline.show {
-      opacity: 1;
-    }
-    .sector-label {
-      font-size: 12px;
-      fill: #666;
-    }
-    .sector-info {
-      position: absolute;
-      padding: 10px;
-      background-color: rgba(255, 255, 255, 0.9);
-      border-radius: 5px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-      pointer-events: none;
-      transition: opacity 0.3s;
-      z-index: 1000;
-      max-width: 200px;
-    }
-    .sector-info h3 {
-      margin: 0 0 5px 0;
-      font-size: 16px;
-    }
-    .sector-info p {
-      margin: 3px 0;
-      font-size: 13px;
-    }
-  `);
+    // 清除之前可能存在的饼图元素
+    container.selectAll("svg").remove();
+    
+    // 声明transportationSlice变量以存储Transportation切片引用
+    let transportationSlice = null;
+    
+    // 使用d3.tip来创建tooltip，设置单一的样式
+    const tip = d3.tip()
+      .attr('class', 'd3-tip')
+      .offset([-15, 0])
+      .html(function(event, d) {
+        // 计算百分比 - 使用精确计算而不是硬编码
+        const percentage = (d.data.Emission / totalEmissions * 100).toFixed(1);
+        const color = sectorColors[d.data.Sector];
+        
+        return `
+          <div style="text-align: center; padding: 8px 5px;">
+            <div style="border-bottom: 2px solid ${color}; margin-bottom: 10px; padding-bottom: 6px;">
+              <strong style="font-size: 16px; color: #2c3e50;">${d.data.Sector}</strong>
+            </div>
+            <div style="font-size: 14px;">
+              <div style="display: flex; justify-content: space-between; margin: 4px 0;">
+                <span>Emissions:</span> 
+                <span style="font-weight: bold; color: #34495e;">${d3.format(",")(d.data.Emission)} Mt CO<sub>2</sub>e</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; margin: 4px 0;">
+                <span>Share:</span> 
+                <span style="font-weight: bold; color: ${color};">${percentage}%</span>
+              </div>
+            </div>
+          </div>
+        `;
+      });
 
-  // Remove old d3-tip tooltip, we'll use custom info card instead
-  // Create info card container but initially hidden
-  const infoCard = container.append("div")
-    .attr("class", "sector-info")
-    .style("opacity", "0")
-    .style("display", "none");
-
-  // 2. Create pie chart
+    // Set up the chart
   const svg = container.append("svg")
       .attr("width", w)
       .attr("height", h)
+      .attr("class", "pie-chart")
     .append("g")
-      .attr("transform", `translate(${w/2},${h/2})`);
+      .attr("transform", `translate(${w / 2},${h / 2})`);
 
-  // Use our custom sector colors
-  const color = d => sectorColors[d.data.Sector] || "#999";
+    // Call the tip on the SVG
+    svg.call(tip);
 
+    // 创建饼图布局
   const pie = d3.pie()
-    .value(d => d.Emission)
-    .sort(null)
-    .padAngle(0.02); // Add some padding between slices
+      .sort(null) // 不排序，保持数据顺序
+      .value(d => d.Emission);
 
-  // Create the basic arc generator
+    // 创建弧生成器
   const arc = d3.arc()
-    .innerRadius(0)
-    .outerRadius(r - 20)
-    .cornerRadius(4); // Slightly rounded corners
+      .innerRadius(r * 0.4) // 创建环形图效果
+      .outerRadius(r);
     
-  // Create arc for animation
-  const arcTween = function(d) {
-    const interpolate = d3.interpolate({startAngle: 0, endAngle: 0}, d);
-    return function(t) {
-      return arc(interpolate(t));
-    };
-  };
+    // 添加阴影效果
+    const defs = svg.append("defs");
     
-  // Track the Transportation slice for special handling
-  let transportationSlice;
+    // 阴影滤镜
+    const filter = defs.append("filter")
+      .attr("id", "drop-shadow")
+      .attr("height", "130%");
+    
+    filter.append("feGaussianBlur")
+      .attr("in", "SourceAlpha")
+      .attr("stdDeviation", 3)
+      .attr("result", "blur");
+    
+    filter.append("feOffset")
+      .attr("in", "blur")
+      .attr("dx", 1)
+      .attr("dy", 1)
+      .attr("result", "offsetBlur");
+    
+    const feComponentTransfer = filter.append("feComponentTransfer")
+      .attr("in", "offsetBlur")
+      .attr("result", "offsetBlur");
+    
+    feComponentTransfer.append("feFuncA")
+      .attr("type", "linear")
+      .attr("slope", 0.3);
+    
+    const feMerge = filter.append("feMerge");
+    feMerge.append("feMergeNode")
+      .attr("in", "offsetBlur");
+    feMerge.append("feMergeNode")
+      .attr("in", "SourceGraphic");
   
-  // Show sector info card function
-  function showSectorInfo(d, event) {
-    const percentage = (d.data.Emission / totalEmissions * 100).toFixed(1);
-    
-    // Update card content
-    infoCard.html(`
-      <h3>${d.data.Sector}</h3>
-      <p>Emissions: ${d3.format(",")(d.data.Emission)} Mt CO<sub>2</sub>e</p>
-      <p>Share: ${percentage}%</p>
-    `);
-    
-    // Position card near mouse
-    const [mouseX, mouseY] = d3.pointer(event, container.node());
-    infoCard
-      .style("left", `${mouseX + 10}px`)
-      .style("top", `${mouseY - 10}px`)
-      .style("display", "block")
-      .transition()
-      .duration(200)
-      .style("opacity", "1");
-  }
-  
-  // Hide sector info card function
-  function hideSectorInfo() {
-    infoCard
-      .transition()
-      .duration(200)
-      .style("opacity", "0")
-      .on("end", function() {
-        d3.select(this).style("display", "none");
-      });
-  }
-  
-  // Draw slices with animation
+    // 绘制饼图切片
   const slices = svg.selectAll("path.slice")
     .data(pie(data))
     .enter().append("path")
       .attr("class", d => d.data.Sector === "Transportation" ? "slice transportation-slice" : "slice")
-      .attr("d", arc) // Initial shape without animation
-      .attr("fill", color)
+      .attr("d", arc)
+      .attr("fill", d => sectorColors[d.data.Sector] || "#999")
       .attr("stroke", "#fff")
-      .attr("stroke-width", 1.5) // Slightly reduced border thickness
-      .style("opacity", 0) // Start invisible for animation
+      .attr("stroke-width", d => d.data.Sector === "Transportation" ? 3 : 1.5)
+      .style("filter", "url(#drop-shadow)")
+      .style("opacity", 0) // 初始不可见，用于动画
       .each(function(d) {
-        // Save reference to Transportation slice
+        // 为Transportation切片保存引用
         if (d.data.Sector === "Transportation") {
           transportationSlice = this;
         }
-      })
-      .on("mouseover", function(event, d) {
-        // Only respond if not locked
-        if (!activeCategoryLocked) {
-          window.highlightPieCategory(d.data.Sector);
-          
-          // Highlight area chart layer
-          if (window.highlightAreaCategory) {
-            window.highlightAreaCategory(d.data.Sector);
-          }
-          
-          // Show info card
-          showSectorInfo(d, event);
-        }
-      })
-      .on("mousemove", function(event, d) {
-        // Update info card position
-        const [mouseX, mouseY] = d3.pointer(event, container.node());
-        infoCard
-          .style("left", `${mouseX + 10}px`)
-          .style("top", `${mouseY - 10}px`);
-      })
-      .on("mouseout", function() {
-        // Only respond if not locked
-        if (!activeCategoryLocked) {
-          window.highlightPieCategory(null);
-          
-          // Reset area chart highlight
-          if (window.highlightAreaCategory) {
-            window.highlightAreaCategory(null);
-          }
-          
-          // Hide info card
-          hideSectorInfo();
-        }
-      })
-      .on("click", function(event, d) {
-        // If clicking already active sector, deactivate
-        if (activeCategory === d.data.Sector && activeCategoryLocked) {
-          // Reset highlight
-          window.highlightPieCategory(null);
-          
-          // Reset area chart highlight
-          if (window.highlightAreaCategory) {
-            window.highlightAreaCategory(null);
-          }
-        } else {
-          // Highlight and lock clicked sector
-          window.highlightPieCategory(d.data.Sector, true);
-          
-          // Highlight and lock area chart layer
-          if (window.highlightAreaCategory) {
-            window.highlightAreaCategory(d.data.Sector, true);
-          }
-        }
       });
-
-  // Animate slices on load
-  slices.transition()
-    .duration(1000)
-    .delay((d, i) => i * 100)
-    .style("opacity", 1)
-    .attrTween("d", arcTween);
-      
-  // Apply pull-out effect to Transportation with delay for better animation
+          
+    // 使Transportation切片突出显示
   setTimeout(() => {
-    if (transportationSlice) {
-      const d = d3.select(transportationSlice).datum();
-      const centroid = arc.centroid(d);
-      const pullFactor = 0.15; // How far to pull out the slice
-      const x = centroid[0] * pullFactor;
-      const y = centroid[1] * pullFactor;
-      
-      d3.select(transportationSlice)
+      slices.filter(d => d.data.Sector === "Transportation")
         .transition()
-        .duration(800)
-        .attr("transform", `translate(${x},${y})`);
-    }
+        .duration(500)
+        .attr("transform", "translate(10, -10) scale(1.05)"); // 轻微偏移和放大
   }, 1500);
 
-  // Add percentage labels with animation
+    // 切片出现的动画
+    slices.transition()
+      .duration(800)
+      .delay((d, i) => i * 50)
+      .style("opacity", 1);
+    
+    // 为切片添加鼠标交互事件  
+    slices.on("mouseover", function(event, d) {
+      if (!activeCategoryLocked) {
+        highlightCategory(d.data.Sector, svg, false);
+      }
+    })
+    .on("mouseout", function() {
+      if (!activeCategoryLocked) {
+        resetHighlight(svg);
+      }
+    })
+    .on("click", function(event, d) {
+      const category = d.data.Sector;
+      
+      // 如果点击已锁定的类别，解除锁定
+      if (activeCategoryLocked && activeCategory === category) {
+        activeCategory = null;
+        activeCategoryLocked = false;
+        resetHighlight(svg);
+        
+        // 重置面积图
+        if (window.highlightAreaCategory) {
+          window.highlightAreaCategory(null);
+        }
+        
+        // 重置legend状态
+        d3.selectAll(".legend-item").classed("locked", false)
+          .style("background-color", "transparent");
+      } else {
+        // 否则锁定新类别
+        activeCategory = category;
+        activeCategoryLocked = true;
+        highlightCategory(category, svg, true);
+        
+        // 同步高亮面积图
+        if (window.highlightAreaCategory) {
+          window.highlightAreaCategory(category, true);
+        }
+        
+        // 更新legend状态
+        d3.selectAll(".legend-item").classed("locked", function() {
+          return d3.select(this).select("span").text() === category;
+        })
+        .style("background-color", function() {
+          return d3.select(this).select("span").text() === category ? "#f0f0f0" : "transparent";
+        });
+      }
+    });
+    
+    // 添加内部百分比标签
   const percentageLabels = svg.selectAll("text.percentage")
     .data(pie(data))
     .enter().append("text")
       .attr("class", "percentage")
       .attr("transform", d => {
-        let pos = arc.centroid(d);
-        // Adjust position for Transportation
-        if (d.data.Sector === "Transportation") {
-          pos[0] = pos[0] * 1.15;
-          pos[1] = pos[1] * 1.15;
-        }
-        return `translate(${pos})`;
+        const midRadius = (r * 0.4 + r) / 2;
+        const midAngle = (d.startAngle + d.endAngle) / 2;
+        const x = Math.sin(midAngle) * midRadius * 0.85;
+        const y = -Math.cos(midAngle) * midRadius * 0.85;
+        return `translate(${x},${y})`;
       })
       .attr("text-anchor", "middle")
       .attr("dy", ".35em")
-      .style("font-size", "0px") // Start with zero font size for animation
+      .style("font-size", "0px") // 初始字体大小为0，用于动画
       .style("font-weight", "bold")
       .style("fill", "#fff")
       .text(d => {
         const percentage = (d.data.Emission / totalEmissions * 100).toFixed(1);
-        return percentage > 3 ? `${percentage}%` : ""; // Show percentage for larger sectors
-      });
+        return percentage > 5 ? `${percentage}%` : ""; // 只显示大于5%的部分
+      })
+      .style("pointer-events", "none"); // 确保标签不会干扰鼠标事件
       
-  // Animate percentage labels after slices are visible
+    // 百分比标签的淡入动画
   setTimeout(() => {
     percentageLabels
-      .classed("show", true)
       .transition()
       .duration(500)
       .style("font-size", function(d) {
-        // Adjust font size based on sector size
         const percentage = (d.data.Emission / totalEmissions * 100);
         if (percentage > 20) return "14px";
         if (percentage > 10) return "12px";
         return "10px";
       });
-  }, 1200);
-
-  // Add sector labels and connector lines with animation
+    }, 1000);
+    
+    // 为外部标签创建更好的布局
+    const excludeSectors = []; // 移除排除项，显示所有扇区标签，包括Transportation
+    let labelData = pie(data).filter(d => !excludeSectors.includes(d.data.Sector));
+    
+    // 排序标签数据以避免拥挤
+    labelData.sort((a, b) => {
+      const angleA = (a.startAngle + a.endAngle) / 2;
+      const angleB = (b.startAngle + b.endAngle) / 2;
+      return angleA - angleB;
+    });
+    
+    // 创建连接线和标签组
   const labelLines = svg.append("g").attr("class", "label-lines");
   const labels = svg.append("g").attr("class", "labels");
   
-  let labelDelay = 1800; // Start showing labels after slices and percentages
-  
-  // Only keep labels for main sectors
-  const mainSectors = ['Electricity/Heat', 'Transportation', 'Manufacturing/Construction', 'Agriculture', 'Industrial Processes'];
-  
-  pie(data).forEach((d) => {
-    // Only add labels for main sectors
-    const percentage = (d.data.Emission / totalEmissions * 100);
-    const isMainSector = mainSectors.includes(d.data.Sector) || percentage > 5;
+    // 计算标签位置，避免重叠
+    function calculateLabelPositions(labelData, radius) {
+      const minDistance = 14; // 最小垂直距离
+      const labelHeight = 12; // 标签高度
+      const leftLabels = [];
+      const rightLabels = [];
     
-    // Don't add labels for sectors below threshold
-    if (!isMainSector) return;
-    
-    const midAngle = d.startAngle + (d.endAngle - d.startAngle) / 2;
-    const isTransportation = d.data.Sector === "Transportation";
-    const isManufacturing = d.data.Sector === "Manufacturing/Construction";
-    
-    // Calculate label position based on sector angle to avoid overlap
-    let labelRadius = r + 45; // Standard distance
-    
-    // Special position adjustments for particular sectors
-    if (isManufacturing) {
-      // For Manufacturing, specially adjust position - further reduce distance
-      labelRadius = r + 15; // Significantly reduce distance to avoid overlap
-    }
-    
-    const x2 = Math.sin(midAngle) * labelRadius;
-    const y2 = -Math.cos(midAngle) * labelRadius;
-    
-    // Ensure Manufacturing label has a separate z-index and more visible style
-    const labelClass = isManufacturing ? "sector-label manufacturing-label" : "sector-label";
-    
-    // Add label text
-    const label = labels.append("text")
-      .attr("class", labelClass)
-      .attr("x", x2)
-      .attr("y", y2)
-      .attr("dy", ".35em")
-      .attr("text-anchor", midAngle < Math.PI ? "start" : "end")
-      .text(d.data.Sector)
-      .style("font-size", "12px") // Uniform font size
-      .style("font-weight", isTransportation ? "bold" : "normal") // Only Transportation uses bold
-      .style("fill", "#666") // All labels use the same color
-      .style("opacity", 0);
-    
-    // Add white background for Manufacturing to make it clearer
-    if (isManufacturing) {
-      labels.append("rect")
-        .attr("x", x2 - (midAngle < Math.PI ? 0 : 200)) // Adjust based on text alignment
-        .attr("y", y2 - 10)
-        .attr("width", 200) // Wide enough for the text
-        .attr("height", 20)
-        .attr("fill", "white")
-        .attr("opacity", 0.85) // Increase opacity
-        .lower(); // Ensure rectangle is behind text
-    }
-    
-    // Calculate line start point, if Transportation, consider offset
-    let startPoint = arc.centroid(d);
-    if (isTransportation) {
-      const pullFactor = 0.15;
-      startPoint = [startPoint[0] * (1 + pullFactor), startPoint[1] * (1 + pullFactor)];
-    }
-    
-    // Calculate line midpoint
-    let midPoint;
-    if (isManufacturing) {
-      // For Manufacturing especially shorten connection line - don't use midpoint, connect directly to label
-      midPoint = null;
-    } else {
-      midPoint = [Math.sin(midAngle) * (r + 5), -Math.cos(midAngle) * (r + 5)];
-    }
-    
-    // Add connector lines for all sectors, including Transportation
-    const line = labelLines.append("polyline")
-      .attr("points", function() {
-        if (isManufacturing) {
-          // Very short connection line, barely visible
-          return [
-            startPoint,
-            [startPoint[0] * 1.05, startPoint[1] * 1.05], // Just extend a little
-            [x2 - (midAngle < Math.PI ? 5 : -5), y2]
-          ];
+      // 将标签分为左右两组
+      labelData.forEach(d => {
+        const midAngle = (d.startAngle + d.endAngle) / 2;
+        if (midAngle < Math.PI) {
+          rightLabels.push({
+            angle: midAngle,
+            data: d,
+            y: -Math.cos(midAngle) * (radius + 40),
+            x: Math.sin(midAngle) * (radius + 40) + 5 // 右侧标签偏移
+          });
         } else {
-          return [
-            startPoint,
-            midPoint,
-            [x2 - (midAngle < Math.PI ? 8 : -8), y2]
-          ];
+          leftLabels.push({
+            angle: midAngle,
+            data: d,
+            y: -Math.cos(midAngle) * (radius + 40),
+            x: Math.sin(midAngle) * (radius + 40) - 5 // 左侧标签偏移
+          });
         }
+      });
+    
+      // 按y坐标排序
+      leftLabels.sort((a, b) => a.y - b.y);
+      rightLabels.sort((a, b) => a.y - b.y);
+      
+      // 调整左侧标签位置避免重叠
+      for (let i = 1; i < leftLabels.length; i++) {
+        const prevY = leftLabels[i-1].y;
+        const currLabel = leftLabels[i];
+        const minY = prevY + minDistance;
+        
+        if (currLabel.y < minY) {
+          currLabel.y = minY;
+        }
+      }
+      
+      // 调整右侧标签位置避免重叠
+      for (let i = 1; i < rightLabels.length; i++) {
+        const prevY = rightLabels[i-1].y;
+        const currLabel = rightLabels[i];
+        const minY = prevY + minDistance;
+        
+        if (currLabel.y < minY) {
+          currLabel.y = minY;
+        }
+      }
+      
+      return [...leftLabels, ...rightLabels];
+    }
+    
+    // 计算优化后的标签位置
+    const labelPositions = calculateLabelPositions(labelData, r);
+    
+    // 添加连接线
+    labelLines.selectAll("polyline")
+      .data(labelPositions)
+      .enter()
+      .append("polyline")
+      .attr("opacity", 0) // 初始不可见
+      .attr("points", function(d) {
+        const pos = arc.centroid(d.data);
+        const midAngle = (d.data.startAngle + d.data.endAngle) / 2;
+        const x2 = Math.sin(midAngle) * (r + 10);
+        const y2 = -Math.cos(midAngle) * (r + 10);
+        return [pos, [x2, y2], [d.x, d.y]];
       })
       .style("fill", "none")
       .style("stroke", "#999")
-      .style("stroke-width", isManufacturing ? 1 : 1) // Uniform line width
-      .style("opacity", 0);
+      .style("stroke-width", 1);
+    
+    // 添加标签文本
+    labels.selectAll("text")
+      .data(labelPositions)
+      .enter()
+      .append("text")
+      .attr("opacity", 0) // 初始不可见
+      .attr("transform", d => `translate(${d.x},${d.y})`)
+      .style("text-anchor", d => d.angle < Math.PI ? "start" : "end")
+      .style("font-size", "12px")
+      .style("fill", d => d.data.data.Sector === "Transportation" ? "#0d47a1" : "#555") // 为Transportation使用特殊颜色
+      .style("font-weight", d => d.data.data.Sector === "Transportation" ? "bold" : "normal") // 为Transportation使用粗体
+      .text(d => d.data.data.Sector);
+    
+    // 连接线和标签的动画
+    setTimeout(() => {
+      labelLines.selectAll("polyline")
+        .transition()
+        .duration(500)
+        .attr("opacity", 1);
       
-    // Line animation
-    setTimeout(() => {
-      line.transition()
-        .duration(300)
-        .style("opacity", 1);
-    }, labelDelay);
+      labels.selectAll("text")
+        .transition()
+        .duration(500)
+        .attr("opacity", 1);
+    }, 1500);
     
-    // Label animation
-    setTimeout(() => {
-      label.transition()
-        .duration(300)
-        .style("opacity", 1);
-    }, labelDelay);
+    // 添加标签交互 - 鼠标悬停在标签上时高亮相应的饼图部分
+    labels.selectAll("text")
+      .on("mouseover", function(event, d) {
+        if (!activeCategoryLocked) {
+          // 高亮对应的切片
+          highlightCategory(d.data.data.Sector, svg, false);
+        }
+      })
+      .on("mouseout", function() {
+        if (!activeCategoryLocked) {
+          // 重置高亮
+          resetHighlight(svg);
+        }
+      })
+      .on("click", function(event, d) {
+        const category = d.data.data.Sector;
+        
+        // 如果点击已锁定的类别，解除锁定
+        if (activeCategoryLocked && activeCategory === category) {
+          activeCategory = null;
+          activeCategoryLocked = false;
+          resetHighlight(svg);
+        } else {
+          // 否则锁定新类别
+          activeCategory = category;
+          activeCategoryLocked = true;
+          highlightCategory(category, svg, true);
+        }
+      });
     
-    labelDelay += 100; // Stagger animation timing
-  });
-
-  // Add selection logic for categories, make it available externally
-  window.highlightPieCategory = function(category, shouldLock = false) {
-    if (category) {
-      // Find matching slice
+    // 添加高亮和重置函数
+    function highlightCategory(category, svg, isLocked) {
+      // 高亮选中的扇区
+      svg.selectAll(".slice")
+        .transition()
+        .duration(200)
+        .style("opacity", function(d) {
+          return d.data.Sector === category ? 1 : 0.3;
+        });
+      
+      // 找到对应的切片
       const targetSlice = svg.selectAll(".slice")
         .filter(d => d.data.Sector === category)
         .node();
       
       if (targetSlice) {
-        // Set global state
+        // 添加高亮样式
+        svg.selectAll(".slice").classed("active", false);
+        d3.select(targetSlice).classed("active", true).raise();
+        
+        // 获取切片数据并显示tooltip
+        const d = d3.select(targetSlice).datum();
+        showPieTooltip(d, svg);
+      }
+    }
+    
+    // 显示饼图tooltip
+    function showPieTooltip(d, svg) {
+      // 创建或选择tooltip
+      const tipDiv = d3.select("body").selectAll(".pie-tooltip").data([0]);
+      const newTip = tipDiv.enter()
+        .append("div")
+        .attr("class", "pie-tooltip")
+        .style("position", "absolute")
+        .style("opacity", 0)
+        .style("background", "white")
+        .style("border-radius", "5px")
+        .style("padding", "10px")
+        .style("box-shadow", "0 0 10px rgba(0,0,0,0.2)")
+        .style("pointer-events", "none")
+        .style("z-index", 100);
+      
+      const tooltip = tipDiv.merge(newTip);
+      
+      // 计算百分比
+      const percentage = (d.data.Emission / totalEmissions * 100).toFixed(1);
+      const color = sectorColors[d.data.Sector];
+      
+      // 设置tooltip内容
+      tooltip.html(`
+        <div style="text-align: center; padding: 8px 5px;">
+          <div style="border-bottom: 2px solid ${color}; margin-bottom: 10px; padding-bottom: 6px;">
+            <strong style="font-size: 16px; color: #2c3e50;">${d.data.Sector}</strong>
+          </div>
+          <div style="font-size: 14px;">
+            <div style="display: flex; justify-content: space-between; margin: 4px 0;">
+              <span>Emissions:</span> 
+              <span style="font-weight: bold; color: #34495e;">${d3.format(",")(d.data.Emission)} Mt CO<sub>2</sub>e</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin: 4px 0;">
+              <span>Share:</span> 
+              <span style="font-weight: bold; color: ${color};">${percentage}%</span>
+            </div>
+          </div>
+        </div>
+      `);
+      
+      // 获取SVG和切片位置
+      const svgNode = svg.node();
+      const svgRect = svgNode.getBoundingClientRect();
+      const centroid = arc.centroid(d);
+      
+      // 计算tooltip位置
+      const tooltipX = svgRect.left + centroid[0] + svgRect.width/2 + window.pageXOffset;
+      const tooltipY = svgRect.top + centroid[1] + svgRect.height/2 + window.pageYOffset - 40;
+      
+      // 显示tooltip
+      tooltip
+        .style("left", tooltipX + "px")
+        .style("top", tooltipY + "px")
+        .transition()
+        .duration(200)
+        .style("opacity", 1);
+    }
+    
+    function hidePieTooltip() {
+      d3.select("body").selectAll(".pie-tooltip")
+        .transition()
+        .duration(200)
+        .style("opacity", 0)
+        .remove();
+    }
+    
+    function resetHighlight(svg) {
+      // 恢复所有扇区的不透明度
+      svg.selectAll(".slice")
+        .transition()
+        .duration(200)
+        .style("opacity", 1);
+      
+      // 移除高亮样式
+      svg.selectAll(".slice").classed("active", false);
+      
+      // 隐藏tooltip
+      hidePieTooltip();
+    }
+    
+    // 设置外部可访问的高亮函数
+    window.highlightPieCategory = function(category, shouldLock = false) {
+      if (category) {
+        // 设置全局状态
         activeCategory = category;
         activeCategoryLocked = shouldLock;
         
-        // Remove highlight from all slices
-        svg.selectAll(".slice").classed("active", false);
-        
-        // Highlight selected slice
-        d3.select(targetSlice)
-          .classed("active", true)
-          .raise();
-        
-        // Apply special pull effect for Transportation
-        if (category === "Transportation" && !d3.select(targetSlice).attr("has-pull-effect")) {
-          const d = d3.select(targetSlice).datum();
-          const centroid = arc.centroid(d);
-          const pullFactor = 0.22; // Enhanced pull effect
-          const x = centroid[0] * pullFactor;
-          const y = centroid[1] * pullFactor;
-          
-          d3.select(targetSlice)
-            .transition()
-            .duration(300)
-            .attr("transform", `translate(${x},${y})`)
-            .attr("has-pull-effect", "true");
-        }
+        // 高亮扇区
+        highlightCategory(category, svg, shouldLock);
+      } else {
+        // 重置高亮状态
+        activeCategory = null;
+        activeCategoryLocked = false;
+        resetHighlight(svg);
       }
-    } else {
-      // If no category specified, reset all highlights
-      activeCategory = null;
-      activeCategoryLocked = false;
-      svg.selectAll(".slice").classed("active", false);
-      
-      // Reset Transportation position
-      const transportationSlice = svg.selectAll(".slice.transportation-slice").node();
-      if (transportationSlice) {
-        const d = d3.select(transportationSlice).datum();
-        const centroid = arc.centroid(d);
-        const pullFactor = 0.15; // Original pull distance
-        const x = centroid[0] * pullFactor;
-        const y = centroid[1] * pullFactor;
-        
-        d3.select(transportationSlice)
-          .transition()
-          .duration(300)
-          .attr("transform", `translate(${x},${y})`)
-          .attr("has-pull-effect", null);
+    };
+  } catch (e) {
+    console.error("Error in drawPieChart:", e);
+    handleError(e);
       }
-    }
-  };
 }
 
 function drawAreaChart(data) {
-  // Get container dimensions and set margins
-  const container = d3.select("#areaChart");
-  const width  = parseInt(container.style("width"));
-  const height = parseInt(container.style("height"));
-  const margin = { top: 50, right: 20, bottom: 60, left: 60 }; // Adjust right margin
-  const innerW = width  - margin.left - margin.right;
-  const innerH = height - margin.top  - margin.bottom;
+  try {
+    if (!data || !data.length) {
+      console.error("No data provided for area chart");
+      d3.select("#areaChart").html("").append("div")
+        .style("padding", "20px")
+        .style("color", "red")
+        .text("Error: No data available for area chart");
+      return;
+    }
+    
+    const container = d3.select("#areaChart");
+    if (container.empty()) {
+      console.error("Area chart container not found");
+      return;
+    }
+    
+    console.log("Drawing area chart with data:", data.length, "items");
+    
+    const containerWidth = parseInt(container.style("width"));
+    const containerHeight = parseInt(container.style("height"));
+    
+    const margin = {top: 20, right: 30, bottom: 30, left: 50};
+    const width = containerWidth - margin.left - margin.right;
+    const height = containerHeight - margin.top - margin.bottom;
+    
+    console.log("Drawing area chart with dimensions:", {width, height});
+    
+    // Clear any existing SVG
+    container.selectAll("svg").remove();
 
-  // Add custom styles for area chart interactions
-  d3.select("head").append("style").html(`
-    .area-chart-container {
-      position: relative;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      border-radius: 8px;
-      background-color: #fafafa;
-      padding: 10px;
-    }
-    .area-layer {
-      transition: opacity 0.3s, filter 0.3s;
-      cursor: pointer;
-    }
-    .area-layer:hover {
-      opacity: 0.9;
-      filter: brightness(1.1);
-    }
-    .area-layer.highlighted {
-      opacity: 1;
-      stroke: #fff;
-      stroke-width: 2px;
-      filter: brightness(1.2);
-    }
-    .area-layer.dimmed {
-      opacity: 0.3;
-    }
-    .area-tooltip {
-      position: absolute;
-      padding: 10px;
-      background-color: rgba(255, 255, 255, 0.95);
-      border-radius: 5px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-      pointer-events: none;
-      z-index: 1000;
-      transition: opacity 0.3s;
-      font-size: 12px;
-      border: 1px solid #ddd;
-      min-width: 180px;
-    }
-    .area-value-line {
-      stroke: #666;
-      stroke-width: 1;
-      stroke-dasharray: 3,3;
-      opacity: 0;
-      transition: opacity 0.3s;
-    }
-    .chart-title {
-      font-size: 16px;
-      font-weight: bold;
-      fill: #333;
-      text-anchor: middle;
-    }
-    .y-axis-label {
-      fill: #666;
-      font-size: 12px;
-    }
-    .x-axis-label {
-      fill: #666;
-      font-size: 12px;
-    }
-  `);
-
-  // Apply container styling
-  container.classed("area-chart-container", true);
-
-  // Create tooltip div
-  const tooltip = container.append("div")
-    .attr("class", "area-tooltip")
-    .style("opacity", 0)
-    .style("display", "none")
-    .style("position", "absolute")
-    .style("background-color", "rgba(255, 255, 255, 0.95)")
-    .style("border-radius", "5px")
-    .style("box-shadow", "0 2px 5px rgba(0,0,0,0.2)")
-    .style("padding", "10px")
-    .style("z-index", "1000")
-    .style("transition", "opacity 0.3s")
-    .style("pointer-events", "none")
-    .style("font-size", "12px")
-    .style("border", "1px solid #ddd");
-
-  // 2. Create SVG and main group
+    // Create the SVG container
   const svg = container.append("svg")
-      .attr("width",  width)
-      .attr("height", height)
+      .attr("width", containerWidth)
+      .attr("height", containerHeight)
     .append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`);
 
-  // Add chart title
+    // Add title - smaller and more compact for the reduced space
   svg.append("text")
-    .attr("class", "chart-title")
-    .attr("x", innerW / 2)
-    .attr("y", -25)
+      .attr("x", width / 2)
+      .attr("y", -margin.top / 2)
+      .attr("text-anchor", "middle")
+      .style("font-size", "12px")
+      .style("font-weight", "bold")
+      .style("fill", "#1A2A43")
     .text("Global Greenhouse Gas Emissions by Sector (1990-2022)");
 
-  // 3. Get columns from first row (excluding year)
-  const rawKeys = Object.keys(data[0]).filter(k => k !== "year");
-
-  // 4. Parse year and convert strings to numbers
-  const parseYear = d3.timeParse("%Y");
-  data.forEach(d => {
-    d.year = parseYear(d.year);
-    rawKeys.forEach(k => {
-      d[k] = +d[k];
+    // Prepare the data - ensure we include data up to 2022
+    // Use d3.group instead of d3.nest (d3.nest is deprecated in d3 v7)
+    const years = [...new Set(data.map(d => d.year))].sort();
+    const sectors = Object.keys(data[0]).filter(key => key !== "year");
+    
+    console.log("Years:", years);
+    console.log("Sectors:", sectors);
+    
+    // Prepare flat data for stacking
+    const flatData = years.map(year => {
+      const yearData = {year};
+      const yearRow = data.find(d => d.year === year);
+      
+      if (yearRow) {
+        sectors.forEach(sector => {
+          yearData[sector] = +yearRow[sector] || 0;
     });
-  });
+      } else {
+        sectors.forEach(sector => {
+          yearData[sector] = 0;
+        });
+      }
+      
+      return yearData;
+    });
+    
+    console.log("Flattened data for area chart:", flatData);
 
-  // 5. Create x (time) and y (total) scales
-  const x = d3.scaleTime()
-    .domain(d3.extent(data, d => d.year))
-    .range([0, innerW]);
-
-  const y = d3.scaleLinear()
-    .domain([
-      0,
-      d3.max(data, d => d3.sum(rawKeys, k => d[k]))
-    ]).nice()
-    .range([innerH, 0]);
-
-  // 6. Color scale for each sector
-  const color = d => sectorColors[d] || "#999";
-
-  // 7. Generate stacked data
+    // Create the stack
   const stack = d3.stack()
-    .keys(rawKeys)
+      .keys(sectors)
     .order(d3.stackOrderNone)
     .offset(d3.stackOffsetNone);
   
-  const series = stack(data);
+    const stackedData = stack(flatData);
+    
+    console.log("Stacked data:", stackedData);
 
-  // 8. Area generator
-  const area = d3.area()
-    .x(d => x(d.data.year))
-    .y0(d => y(d[0]))
-    .y1(d => y(d[1]))
-    .curve(d3.curveMonotoneX); // Use monotone curve for smoother transitions
-
-  // Reference for all layers
-  let areaLayers;
+    // Create scales  
+    const xScale = d3.scaleTime()
+      .domain(d3.extent(flatData, d => new Date(d.year, 0, 1)))
+      .range([0, width]);
+      
+    const yScale = d3.scaleLinear()
+      .domain([0, d3.max(stackedData[stackedData.length - 1], d => d[1])])
+      .range([height, 0]);
   
-  // Prepare for animation - create path from 0 height
-  const areaStart = d3.area()
-    .x(d => x(d.data.year))
-    .y0(innerH)
-    .y1(innerH)
-    .curve(d3.curveMonotoneX);
-
-  // 9. Draw each layer with animation and interactions
-  areaLayers = svg.selectAll("path.area-layer")
-    .data(series)
-    .enter().append("path")
-      .attr("class", "area-layer")
-      .attr("d", areaStart) // Start with flat area (for animation)
-      .attr("fill", d => color(d.key))
-      .attr("opacity", 0.8)
-      .attr("data-key", d => d.key)
+    // Create and add the axes
+    const xAxis = d3.axisBottom(xScale)
+      .ticks(5) // Reduced number of ticks for smaller chart
+      .tickFormat(d3.timeFormat("%Y"));
+      
+    svg.append("g")
+      .attr("class", "x-axis")
+      .attr("transform", `translate(0,${height})`)
+      .call(xAxis)
+      .selectAll("text")
+      .style("font-size", "10px");
+      
+    const yAxis = d3.axisLeft(yScale)
+      .ticks(5) // Reduced number of ticks
+      .tickFormat(d => d / 1000 + "k");
+      
+    svg.append("g")
+      .attr("class", "y-axis")
+      .call(yAxis)
+      .selectAll("text")
+      .style("font-size", "10px");
+          
+    // Add Y axis label
+    svg.append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 0 - margin.left)
+      .attr("x", 0 - (height / 2))
+      .attr("dy", "1em")
+      .style("text-anchor", "middle")
+      .style("font-size", "10px")
+      .text("CO₂e Emissions (MtCO₂e)");
+        
+    // Create the area generator
+    const area = d3.area()
+      .x(d => xScale(new Date(d.data.year, 0, 1)))
+      .y0(d => yScale(d[0]))
+      .y1(d => yScale(d[1]));
+        
+    // Add the areas
+    const layers = svg.selectAll(".layer")
+      .data(stackedData)
+      .enter().append("g")
+      .attr("class", "layer");
+      
+    layers.append("path")
+      .attr("class", d => d.key === "Transportation" ? "area transportation-area" : "area")
+      .attr("d", area)
+      .style("fill", (d, i) => sectorColors[d.key] || "#ccc")
+      .style("opacity", 0.8)
+      .style("stroke", "white")
+      .style("stroke-width", d => d.key === "Transportation" ? 1.5 : 0.5) // 增加Transportation的边框宽度
       .on("mouseover", function(event, d) {
-        // Only respond if not locked
         if (!activeCategoryLocked) {
           highlightLayer(this, d);
-          showTooltip(event, d);
-          
-          // Sync highlight with pie chart
-          if (window.highlightPieCategory) {
-            window.highlightPieCategory(d.key);
-          }
+        }
+      })
+      .on("mouseout", function() {
+        if (!activeCategoryLocked) {
+          resetHighlight();
         }
       })
       .on("mousemove", function(event, d) {
-        // Get mouse x-position to find nearest data point
-        const mouseX = d3.pointer(event, this)[0];
-        const xDate = x.invert(mouseX);
-        
-        // Find closest data point
-        const bisect = d3.bisector(d => d.data.year).left;
-        const idx = bisect(d, xDate, 1);
-        const leftPoint = d[idx - 1];
-        const rightPoint = d[idx];
-        
-        // Use the closest point
-        const point = !rightPoint ? leftPoint : 
-                     !leftPoint ? rightPoint :
-                     (xDate - leftPoint.data.year) < (rightPoint.data.year - xDate) ? leftPoint : rightPoint;
-        
-        if (!point) return;
-        
-        // Show value line at this point
-        showValueLine(point.data.year, mouseX);
-        
-        // Update tooltip with data for this specific sector and year
-        updateTooltipForSector(d.key, point, event);
-      })
-      .on("mouseout", function() {
-        // Only respond if not locked
-        if (!activeCategoryLocked) {
-          resetHighlight();
-          hideTooltip();
-          hideValueLine();
+        const [mouseX] = d3.pointer(event, this);
+        const date = xScale.invert(mouseX);
+        const year = date.getFullYear();
+        showValueLine(year, mouseX);
           
-          // Sync with pie chart
-          if (window.highlightPieCategory) {
-            window.highlightPieCategory(null);
-          }
-        }
-      })
-      .on("click", function(event, d) {
-        // If clicking already active area, deactivate
-        if (activeCategory === d.key && activeCategoryLocked) {
-          activeCategoryLocked = false;
-          activeCategory = null;
-          resetHighlight();
-          
-          // Sync with pie chart
-          if (window.highlightPieCategory) {
-            window.highlightPieCategory(null);
-          }
-        } else {
-          // Lock clicked area
-          activeCategoryLocked = true;
-          activeCategory = d.key;
-          highlightLayer(this, d, true);
-          
-          // Sync with pie chart
-          if (window.highlightPieCategory) {
-            window.highlightPieCategory(d.key, true);
-          }
+        // Find closest data point and show tooltip
+        const closestYear = years.reduce((prev, curr) => {
+          return Math.abs(curr - year) < Math.abs(prev - year) ? curr : prev;
+        });
+        
+        const yearData = flatData.find(item => item.year === closestYear);
+        if (yearData) {
+          showAreaTooltip(event, {
+            year: closestYear,
+            sector: d.key,
+            value: yearData[d.key]
+          });
         }
       });
 
-  // Create vertical line for value indication
-  const valueLine = svg.append("line")
-    .attr("class", "area-value-line")
-    .attr("y1", 0)
-    .attr("y2", innerH)
-    .attr("opacity", 0);
+    // Make Transportation layer stand out
+    setTimeout(() => {
+      layers.filter(d => d.key === "Transportation")
+        .select("path")
+        .transition()
+        .duration(500)
+        .style("opacity", 1)
+        .style("stroke-width", 2); // 加粗Transportation的边线
+    }, 1500);
 
-  // Create invisible overlay to capture mouse events on entire chart area
-  const mouseArea = svg.append("rect")
-    .attr("width", innerW)
-    .attr("height", innerH)
-    .attr("fill", "none")
-    .attr("pointer-events", "all")
-    .on("mouseover", function() {
-      if (!activeCategoryLocked) {
-        tooltip.style("display", "block");
-        valueLine.attr("opacity", 1);
+    // Create tooltip div if it doesn't exist
+    let tooltip = d3.select("body").select(".area-tooltip");
+    if (tooltip.empty()) {
+      tooltip = d3.select("body").append("div")
+        .attr("class", "area-tooltip")
+        .style("position", "absolute")
+        .style("background", "white")
+        .style("border", "1px solid #ddd")
+        .style("border-radius", "3px")
+        .style("padding", "8px")
+        .style("pointer-events", "none")
+        .style("opacity", 0)
+        .style("box-shadow", "0 2px 5px rgba(0,0,0,0.1)")
+        .style("font-size", "12px")
+        .style("z-index", 999);
       }
-    })
-    .on("mousemove", function(event) {
-      if (activeCategoryLocked) return; // Skip if locked on a category
-      
-      // Get mouse position
-      const [mouseX, mouseY] = d3.pointer(event);
-      
-      // Get date from x position
-      const xDate = x.invert(mouseX);
-      
-      // Find closest time point in data
-      const bisect = d3.bisector(d => d.year).left;
-      const idx = bisect(data, xDate, 1);
-      const leftPoint = data[idx - 1];
-      const rightPoint = data[idx];
-      const point = !rightPoint ? leftPoint : 
-                   !leftPoint ? rightPoint :
-                   (xDate - leftPoint.year) < (rightPoint.year - xDate) ? leftPoint : rightPoint;
-      
-      if (!point) return;
-      
-      // Show value line
-      showValueLine(point.year, mouseX);
-      
-      // Find which layer the y position corresponds to
-      const y0 = y(0); // Bottom of chart
-      // Reverse the order of keys to match visual stacking
-      const stackOrder = [...rawKeys].reverse();
-      
-      // Find which sector the mouse is over based on y position
-      let selectedSector = null;
-      
-      for (let i = 0; i < stackOrder.length; i++) {
-        const key = stackOrder[i];
-        // Skip if this category has no value in this year
-        if (!point[key] || point[key] === 0) continue;
+    
+    // Position reference line
+    let valueLine = svg.selectAll(".value-line");
+    if (valueLine.empty()) {
+      valueLine = svg.append("line")
+        .attr("class", "value-line")
+        .attr("y1", 0)
+        .attr("y2", height)
+        .style("stroke", "#999")
+        .style("stroke-width", 1)
+        .style("stroke-dasharray", "5,5")
+        .style("pointer-events", "none")
+        .style("opacity", 0);
+    }
+    
+    let yearLabel = svg.selectAll(".year-label");
+    if (yearLabel.empty()) {
+      yearLabel = svg.append("text")
+        .attr("class", "year-label")
+        .attr("text-anchor", "middle")
+        .attr("y", 15)
+        .style("font-size", "12px")
+        .style("font-weight", "bold")
+        .style("pointer-events", "none")
+        .style("opacity", 0);
+    }
+    
+    function showValueLine(date, xPos) {
+      valueLine
+        .attr("x1", xPos)
+        .attr("x2", xPos)
+        .style("opacity", 1);
         
-        // Calculate the y positions for this stack
-        const otherKeys = stackOrder.slice(i + 1);
-        const stackBase = d3.sum(otherKeys, k => +point[k] || 0);
-        const stackTop = stackBase + (+point[key]);
-        
-        // Check if mouse is within this layer's y-range
-        const yBottom = y(stackBase);
-        const yTop = y(stackTop);
-        
-        if (mouseY >= yTop && mouseY <= yBottom) {
-          selectedSector = key;
-          break;
-        }
+      yearLabel
+        .attr("x", xPos)
+        .text(date)
+        .style("opacity", 1);
+    }
+    
+    function hideValueLine() {
+      valueLine.style("opacity", 0);
+      yearLabel.style("opacity", 0);
+    }
+    
+    // 添加高亮区域功能
+    function highlightLayer(layer, d, isLocked = false, showTooltip = true) {
+      // 高亮选中的层，淡化其他层
+      layers.selectAll("path")
+        .transition()
+        .duration(200)
+        .style("opacity", function(layerData) {
+          return layerData.key === d.key ? 1 : 0.3;
+        });
+      
+      // 为Transportation保持一定的可见度
+      if (d.key !== "Transportation") {
+        layers.filter(l => l.key === "Transportation")
+          .select("path")
+          .transition()
+          .duration(200)
+          .style("opacity", 0.6);
       }
       
-      if (selectedSector) {
-        // Find the corresponding layer data
-        const layerData = series.find(d => d.key === selectedSector);
-        if (layerData) {
-          // Find the data point for this year
-          const dataPoint = layerData.find(d => {
-            return d3.timeFormat("%Y")(d.data.year) === d3.timeFormat("%Y")(point.year);
+      // 添加高亮样式
+      d3.select(layer).raise();
+      
+      // 显示面积图tooltip - 仅当showTooltip为true且鼠标悬停时
+      if (window.event && !isLocked && showTooltip) {
+        const event = window.event;
+        const yearData = findClosestYearData(event, xScale, flatData);
+        if (yearData) {
+          showAreaTooltip(event, {
+            year: yearData.year,
+            sector: d.key,
+            value: yearData[d.key]
           });
-          
-          if (dataPoint) {
-            // Highlight this layer
-            highlightLayer(d3.select(`.area-layer[data-key="${selectedSector}"]`).node(), layerData);
-            
-            // Show tooltip
-            tooltip.style("display", "block")
-              .style("opacity", 1);
-            
-            // Update tooltip content
-            updateTooltipForSector(selectedSector, dataPoint, event);
-          }
         }
-      } else {
-        // If not over any specific layer, show the year summary
-        updateTooltipForYear(point, event);
       }
-    })
-    .on("mouseout", function() {
-      if (!activeCategoryLocked) {
+    }
+    
+    function resetHighlight() {
+      if (!activeCategory || !activeCategoryLocked) {
+        // 恢复所有层的原始透明度
+        layers.selectAll("path")
+          .transition()
+          .duration(200)
+          .style("opacity", function(d) {
+            return d.key === "Transportation" ? 1 : 0.8; // Transportation保持高透明度
+          })
+          .style("stroke-width", d => d.key === "Transportation" ? 2 : 0.5);
+        
         hideTooltip();
         hideValueLine();
-        resetHighlight();
       }
-    });
-
-  // Animate areas on load
-  areaLayers.transition()
-    .duration(1500)
-    .attr("d", area)
-    .delay((d, i) => i * 100);
-
-  // 10. Add x-axis
-  svg.append("g")
-      .attr("transform", `translate(0,${innerH})`)
-      .attr("class", "x-axis")
-      .call(d3.axisBottom(x).ticks(data.length < 12 ? data.length : 12).tickFormat(d3.timeFormat("%Y")))
-    .selectAll("text")
-      .attr("transform", "rotate(-45)")
-      .style("text-anchor", "end")
-      .attr("dx", "-0.8em")
-      .attr("dy", "0.15em")
-      .attr("class", "x-axis-label");
-
-  // Add x-axis label
-  svg.append("text")
-    .attr("class", "axis-title")
-    .attr("text-anchor", "middle")
-    .attr("x", innerW / 2)
-    .attr("y", innerH + 55)
-    .text("Year")
-    .style("font-size", "14px")
-    .style("fill", "#666");
-
-  // 11. Add y-axis
-  svg.append("g")
-      .attr("class", "y-axis")
-      .call(d3.axisLeft(y).ticks(10))
-    .selectAll("text")
-      .attr("class", "y-axis-label");
+    }
+    
+    function showAreaTooltip(event, d) {
+      tooltip
+        .style("opacity", 0.9)
+        .html(() => {
+          if (d.year) {
+            // Point tooltip
+            return `<div>
+                      <strong>${d.sector}</strong><br/>
+                      Year: ${d.year}<br/>
+                      Emissions: ${d3.format(".2f")(d.value)} MtCO₂e
+                    </div>`;
+          } else {
+            // Layer tooltip - 恢复总排放量显示
+            return `<div>
+                      <strong>${d.sector}</strong><br/>
+                      ${d3.format(".2f")(d.total)} MtCO₂e
+                    </div>`;
+          }
+        })
+        .style("left", (event.pageX + 10) + "px")
+        .style("top", (event.pageY - 28) + "px");
+    }
+    
+    function updateTooltipForSector(sector, point, event) {
+      const yearData = flatData.find(d => d.year === point.data.year);
+      if (yearData) {
+        tooltip
+          .style("opacity", 0.9)
+          .html(() => {
+            return `<div>
+                      <strong>${sector}</strong><br/>
+                      Year: ${yearData.year}<br/>
+                      Emissions: ${d3.format(".2f")(yearData[sector] || 0)} MtCO₂e
+                    </div>`;
+          })
+          .style("left", (event.pageX + 10) + "px")
+          .style("top", (event.pageY - 28) + "px");
+      }
+    }
+    
+    function hideTooltip() {
+      tooltip.style("opacity", 0);
+    }
+    
+    // 暴露面积图的高亮函数给窗口对象
+    window.highlightAreaCategory = function(category, isLocked = false, showTooltip = true) {
+      console.log("Highlighting area category:", category, isLocked);
       
-  // Add y-axis label
-  svg.append("text")
-    .attr("class", "axis-title")
-    .attr("text-anchor", "middle")
-    .attr("transform", "rotate(-90)")
-    .attr("x", -innerH / 2)
-    .attr("y", -45)
-    .text("Mt CO₂e")
-    .style("font-size", "14px")
-    .style("fill", "#666");
-  
-  // Provide external highlight function for pie chart to call
-  window.highlightAreaCategory = function(category, shouldLock = false) {
-    if (category) {
-      // Find corresponding layer
-      const targetLayer = svg.selectAll(".area-layer")
-        .filter(d => d.key === category)
-        .node();
+      if (!category) {
+        resetHighlight();
         
-      if (targetLayer) {
-        activeCategory = category;
-        activeCategoryLocked = shouldLock;
-        highlightLayer(targetLayer, { key: category }, shouldLock);
+        // 如果是锁定状态被取消，也要重置饼图
+        if (activeCategoryLocked) {
+          activeCategory = null;
+          activeCategoryLocked = false;
+          
+          if (window.highlightPieCategory) {
+            window.highlightPieCategory(null);
+          }
+          
+          // 重置legend状态
+          d3.selectAll(".legend-item").classed("locked", false)
+            .style("background-color", "transparent");
+        }
+        
+        return;
       }
-    } else {
-      // If no category specified, reset all highlights
-      activeCategory = null;
-      activeCategoryLocked = false;
-      resetHighlight();
-    }
-  };
-  
-  // Helper function to show value line
-  function showValueLine(date, xPos) {
-    valueLine
-      .attr("x1", xPos)
-      .attr("x2", xPos)
-      .transition()
-      .duration(100)
-      .attr("opacity", 1);
+      
+      // 找到对应的图层
+      const layer = layers.filter(d => d.key === category);
+      if (!layer.empty()) {
+        const layerData = layer.datum();
+        const layerPath = layer.select("path").node();
+        
+        // 锁定状态下同步更新全局状态和饼图
+        if (isLocked) {
+          activeCategory = category;
+          activeCategoryLocked = true;
+          
+          // 同步高亮饼图
+          if (window.highlightPieCategory) {
+            window.highlightPieCategory(category, true);
+          }
+          
+          // 更新legend状态
+          d3.selectAll(".legend-item").classed("locked", function() {
+            return d3.select(this).select("span").text() === category;
+          })
+          .style("background-color", function() {
+            return d3.select(this).select("span").text() === category ? "#f0f0f0" : "transparent";
+          });
+        }
+        
+        // 高亮图层
+        highlightLayer(layerPath, layerData, isLocked, showTooltip);
+      }
+    };
+  } catch (e) {
+    console.error("Error in drawAreaChart:", e);
+    handleError(e);
+  }
   }
   
-  // Helper function to hide value line
-  function hideValueLine() {
-    valueLine
-      .transition()
-      .duration(200)
-      .attr("opacity", 0);
+// 添加错误处理
+function handleError(error) {
+  console.error("Error in chart rendering:", error);
+  // 显示错误信息，而不是白屏
+  const container = d3.select("#pieChart");
+  if (container.empty()) {
+    console.error("Pie chart container not found!");
+    return;
   }
   
-  // Helper function to highlight a specific layer
-  function highlightLayer(element, d, isLocked = false) {
-    // Update lock state
-    if (isLocked) {
-      activeCategoryLocked = true;
-      activeCategory = d.key;
-    }
-    
-    d3.selectAll(".area-layer")
-      .classed("highlighted", false)
-      .classed("dimmed", function() {
-        return this !== element;
-      });
-    
-    d3.select(element)
-      .classed("highlighted", true)
-      .raise();
-  }
-  
-  // Helper function to reset all highlights
-  function resetHighlight() {
-    // Cancel lock
-    activeCategoryLocked = false;
-    activeCategory = null;
-    
-    d3.selectAll(".area-layer")
-      .classed("highlighted", false)
-      .classed("dimmed", false);
-  }
-  
-  // Helper function to show tooltip
-  function showTooltip(event, d) {
-    tooltip
-      .style("display", "block")
-      .style("left", `${event.pageX + 10}px`)
-      .style("top", `${event.pageY - 28}px`)
-      .transition()
-      .duration(200)
-      .style("opacity", 1);
-  }
-  
-  // Helper function to update tooltip for a specific sector at a specific year
-  function updateTooltipForSector(sector, point, event) {
-    if (!point || !point.data) return;
-    
-    const year = d3.timeFormat("%Y")(point.data.year);
-    const value = (point[1] - point[0]).toFixed(1);
-    const total = d3.sum(Object.values(point.data).filter(v => !isNaN(v) && v !== point.data.year));
-    const percentage = ((point[1] - point[0]) / total * 100).toFixed(1);
-    
-    // Position tooltip precisely where the mouse is
-    const [mouseX, mouseY] = d3.pointer(event, container.node());
-    
-    tooltip
-      .html(`
-        <div style="text-align:center; font-weight:bold; margin-bottom:5px; font-size:14px;">${year}</div>
-        <div style="display:flex; align-items:center; margin:8px 0;">
-          <div style="width:12px; height:12px; background-color:${sectorColors[sector]}; margin-right:8px;"></div>
-          <div style="font-weight:bold; font-size:13px;">${sector}</div>
-        </div>
-        <div style="margin:5px 0;">Emissions: ${d3.format(",")(value)} Mt CO₂e</div>
-        <div style="margin:5px 0;">Share: ${percentage}%</div>
-      `)
-      .style("left", `${mouseX + 15}px`)
-      .style("top", `${mouseY - 15}px`);
-  }
-  
-  // Helper function to hide tooltip
-  function hideTooltip() {
-    tooltip
-      .transition()
-      .duration(200)
-      .style("opacity", 0)
-      .on("end", function() {
-        d3.select(this).style("display", "none");
-      });
-  }
+  container.html("")
+    .append("div")
+    .style("padding", "20px")
+    .style("color", "red")
+    .text("Error rendering chart: " + error.message);
 }
 
 Promise.all([
   d3.csv("./data/historical_emissions/ghg_sector_2022.csv"),
   d3.csv("./data/historical_emissions/ghg_time_series.csv")
 ]).then(([sectorData, timeSeriesRaw]) => {
+  console.log("Data loaded successfully"); // 添加调试信息
+  console.log("Sector data:", sectorData);
+  console.log("Time series data:", timeSeriesRaw);
+  
+  try {
   // Map pie chart data
   const pieData = sectorData.map(d => ({
     Sector: d.sector,
     Emission: +d.value
   }));
+    
+    console.log("Processed pie data:", pieData);
   
   // Fix category name inconsistency in time series data
   timeSeriesRaw.forEach(d => {
@@ -1154,6 +1149,8 @@ Promise.all([
       delete d["Electricity/Heat2"];
     }
   });
+    
+    console.log("Processed time series data:", timeSeriesRaw);
   
   // Create pie chart
   drawPieChart(pieData);
@@ -1163,5 +1160,14 @@ Promise.all([
 
   // Create shared legend after both charts are created
   createSharedLegend(pieData);
+    
+    console.log("Charts and legend created successfully");
+  } catch (e) {
+    console.error("Error creating charts:", e);
+    handleError(e);
+  }
 })
-.catch(err => console.error("Error loading data or drawing charts:", err));
+.catch(err => {
+  console.error("Error loading data or drawing charts:", err);
+  handleError(err);
+});

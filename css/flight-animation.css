@@ -16,9 +16,10 @@
 }
 
 .world-globe {
-    filter: drop-shadow(0 0 10px rgba(100, 200, 255, 0.3));
     transform-origin: center;
-    animation: pulse 5s ease-in-out infinite;
+    animation: none; /* Disable animation completely */
+    opacity: 0 !important; /* Force opacity to 0 */
+    fill: transparent !important; /* Force fill to be transparent */
 }
 
 .flight-path {
@@ -34,18 +35,6 @@
 .person-icon {
     filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.7));
     transform-origin: center;
-}
-
-/* Pulsing animation for the globe */
-@keyframes pulse {
-    0%, 100% {
-        transform: scale(1);
-        opacity: 0.3;
-    }
-    50% {
-        transform: scale(1.02);
-        opacity: 0.4;
-    }
 }
 
 /* Dashed line animation for the flight path */

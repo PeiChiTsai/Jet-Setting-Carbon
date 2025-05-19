@@ -18,19 +18,22 @@ class World {
     this.innerW = this.width - this.margin.left - this.margin.right;
     this.innerH = this.height - this.margin.top - this.margin.bottom;
 
-  this.svg = div
-    .selectAll(".mysvg")
-    .data(["mysvg"])
-    .join("svg")
-      .attr("class", "mysvg")
-      // 1. 定义内部坐标系为 [0,0] → [width,height]
-      .attr("viewBox", `0 0 ${this.width} ${this.height}`)
-      // 2. 保持等比缩放，居中显示
-      .attr("preserveAspectRatio", "xMidYMid meet")
-      // 3. 外围尺寸由 CSS / 容器来控制
-      .style("width", "100%")
-      .style("height", "auto");
-
+    // 恢复响应式SVG尺寸，使交互正常工作
+    this.svg = div
+      .selectAll(".mysvg")
+      .data(["mysvg"])
+      .join("svg")
+        .attr("class", "mysvg")
+        // 定义内部坐标系为 [0,0] → [width,height]
+        .attr("viewBox", `0 0 ${this.width} ${this.height}`)
+        // 保持等比缩放，居中显示
+        .attr("preserveAspectRatio", "xMidYMid meet")
+        // 恢复响应式尺寸
+        .style("width", "100%")
+        .style("height", "auto")
+        .style("max-width", "100%")
+        .style("margin", "0 auto")
+        .style("display", "block");
 
     this._initChartArea();
   }
@@ -132,12 +135,12 @@ class Map extends World {
     this.color = d3.scaleThreshold()
       .domain([0,1e5, 1e6, 1e7, 1e8])
       .range([
-      "#d3d3d3",
-      "#fde0ae",  // 100k–1M
-      "#fbb185",  // 1M–10M
-      "#fc7f63",  // 10M–100M
-      "#db2c04",   // >100M
-      "#901d03",  // >100M
+      "#f0f0f0",  // 灰白色（无数据）
+      "#e1ecf7",  // 极浅蓝色
+      "#93c4f5",  // 浅蓝色
+      "#4c8ed4",  // 中蓝色
+      "#1e54a8",  // 深蓝色
+      "#072656",  // 极深蓝色
       ]);
 
     this.x = d3
@@ -391,7 +394,7 @@ _addLabel() {
       .transition().duration(800)
       .attr("cx", d => newX(d.avg));
 
-    // —— 5. **关键**：对 morph 出来的 “2024 圆” 再来一次 flubber 过渡
+    // —— 5. **关键**：对 morph 出来的 "2024 圆" 再来一次 flubber 过渡
     d3.selectAll(".worldPath")
       .filter(d => validSlugs.has(d.properties.admin_slug))
       .transition().duration(800)
@@ -431,7 +434,7 @@ _addLabel() {
           .tickFormat(d3.format("~s"))
       );
 
-    // 4. 更新所有 “year-point” 和 “avg-point” 的 cx
+    // 4. 更新所有 "year-point" 和 "avg-point" 的 cx
     this.DrawArea.selectAll(".year-point")
       .transition().duration(800)
       .attr("cx", d => this.x(d.val));
@@ -460,7 +463,7 @@ _addLabel() {
 
 
   _drawAveragePoints() {
-    // 1. 计算每个国家的平均值，先过滤掉所有 val===0 的“无数据”点
+    // 1. 计算每个国家的平均值，先过滤掉所有 val===0 的"无数据"点
     const avgData = this.scatter_data.map(([slug, series]) => {
       // 提取所有数值并剔除 0
       const validVals = series
@@ -516,7 +519,7 @@ _addLabel() {
 
 // Scatter 类里，替换掉原来的 showOverlay()：
   showOverlay() {
-    // 1. 定义要遮罩的国家 slug 以及对应的“由深到浅”色值数组
+    // 1. 定义要遮罩的国家 slug 以及对应的"由深到浅"色值数组
     const targets = [
       "united_states_of_america",
       "brazil",
@@ -529,15 +532,15 @@ _addLabel() {
       "spain"
     ];
     const colors = [
-      "#67000d", 
-      "#a50f15",
-      "#cb181d",
-      "#ef3b2c",
-      "#fb6a4a",
-      "#fc9272",
-      "#fcbba1",
-      "#FFCAB1",
-      "#FFDBCA"  
+      "#072656",     // 极深蓝色
+      "#0d3672",
+      "#154491",
+      "#1e54a8",
+      "#306cbd",
+      "#4c8ed4",
+      "#70abe3",
+      "#93c4f5",
+      "#e1ecf7"      // 极浅蓝色
     ];
 
     // 2. 过滤出 y 轴上存在的那些 slug，并组装成 { slug, color } 的对象数组
@@ -611,7 +614,7 @@ _addLabel() {
           yScale    = this.y,
           validSlugs = new Set(yScale.domain());
 
-    // 1. 隐藏掉所有 “无效” 国家
+    // 1. 隐藏掉所有 "无效" 国家
     d3.selectAll(".worldPath")
       .filter(d => !validSlugs.has(d.properties.admin_slug))
       .transition()
@@ -619,7 +622,7 @@ _addLabel() {
       .style("opacity", 0)
       .attr("pointer-events", "none");  // 也一起禁用 hover
 
-    // 2. 对 “有效” 国家 做 morph
+    // 2. 对 "有效" 国家 做 morph
     d3.selectAll(".worldPath")
       .filter(d => validSlugs.has(d.properties.admin_slug))
       .transition()
@@ -1000,6 +1003,7 @@ async function main() {
   // —— 新增：让 ScrollMorph 接管滚动触发
   new ScrollMorph(scatter, map, "#chartArea");
 }
+
 
 
 

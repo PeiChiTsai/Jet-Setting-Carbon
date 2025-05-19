@@ -1,0 +1,160 @@
+/* 滚动触发动画效果的CSS样式 */
+
+/* 初始状态 - 所有section在开始时都隐藏 */
+section:not(.animated) {
+    opacity: 0;
+}
+
+/* 动画后的状态 */
+section.animated {
+    opacity: 1;
+    transition: opacity 0.5s ease-out;
+}
+
+/* 淡入动画 */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* 从下方淡入动画 */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 从左侧淡入动画 */
+@keyframes fadeInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* 从右侧淡入动画 */
+@keyframes fadeInRight {
+    from {
+        opacity: 0;
+        transform: translateX(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* 放大淡入动画 */
+@keyframes zoomIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* 缩小淡入动画 */
+@keyframes zoomInDown {
+    from {
+        opacity: 0;
+        transform: scale(1.1) translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* 动画预设 - 可以直接添加这些类到HTML元素 */
+.fade-in {
+    animation: fadeIn 0.8s ease-out forwards;
+}
+
+.fade-in-up {
+    animation: fadeInUp 0.8s ease-out forwards;
+}
+
+.fade-in-left {
+    animation: fadeInLeft 0.8s ease-out forwards;
+}
+
+.fade-in-right {
+    animation: fadeInRight 0.8s ease-out forwards;
+}
+
+.zoom-in {
+    animation: zoomIn 0.8s ease-out forwards;
+}
+
+.zoom-in-down {
+    animation: zoomInDown 0.8s ease-out forwards;
+}
+
+/* 动画延迟类 */
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+.delay-400 { animation-delay: 400ms; }
+.delay-500 { animation-delay: 500ms; }
+
+/* 确保动画完成后保持最终状态 */
+[class*="fade-"], [class*="zoom-"] {
+    animation-fill-mode: forwards;
+}
+
+/* 首页特殊动画 */
+.jet-title, .jet-subtitle {
+    opacity: 0;
+}
+
+section.animated .jet-title {
+    animation: fadeInUp 1s ease-out forwards;
+}
+
+section.animated .jet-subtitle {
+    animation: fadeInUp 1s ease-out 0.3s forwards;
+}
+
+/* 针对不同部分的特定样式 */
+#Intro-1 .chart-cell, 
+#Intro-1 .right-col > * {
+    opacity: 0;
+}
+
+#Intro-2 .header,
+#Intro-2 .year-selector,
+#Intro-2 .left-column,
+#Intro-2 .right-column {
+    opacity: 0;
+}
+
+#Intro-3 .left-col,
+#Intro-3 .right-col {
+    opacity: 0;
+}
+
+#chartArea .chart,
+#chartArea .right-side-div {
+    opacity: 0;
+}
+
+/* 确保所有动画元素初始不可见 */
+.fade-in, .fade-in-up, .fade-in-left, .fade-in-right, .zoom-in, .zoom-in-down {
+    opacity: 0;
+} 
