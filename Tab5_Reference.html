@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <title>Jet Setting Carbon</title>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <!-- Google Fonnts -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200;0,400;0,600;0,700;1,200;1,700&family=Cabin+Condensed:wght@400;500;600;700&family=Contrail+One&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+
+
+        <!-- Style -->
+        <link rel="stylesheet" href="css/main-styles.css">
+        <link rel="stylesheet" href="css/jet-title-styles.css">        
+        <link rel="stylesheet" href="css/arrow_style.css">
+        <link rel="stylesheet" href="./js/d3-tip.css">
+        <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+        
+        <link rel="stylesheet" href="css/bubble_style.css">
+
+        <!-- Script -->
+        <script src="./js/click-scroll.js"></script>
+        <script src="./js/d3.min.js"></script>
+        <script src="./js/d3-tip-v6.js"></script>    
+        <script src="https://unpkg.com/flubber@0.3.0"></script>
+        <script src="https://unpkg.com/topojson@3"></script>
+        <!-- Load D3.js and Sankey plugin -->
+        <script src="https://d3js.org/d3.v7.min.js"></script>
+        <script src="https://unpkg.com/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
+        
+
+
+        <!-- lib -->
+        <script src="lib/highcharts.js"></script>
+        <script src="lib/highcharts-more.js"></script>
+        <script src="lib/exporting.js"></script>
+        <script src="lib/export-data.js"></script>
+        <script src="lib/accessibility.js"></script>
+
+        <style>
+            *,
+            *::before,
+            *::after {
+            box-sizing: border-box;
+            }
+
+            html, body, main {
+            overflow: hidden;
+            }
+            
+            /* 1. 禁止 body/page 本身滚动，只由 article 来滚动 */
+            html, body {
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+            }
+
+            /* 2. 让 article 顶在导航下方，并自己滚动 */
+            article {
+            position: relative;
+            top: 50px;                   /* 导航高度，按实际改 */
+            height: calc(100vh );  /* 扣掉导航 */
+            overflow-y: auto;
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+            /* scroll-padding-top 只影响 snap 对齐，不推下初始位置 */
+            }
+
+            /* 3. 每个 section 都是一屏高，成为 snap 点 */
+            article > section {
+            height: 100%;                /* 刚好撑满 article */
+            scroll-snap-align: start;
+            box-sizing: border-box;
+            }
+
+            /* 4. 如果需要给内容顶部一点内边距，防止紧贴 section 顶 */
+            article > section > * {
+            padding-top: 1rem;           /* 可选，看你想要留多少空隙 */
+            }
+
+
+
+            .video-section {
+            position: relative;
+            overflow: hidden;
+            }
+
+            .video-section .bg-video {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: auto;
+            height: auto;
+            min-width: 100%;
+            min-height: 100%;
+            object-fit: cover;
+            z-index: 0;
+            }
+            
+            .video-section::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            pointer-events: none;
+            z-index: 1;
+            }
+
+            .video-section .TitlePage {
+            position: relative;
+            z-index: 2;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;   
+            align-items: flex-start; 
+            padding: 0 5%; 
+            color: #fff; 
+            text-shadow: 0 2px 8px rgba(0,0,0,0.5);  
+            }
+
+            /* —— 标题 —— */
+            .video-section .title {
+            font-size: 3rem;            /* 按需调大 */
+            margin-bottom: 0.5rem;
+            line-height: 1.2;
+            }
+
+            /* —— 副标题 —— */
+            .video-section .mid-text {
+            font-size: 1.5rem;
+            max-width: 700px;           /* 最宽 700px，换行可读 */
+            margin-bottom: 1.5rem;
+            }
+
+
+
+            #chart-intro1 {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            }
+
+            #pieChart, #areaChart {
+            width: 100%;
+            height: 300px;
+            position: relative;
+            }
+
+            #pieChart svg, #areaChart svg {
+            width: 100%;
+            height: 100%;
+            }
+
+
+
+
+            .chart {
+                width: 100%;
+                height: 100vh;
+                display: grid;
+                grid-template-rows: 10% 90%;
+                background-color: #f4f4f4;
+
+            }
+
+            #map {
+                width: 100%;
+            }
+
+            /* svg {
+                background-image: url("./img/world.png");
+                background-size: cover;
+            } */
+
+            .domain {
+                stroke: lightgray;
+            }
+
+            body {
+                margin: 0;
+                box-sizing: content-box;
+                z-index:1;
+            }
+            .title {
+                font-size: 45px;
+                text-align: center;
+                font-weight:lighter;
+                font-family:'Montserrat',sans-serif;
+                font-weight: bold;
+                color:rgb(0, 0, 0);
+            }
+            
+            .maptitle{
+                font-size: 30px;
+                text-align: center;
+                font-weight: lighter;
+                font-family: 'Montserrat',sans-serif;
+                font-weight: bold;
+                color: rgb(0, 0, 0);
+                margin-top:2%;
+                margin-left: 10%;
+
+            }
+
+            text {
+                fill: gray
+
+            }
+
+
+
+            g line {
+                stroke: lightgray;
+            }
+
+            .right-side-div {
+                height: 100vh;
+                margin-left:10px;
+
+            }
+
+            .left-col,
+            .right-col {
+            padding: 0 5rem;
+            }
+
+            .middleThings {
+            display: grid;
+            grid-template-columns: 65% 30%;  /* 左 70% / 右 30% */
+            gap: 1.5rem;                     /* 栏间距，可按需调整 */
+            width: 100%;
+            margin: 0 auto;
+            }
+
+
+            .finalThings {
+            display: grid;
+            justify-content: center; 
+            align-items: center; 
+            gap: 1.5rem;
+            width: 50%;
+            margin: 0 auto;
+            }
+
+
+
+
+
+
+
+            /* 响应式：窄屏时回退成单栏 */
+            @media (max-width: 800px) {
+            .middleThings {
+                grid-template-columns: 1fr;
+            }
+            }
+
+            .midHeader{
+                background-color:gray;
+                margin-top:50px;
+                margin-bottom:10px;
+                text-align: center;
+                color:rgb(255, 255, 255);
+                font-size:25px;
+                font-family:'Montserrat',sans-serif;
+                vertical-align:middle;
+                font-weight:bold;
+                margin-left:10px;
+            }
+            .text{
+                font-size: 20px;
+                text-align: center;
+                font-weight:lighter;
+                font-family:'Montserrat',sans-serif;
+                margin-top:35px;
+                margin-bottom:35px;
+            }
+            .mid-text{
+                font-size: 18px;
+                font-weight:lighter;
+                font-family:'Montserrat',sans-serif;
+                margin-top:35px;
+                margin-bottom:35px;
+                margin-left:10px;
+                width:100%;
+            }
+            
+            /* Add specific style for strong elements inside mid-text */
+            .mid-text strong {
+                font-weight: bold;
+            }
+
+            .right-side-header{
+                background-color:#314563;
+                margin-bottom:10px;
+                color:rgb(255, 255, 255);
+                font-size:15px;
+                font-family:'Montserrat',sans-serif;
+                font-weight:bold;
+            }
+            .right-text {
+                background-color: #f1f1f1;
+                border-left: 2px solid gray;
+                font-family:'Montserrat',sans-serif;
+                padding: 5px;
+            }
+
+            #chartArea {
+            display: grid;
+            grid-template-columns: 70% 25%;
+            height: 99vh;
+            overflow-y: auto;    /* 保留纵向滚动 */
+            overflow-x: hidden;
+            width: 100%;
+            padding-right: 18px;
+
+            /* —— 以下三行隐藏滚动条 —— */
+            -ms-overflow-style: none;  /* IE & Edge */
+            scrollbar-width: none;     /* Firefox */
+            }
+            #chartArea::-webkit-scrollbar {
+            display: none;             /* Chrome, Safari & Opera */
+            }
+
+            
+            #container1 {
+                height: 100%;
+                width: 100%;
+                overflow: hidden;
+
+            }
+
+            .flourish-embed{
+                text-align: center;
+                width: 100%;
+            }
+
+            .rough-box {
+                max-width: 500px;
+                margin: 0 auto;
+                margin-bottom:35px;
+                padding: 20px;
+                color: rgb(255, 255, 255);
+                background-image: paint(rough-painter);
+            }
+            .rough-box {
+                --rough-border-width: 3;
+                --rough-fill: rgb(194, 188, 188);
+                --rough-fill-weight: 9;
+                --rough-fill-style: zigzag;
+            }
+            .rough-box-title {
+                margin: 0 auto;
+                margin-top:70px;
+                margin-bottom:35px;
+                padding: 20px;
+                color: rgb(255, 255, 255);
+                background-image: paint(rough-painter);
+                text-align: center;
+            }
+            .rough-box-title {
+                --rough-border-width: 3;
+                --rough-fill: rgb(219, 219, 219); 
+                --rough-fill-weight: 9;
+                --rough-fill-style: zigzag;
+            }
+
+
+
+
+            .button-container{
+                text-align: center;
+                margin-bottom: 35px;
+            }
+
+
+            /* ===============================
+            SCROLL STEP INDICATOR
+            ================================= */
+            .step-indicator {
+                position: fixed;
+                right: 20px;
+                top: 50%;
+                transform: translateY(-50%);
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .step {
+                width: 12px;
+                height: 12px;
+                border-radius: 50%;
+                background-color: #ccc;
+                cursor: pointer;
+            }
+
+            .step.active {
+                background-color: #314563;
+            }
+
+            
+
+
+
+
+
+
+            /* ======================================
+            全局容器：三行竖直排列，行间留隙
+            ====================================== */
+            /* ── 全局：Flex 容器，3 行垂直排列 ── */
+            #chart-intro1 {
+            padding-top: 0 ;
+            }
+
+            .chart-container {
+            display: flex;
+            flex-direction: column;
+            height: 90vh;       /* 占满整个视口高度 */
+            margin: 0; padding: 0;
+            }
+
+            .chart-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            }
+
+            /* ── 第1行：饼图+图例 ── */
+            .pie-row {
+            flex: 50%; 
+            gap: 1rem; 
+            }
+
+            .chart-cell {
+            height: 100%;          /* 占满行高 */
+            }
+
+            /* 左侧 饼图区 */
+            .chart-cell--chart {
+            flex: 5;               /* 占宽比：5  */
+            
+            
+            }
+
+            /* 右侧 图例区 */
+            .chart-cell--legend {
+            flex: 4%;               /* 占宽比：2  */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;/* 图例列表垂直居中 */
+            padding-left: 0.5rem;
+            }
+
+            /* 图例列表样式 */
+            #legendPlacement ul {
+            list-style: none;
+            margin: 0; padding: 0;
+            }
+            #legendPlacement li {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.4rem;
+            font-size: 0.9rem;
+            }
+            #legendPlacement li .legend-color {
+            width: 12px; height: 12px;
+            margin-right: 0.5rem;
+            }
+
+            /* ── 第3行：面积图 ── */
+            .area-row {
+            flex: 50%;               /* 行高比：5 */
+            }
+            .area-row .chart-cell--chart {
+            width: 100%;
+            }
+
+
+
+
+
+            /* ── SVG 自适应填满容器 ── */
+            #pieChart svg,
+            #areaChart svg {
+            width: 100%;
+            height: 100%;
+            }
+
+
+
+
+            
+        </style>
+
+        <style>
+
+
+
+      
+
+
+        
+        h1 {
+            margin-bottom: 5px;
+            color: #2c3e50;
+            font-size: 24px;
+        }
+        
+        h3 {
+            margin-top: 0;
+            color: #7f8c8d;
+            font-weight: normal;
+            font-size: 18px;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        select, button {
+            padding: 8px 12px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            background-color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        
+        select:focus, button:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            transition: background-color 0.2s;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        .button-group {
+            display: none; /* 隐藏顶部按钮组 */
+        }
+        
+        .year-button {
+            padding: 20px 30px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            background-color: #f0f0f0;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-width: 120px;
+            text-align: center;
+            color: #FFF;
+        }
+        
+        .year-button:not(.active) {
+            background-color: #eee;
+            color: #000;
+        }
+        
+        .year-button.active {
+            background-color: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+        
+        /* 双列布局 */
+        .main-content {
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .left-column {
+            flex: 60%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .right-column {
+            flex: 40%;
+            background-color: #e6f2ff; /* 浅蓝色背景 */
+            padding: 20px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        #sankey-container {
+            width: 100%;
+            height: 650px;
+            position: relative;
+        }
+        
+        /* 新的底部年份选择器样式 */
+        .year-selector {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+            background-color: #f5f5f5;
+            border-radius: 4px;
+            padding: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .year-selector-button {
+            background-color: #f0f0f0;
+            color: #333;
+            border: none;
+            padding: 12px 20px;
+            margin: 0 2px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .year-selector-button.active {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .year-selector-button:first-child {
+            border-top-left-radius: 4px;
+            border-bottom-left-radius: 4px;
+        }
+        
+        .year-selector-button:last-child {
+            border-top-right-radius: 4px;
+            border-bottom-right-radius: 4px;
+        }
+        
+        .loader {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+        }
+        
+        .loader.active {
+            display: block;
+        }
+        
+        .info-heading {
+            font-size: 28px;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            line-height: 1.3;
+        }
+        
+        .info-text {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #34495e;
+            margin-bottom: 20px;
+        }
+        
+        .info-citation {
+            font-size: 12px;
+            font-style: italic;
+            color: #7f8c8d;
+            border-top: 1px solid #dbe9f6;
+            padding-top: 10px;
+            margin-top: 10px;
+            text-align: right;
+        }
+        
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: 20px;
+        }
+        
+        .description {
+            background-color: #f1f8ff;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        
+        .source-link {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 12px;
+        }
+        
+        .source-link a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        
+        .source-link a:hover {
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+            .left-column, .right-column {
+                flex: 100%;
+            }
+            #sankey-container {
+                height: 500px;
+            }
+        }
+    </style>
+
+    </head>
+
+    <body>
+        <main>
+            <!-- Top navigation -->
+            <ul class="navbar">
+                <li class="logo">
+                    <a href="#Home">
+                        <img src="images/logo.svg" alt="Logo" class="logo-image">
+                        <span class="logo-text">AVIATION NETWORK</span>
+                    </a>
+                </li>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="Tab1_3DGlobe.html">Global</a></li>
+                    <li><a href="Tab2_Europe.html">Continent</a></li>
+                    <li><a href="Tab3_City.html">City</a></li>
+                    <li><a href="Tab4_Conclusion.html">Conclusion</a></li>
+                    <li><a href="Tab5_Reference.html">Reference</a></li>
+            </ul>
+
+
+
+            <article>
+ 
+                <section>
+                    <div class="finalThings">
+                        <div class="midHeader">
+                            <span>
+                                References
+                            </span>
+                        </div>
+                        <div class="mid-text">
+                                        <h3>Story</h3>
+            <ul>
+                <li><em>10 figures about aviation and the climate</em></li>
+            </ul>
+
+            <h3>Data</h3>
+            <ul>
+                <li>World Resources Institute - Research for People &amp; Planet</li>
+                <li>
+                OECD (2025) – processed by Our World in Data. 
+                “<a href="https://ourworldindata.org/grapher/annual-co-emissions-from-aviation" target="_blank" rel="noopener noreferrer">Annual CO₂ emissions from aviation</a>” [dataset]. 
+                OECD, “Air transport CO2 emissions (experimental)” [original data]. Retrieved May 8, 2025.
+                </li>
+                <li>
+                <a href="https://www.nature.com/articles/s41560-022-01121-5" target="_blank" rel="noopener noreferrer">
+                    Large inequality in international and intranational energy footprints between income groups and across consumption categories</a> | Nature Energy
+                </li>
+                <li>
+                <a href="https://www.avbuyer.com/articles/private-jets/what-are-the-fastest-growing-registries-in-the-world-113282" target="_blank" rel="noopener noreferrer">
+                    What are the Fastest Growing Registries in the World?</a> | AvBuyer
+                </li>
+                <li>Private aviation path and their estimated emissions from 2019–2024 (by each flight)</li>
+                <li>
+                <a href="https://github.com/ip2location/ip2location-iata-icao" target="_blank" rel="noopener noreferrer">
+                    GitHub - ip2location/ip2location-iata-icao</a>: IATA and ICAO airport codes with country and region metadata
+                </li>
+                <li>
+                <a href="https://www.eurocontrol.int/publication/eurocontrol-data-snapshot-49" target="_blank" rel="noopener noreferrer">
+                    EUROCONTROL Data Snapshot #49</a> | EUROCONTROL
+                </li>
+                <li>
+                <a href="https://www.oag.com/busiest-routes" target="_blank" rel="noopener noreferrer">
+                    Busiest Flight Routes in the World 2024</a> | OAG
+                </li>
+            </ul>
+
+            <h3>Icon / Texture Source</h3>
+            <ul>
+                <li>
+                <a href="https://www.vecteezy.com/" target="_blank" rel="noopener noreferrer">Vector Icons and Stickers</a> - PNG, SVG, EPS, PSD and CSS
+                </li>
+                <li>
+                <a href="https://www.solarsystemscope.com/textures/" target="_blank" rel="noopener noreferrer">Solar Textures</a> | Solar System Scope
+                </li>
+            </ul>
+                        </div>
+                    </div>
+
+                </section>
+
+
+
+                
+            </article>
+
+
+
+
+
+        </main>
+
+
+
+
+    </body>
+
+</html>
