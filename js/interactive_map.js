@@ -19,17 +19,17 @@ class World {
     this.innerH = this.height - this.margin.top - this.margin.bottom;
 
     // 恢复响应式SVG尺寸，使交互正常工作
-    this.svg = div
-      .selectAll(".mysvg")
-      .data(["mysvg"])
-      .join("svg")
-        .attr("class", "mysvg")
+  this.svg = div
+    .selectAll(".mysvg")
+    .data(["mysvg"])
+    .join("svg")
+      .attr("class", "mysvg")
         // 定义内部坐标系为 [0,0] → [width,height]
-        .attr("viewBox", `0 0 ${this.width} ${this.height}`)
+      .attr("viewBox", `0 0 ${this.width} ${this.height}`)
         // 保持等比缩放，居中显示
-        .attr("preserveAspectRatio", "xMidYMid meet")
+      .attr("preserveAspectRatio", "xMidYMid meet")
         // 恢复响应式尺寸
-        .style("width", "100%")
+      .style("width", "100%")
         .style("height", "auto")
         .style("max-width", "100%")
         .style("margin", "0 auto")

@@ -32,8 +32,26 @@
         <!-- Load D3.js and Sankey plugin -->
         <script src="https://d3js.org/d3.v7.min.js"></script>
         <script src="https://unpkg.com/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
-        
 
+        <!-- Floating animations -->
+        <script src="./js/floating-animations.js"></script>
+        
+        <!-- SVG Patterns for Background -->
+        <svg width="0" height="0" style="position: absolute;">
+            <defs>
+                <pattern id="dots-pattern" width="20" height="20" patternUnits="userSpaceOnUse">
+                    <circle cx="3" cy="3" r="1" fill="#314563" opacity="0.2"></circle>
+                    <circle cx="13" cy="13" r="1" fill="#314563" opacity="0.2"></circle>
+                </pattern>
+                
+                <pattern id="flight-pattern" width="100" height="100" patternUnits="userSpaceOnUse">
+                    <path d="M20,20 L80,80" stroke="#314563" stroke-width="1" stroke-dasharray="2,2" opacity="0.3"></path>
+                    <path d="M80,20 L20,80" stroke="#314563" stroke-width="1" stroke-dasharray="2,2" opacity="0.3"></path>
+                    <text x="90" y="30" font-family="Montserrat" font-size="12" fill="#314563" opacity="0.5">✈️</text>
+                    <text x="10" y="90" font-family="Montserrat" font-size="12" fill="#314563" opacity="0.5">✈️</text>
+                </pattern>
+            </defs>
+        </svg>
 
         <!-- lib -->
         <script src="lib/highcharts.js"></script>
@@ -50,23 +68,22 @@
             }
 
             html, body, main {
-            overflow: hidden;
+            overflow: visible;
             }
             
             /* 1. 禁止 body/page 本身滚动，只由 article 来滚动 */
             html, body {
             height: 100%;
             margin: 0;
-            overflow: hidden;
+            overflow: visible;
             }
 
             /* 2. 让 article 顶在导航下方，并自己滚动 */
             article {
             position: relative;
             top: 50px;                   /* 导航高度，按实际改 */
-            height: calc(100vh );  /* 扣掉导航 */
+            height: calc(100vh - 50px);  /* 扣掉导航 */
             overflow-y: auto;
-            scroll-snap-type: y mandatory;
             scroll-behavior: smooth;
             /* scroll-padding-top 只影响 snap 对齐，不推下初始位置 */
             }
@@ -249,8 +266,6 @@
             width: 50%;
             margin: 0 auto;
             }
-
-
 
 
 
@@ -732,6 +747,212 @@
         }
     </style>
 
+    <style>
+        /* Aviation-themed styling for reference page */
+        .reference-section {
+            background-image: linear-gradient(rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.95)), 
+                              url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cpath d='M20,20 L80,80' stroke='%23314563' stroke-width='1' stroke-dasharray='2,2' opacity='0.2'%3E%3C/path%3E%3Cpath d='M80,20 L20,80' stroke='%23314563' stroke-width='1' stroke-dasharray='2,2' opacity='0.2'%3E%3C/path%3E%3C/svg%3E");
+            padding: 20px;
+            position: relative;
+        }
+
+        .reference-section::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Ccircle cx='3' cy='3' r='1' fill='%23314563' opacity='0.2'%3E%3C/circle%3E%3Ccircle cx='13' cy='13' r='1' fill='%23314563' opacity='0.2'%3E%3C/circle%3E%3C/svg%3E");
+            z-index: -1;
+        }
+
+        .reference-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            padding: 20px 40px;
+            border-top: 5px solid #314563;
+        }
+
+        .reference-header {
+            background-color: #314563;
+            color: white;
+            text-align: center;
+            padding: 15px;
+            margin-bottom: 25px;
+            border-radius: 6px;
+            font-size: 28px;
+            font-weight: bold;
+            font-family: 'Montserrat', sans-serif;
+            position: relative;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .reference-header::before {
+            content: '';
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 30px;
+            height: 30px;
+            background-image: url('images/planet-earth-svgrepo-com.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        .reference-header::after {
+            content: '✈️';
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%) translateX(-50%);
+            width: 30px;
+            height: 30px;
+        }
+
+        .reference-content {
+            font-size: 16px;
+            line-height: 1.6;
+            font-family: 'Montserrat', sans-serif;
+            padding: 20px 0;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+            max-width: 900px;
+            margin: 30px auto;
+        }
+
+        .navigation-button {
+            background-color: #314563;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .navigation-button::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: all 0.4s ease;
+            z-index: -1;
+        }
+
+        .navigation-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            color: white;
+        }
+
+        .navigation-button:hover::before {
+            left: 0;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .reference-container {
+                padding: 15px;
+            }
+            
+            .reference-header::before,
+            .reference-header::after {
+                display: none;
+            }
+            
+            .button-container {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+
+    <style>
+        /* Airplane animation */
+        .airplane-animation {
+            position: fixed;
+            z-index: 1;
+            pointer-events: none;
+            width: 120px;
+            height: 120px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            filter: drop-shadow(0 0 10px rgba(49, 69, 99, 0.3));
+        }
+
+        .cloud-animation {
+            position: fixed;
+            z-index: 1;
+            pointer-events: none;
+            width: 80px;
+            height: 50px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.5));
+        }
+
+        .airplane-1 {
+            background-image: url('images/planes/image4.png');
+        }
+
+        .airplane-2 {
+            background-image: url('images/planes/image5.png');
+        }
+
+        .airplane-3 {
+            background-image: url('images/planes/image4.png');
+        }
+
+        .airplane-4 {
+            background-image: url('images/planes/image5.png');
+        }
+
+        .cloud-1 {
+            background-image: url('images/clouds/cloud1.png');
+        }
+
+        .cloud-2 {
+            background-image: url('images/clouds/cloud2.png');
+        }
+
+        .cloud-3 {
+            background-image: url('images/clouds/cloud1.png');
+        }
+
+        .cloud-4 {
+            background-image: url('images/clouds/cloud2.png');
+        }
+
+        .cloud-5 {
+            background-image: url('images/clouds/cloud1.png');
+        }
+
+        .cloud-6 {
+            background-image: url('images/clouds/cloud2.png');
+        }
+    </style>
+
     </head>
 
     <body>
@@ -752,22 +973,30 @@
                     <li><a href="Tab5_Reference.html">Reference</a></li>
             </ul>
 
-
-
-
-
-        
+            <!-- Animated airplanes -->
+            <div class="airplane-animation airplane-1"></div>
+            <div class="airplane-animation airplane-2"></div>
+            <div class="airplane-animation airplane-3"></div>
+            <div class="airplane-animation airplane-4"></div>
+            
+            <!-- Animated clouds -->
+            <div class="cloud-animation cloud-1"></div>
+            <div class="cloud-animation cloud-2"></div>
+            <div class="cloud-animation cloud-3"></div>
+            <div class="cloud-animation cloud-4"></div>
+            <div class="cloud-animation cloud-5"></div>
+            <div class="cloud-animation cloud-6"></div>
             
             <article>
  
-                <section>
-                    <div class="finalThings">
-                        <div class="midHeader">
+                <section class="reference-section">
+                    <div class="reference-container">
+                        <div class="reference-header">
                             <span>
                                 Global Aviation: Emissions and Ownership
                             </span>
                         </div>
-                        <div class="mid-text">
+                        <div class="reference-content">
                             <p>
                                 Every year, the aviation industry generates significant carbon emissions — with each country contributing differently based on its flight volume and fleet size.
                                 Beyond emissions, the number of aircraft owned by each country also shapes the global aviation network, influencing travel patterns, connectivity, and environmental impact.
@@ -781,26 +1010,16 @@
                             </p>
                         </div>
                     </div>
-                    <div class="finalThings">
                         <div class="button-container">
-                            <a href="Tab1_3DGlobe.html" class="w3-button" style="background-color: gray; color: white;">Global View</a>
-                            <a href="Tab2_Europe.html" class="w3-button" style="background-color: gray; color: white;">Continent View</a>
-                            <a href="Tab3_City.html" class="w3-button" style="background-color: gray; color: white;">City View</a>
-                        </div>
-                        
+                        <a href="Tab1_3DGlobe.html" class="navigation-button">Global View</a>
+                        <a href="Tab2_Europe.html" class="navigation-button">Continent View</a>
+                        <a href="Tab3_City.html" class="navigation-button">City View</a>
                     </div>
                 </section>
-
-
-
                 
             </article>
 
         </main>
-
-
-
-
     </body>
 
 </html>

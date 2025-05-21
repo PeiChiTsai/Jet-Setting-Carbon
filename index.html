@@ -1161,7 +1161,7 @@
         
         /* 年份突出显示 */
 
-        </style>
+    </style>
 
     </head>
 
@@ -1197,7 +1197,8 @@
                     <li><a href="Tab2_Europe.html">Continent</a></li>
                     <li><a href="Tab3_City.html">City</a></li>
                     <li><a href="Authors.html">Authors</a></li>
-                    <li><a href="Reference.html">Reference</a></li>
+                    <li><a href="Tab4_Conclusion.html">Conclusion</a></li>
+                    <li><a href="Tab5_Reference.html">Reference</a></li>
             </ul>
 
 
@@ -1276,19 +1277,19 @@
                             <div class="title-box" style="width: 100%; max-width: 100%; margin: 0 0 30px;">
                                 Air transport is a carbon-intensive luxury.                            </div>
                             <div class="mid-text">
-                                <p>
-                                If flying may seem normal to you, remember that it's not for everyone. 
+                            <p>
+                                 If flying may seem normal to you, remember that it's not for everyone. 
                                 In fact, every year, around 90% of the world's population does not fly. 
                                 Only 1% of the world's population accounts for 50% of aviation emissions. 
                                 Flying, and flying far, is a habit for only a tiny minority of the world's population.
-                                </p>
+                            </p>
                             </div>
                             <div class="mid-text">
                                 <p>
-                                Currently, aviation accounts for approximately 2.5% of global energy-related CO2 emissions. 
-                                While it's a relatively small percentage of the overall emissions, 
-                                aviation's growth rate has been faster than other transport sectors like rail, road, 
-                                or shipping between 2000 and 2019.
+                                    Currently, aviation accounts for approximately 2.5% of global energy-related CO2 emissions. 
+                                    While it's a relatively small percentage of the overall emissions, 
+                                    aviation's growth rate has been faster than other transport sectors like rail, road, 
+                                    or shipping between 2000 and 2019.
                                 </p>
                             </div>
                         </div>
@@ -1533,7 +1534,7 @@
 
         <!-- 返回顶部按钮 -->
         <button id="topBtn" onclick="scrollToTop()" title="回到顶部"></button>
-        
+
         <script src="js/d3-bubble.js"></script>
         <script src="./js/interactive_map.js"  type="module"></script>
         <script type="module" src="./js/chartIntro-1.js"></script>
@@ -1629,8 +1630,8 @@
                     // 首先检查哪个section在视窗中
                     for (const section of sections) {
                         if (isElementInViewport(section)) {
-                            const sectionId = section.getAttribute('id');
-                            if (sectionId) {
+                        const sectionId = section.getAttribute('id');
+                        if (sectionId) {
                                 current = '#' + sectionId;
                                 break;
                             }
@@ -1644,18 +1645,18 @@
                         const numDots = scrollbarDots.length;
                         const dotIndex = Math.min(Math.floor(progress * numDots), numDots - 1);
                         if (scrollbarDots[dotIndex]) {
-                            current = scrollbarDots[dotIndex].getAttribute('data-target');
+                        current = scrollbarDots[dotIndex].getAttribute('data-target');
                         }
                     }
                     
                     // 更新活动点
                     if (current) {
-                        scrollbarDots.forEach(dot => {
-                            dot.classList.remove('active');
-                            if (dot.getAttribute('data-target') === current) {
-                                dot.classList.add('active');
-                            }
-                        });
+                    scrollbarDots.forEach(dot => {
+                        dot.classList.remove('active');
+                        if (dot.getAttribute('data-target') === current) {
+                            dot.classList.add('active');
+                        }
+                    });
                     }
                 }
                 
