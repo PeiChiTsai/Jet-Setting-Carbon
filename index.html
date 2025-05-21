@@ -91,6 +91,7 @@
             text-size-adjust: 100%;
             }
 
+
             html, body, main {
             overflow: visible;
             margin: 0;
@@ -98,6 +99,7 @@
             width: 100%;
             height: 100%;
             }
+
             
             /* 1. Prevent body/page scrolling, only article scrolls */
             html, body {
@@ -116,6 +118,7 @@
             grid-template-columns: 55% 43%; /* 调整为更宽的右侧 */
             gap: 2%;
             padding: 10px;
+            padding-top: 0px;
             }
 
             /* 重置右侧文本框样式 */
@@ -150,7 +153,6 @@
             scroll-behavior: smooth;
             scroll-snap-type: y proximity;
             margin: 0;
-            padding: 0;
             }
 
             /* 3. Each section takes up appropriate height and snaps properly */
@@ -158,7 +160,7 @@
             min-height: 100vh;
             scroll-snap-align: start;
             box-sizing: border-box;
-            padding-top: 0; /* 改为0 */
+            padding-top: 70px; /* 改为0 */
             position: relative;
             display: block;
             overflow: visible;
@@ -294,7 +296,6 @@
             flex-direction: column;
             justify-content: center;   
             align-items: center; 
-            padding-top: 50px; /* 添加与导航栏高度相同的顶部内边距 */
             color: #fff; 
             text-shadow: 0 2px 8px rgba(0,0,0,0.5);  
             }
@@ -426,7 +427,7 @@
                 margin-bottom:35px;
             }
             .mid-text{
-                font-size: 18px;
+                font-size: 10px;
                 font-weight:lighter;
                 font-family:'Montserrat',sans-serif;
                 margin-top:35px;
@@ -787,11 +788,11 @@
         }
         
         .year-button {
-            padding: 20px 30px;
+            padding: 10px 30px;
             border-radius: 4px;
             border: 1px solid #ddd;
             background-color: #f0f0f0;
-            font-size: 24px;
+            font-size: 14px;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.2s;
@@ -1231,6 +1232,7 @@
                 <div class="TitlePage" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; padding-top: 50px;">
                     <div class="rough-box-title">
                         <h1 class="jet-title">Jet-Setting Carbon</h1>
+                        <div></div>
                         <h1 class="jet-subtitle">The Hidden Link Between Aviation and Climate Change</h2>
                     </div>
                 </div>
@@ -1274,7 +1276,7 @@
                         </div>
 
                         <div class="right-col scrollable-content">
-                            <div class="title-box" style="width: 100%; max-width: 100%; margin: 0 0 30px;">
+                            <div class="title-box" style="width: 100%; max-width: 100%; ">
                                 Air transport is a carbon-intensive luxury.                            </div>
                             <div class="mid-text">
                             <p>
@@ -1307,7 +1309,7 @@
                 <section id="Intro-2" class="chart-section">
                     <div class="container">
                         <div class="header">
-                            <h1 id="chart-title">World Greenhouse Gas Emissions in 2019 (Sector | End Use | Gas)</h1>
+                            <h1 id="chart-title" style="font-family:'Montserrat',sans-serif;font-weight: bold;">World Greenhouse Gas Emissions in 2019 (Sector | End Use | Gas)</h1>
                             <h3 id="chart-subtitle">Total: 49.8 GtCO₂e</h3>
                         </div>
                         
@@ -1337,13 +1339,14 @@
                         </div>
                         
                         <div class="footer">
-                            <p>Data unit: Percentage of global greenhouse gas emissions (%) | Data source: Climate Watch</p>
+                            <p style="font-size: 10px;">Data unit: Percentage of global greenhouse gas emissions (%) | Data source: Climate Watch</p>
+                            <a href="https://www.wri.org/data/world-greenhouse-gas-emissions-2019" target="_blank" rel="noopener" id="data-source-link" style="font-size: 10px;">
+                                Data Source: World Resources Institute (<span id="data-source-year">2019</span>)
+                            </a>
                         </div>
                         
                         <div class="source-link">
-                            <a href="https://www.wri.org/data/world-greenhouse-gas-emissions-2019" target="_blank" rel="noopener" id="data-source-link">
-                                Data Source: World Resources Institute (<span id="data-source-year">2019</span>)
-                            </a>
+                            
                         </div>
                     </div>
                 </section>
@@ -1357,7 +1360,7 @@
 
 
 
-                <section id="Intro-3" class="chart-section" style="min-height: 80vh; padding-bottom: 60px; margin-bottom: 80px;">
+                <section id="Intro-3" class="chart-section" style="min-height: 100vh; padding-bottom: 60px; margin-bottom: 80px;">
                     <div class="middleThings">
                         <div class="left-col">
                             <figure class="highcharts-figure" style="margin-bottom: 40px;">
@@ -1366,7 +1369,7 @@
                         </div>
 
                         <div class="right-col scrollable-content">
-                            <div class="title-box" style="width: 100%; max-width: 100%; margin: 0 0 30px;">
+                            <div class="title-box" style="width: 100%; max-width: 100%; ">
                                 Air, Land and Water Transport: A High-Impact Driver of Luxury Energy Use
                             </div>
                             <div class="mid-text">
@@ -1379,13 +1382,20 @@
                     </div>
                 </section>
 
-                <!-- 减小分隔空间 -->
-                <div class="section-separator" style="height: 30px;"></div>
 
-                <section id="chartArea">
+
+
+
+
+
+
+
+
+
+                <section id="chartArea" style="padding-top: 0;">
                     <div class="chart">
-                        <div class="maptitle">
-                            <h2>2024 Global Annual Emission Amount from Aviation</h2>
+                        <div class="maptitle" style="font-family: 'Montserrat',sans-serif;" >
+                            <h2 style="font-family: 'Montserrat',sans-serif;font-weight: bold;" >Global Annual Emission Amount from Aviation</h2>
                         </div>
                         <div id="map"></div>
                     </div>
@@ -1815,6 +1825,63 @@
                 }
             });
         </script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const sections = Array.from(document.querySelectorAll('article > section'));
+  const chartArea = document.getElementById('chartArea');
+  let isScrolling = false;
+
+  function scrollToSection(index) {
+    if (index < 0 || index >= sections.length) return;
+    isScrolling = true;
+    sections[index].scrollIntoView({ behavior: 'smooth' });
+    setTimeout(() => { isScrolling = false; }, 800);
+  }
+
+  document.addEventListener('wheel', function(e) {
+    // 1) 如果在地图区域
+    if (e.target.closest('#chartArea')) {
+      // 检查地图是否能再往下（或往上）滚
+      const ca = chartArea;
+      const atBottom = ca.scrollTop + ca.clientHeight >= ca.scrollHeight;
+      const atTop    = ca.scrollTop <= 0;
+
+      // 如果地图还没到底（或没到顶），就让它默认滚：
+      if ((e.deltaY > 0 && !atBottom) || (e.deltaY < 0 && !atTop)) {
+        return;  
+      }
+      // 否则（已经到底／到顶），继续往下执行全页滚动逻辑
+    }
+
+    // 2) 如果正在平滑滚动中，阻止多次触发
+    if (isScrolling) {
+      e.preventDefault();
+      return;
+    }
+
+    // 3) 找到当前视口中点所在的 section
+    const delta = e.deltaY;
+    const viewportMid = window.innerHeight / 2;
+    let currentIndex = sections.findIndex(sec => {
+      const rect = sec.getBoundingClientRect();
+      return rect.top <= viewportMid && rect.bottom > viewportMid;
+    });
+    if (currentIndex === -1) currentIndex = 0;
+
+    // 4) 根据方向，跳到上下一个 section
+    if (delta > 0) {
+      scrollToSection(currentIndex + 1);
+    } else if (delta < 0) {
+      scrollToSection(currentIndex - 1);
+    }
+
+    e.preventDefault();
+  }, { passive: false });
+});
+</script>
+
+
 
         <!-- 在底部添加滚动动画脚本，确保在所有内容加载后执行 -->
         <script src="js/scroll-animations.js"></script>
