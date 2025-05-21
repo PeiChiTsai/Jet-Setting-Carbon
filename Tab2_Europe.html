@@ -2,8 +2,7 @@
 <html>
 <head>
   <meta charset='utf-8' />
-  <title>Airport Emissions Map (Vector Tileset)</title>
-  
+  <title>Airport Emissions & Flight Network Visualization</title>
   <link rel="stylesheet" href="css/main-styles.css">
   <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
   <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
@@ -12,204 +11,322 @@
   <style>
     body { margin:0; padding:0; font-family: sans-serif; }
     #map-container { position: relative; width: 100%; height: 100vh; }
-    #map-europe, #map-gva { position:absolute; top:0; bottom:0; width:100%; }
-    .map-overlay {
+    #map { position:absolute; top:0; bottom:0; width:100%; }
+    
+    /* Base UI Panel Styles */
+    .ui-panel {
       position: absolute;
-      top: 60px;
-      left: 20px;
-      background: #111;
+      background: rgba(17, 17, 17, 0.9);
       color: #fff;
-      padding: 14px;
-      border-radius: 10px;
-      font-size: 13px;
-      z-index: 10;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
-    }
-    .map-overlay h3 {
-      margin: 0 0 10px;
-      font-size: 15px;
-    }
-    .map-overlay label {
-      display: block;
-      margin-bottom: 6px;
-    }
-    .map-overlay input[type=range] {
-      width: 100%;
-    }
-    .chart-container {
-      position: absolute;
-      background: #111;
-      color: white;
-      padding: 10px;
+      padding: 15px;
       border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
       z-index: 10;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255,255,255,0.1);
     }
-    #chart-europe {
+    
+    /* Panel States */
+    .hidden {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(10px);
+    }
+    .visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+    
+    /* Control Panel - Top Left */
+    .control-panel {
+      top: 80px;
+      left: 20px;
+      width: 250px;
+    }
+    .control-panel h3 {
+      margin: 0 0 15px;
+      font-size: 16px;
+      color: #fff;
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+      padding-bottom: 8px;
+    }
+    .control-panel label {
+      display: block;
+      margin-bottom: 10px;
+      line-height: 1.5;
+    }
+    .control-panel input[type=range] {
+      width: 100%;
+      margin: 8px 0;
+    }
+    
+    /* Chart Container - Bottom Left */
+    .chart-container {
       bottom: 20px;
       left: 20px;
-      width: 540px;
+      width: 600px;
+      height: 360px;
     }
-    #chart-gva {
-      left: 20px;
-      bottom: 20px;
-      width: 500px;
+    .chart-container h4 {
+      margin: 0 0 12px;
+      font-size: 14px;
     }
     .chart-selector {
-      margin-bottom: 10px;
-      background: #222;
+      margin-bottom: 12px;
+      background: #333;
       color: #fff;
       border: 1px solid #444;
-      padding: 4px;
+      padding: 6px 10px;
       width: 100%;
+      border-radius: 4px;
+      font-size: 13px;
     }
-    svg { width: 100%; height: 300px; }
-    .axis-label, .tick text { font-size: 11px; fill: #eee; }
-    .legend-box {
-      position: absolute;
-      background: #111;
-      color: #fff;
-      padding: 10px;
-      border-radius: 8px;
-      font-size: 12px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
-      z-index: 10;
-    }
-    #legend-europe {
+    
+    /* Legend - Bottom Right */
+    .legend-container {
       bottom: 20px;
       right: 20px;
-      width: 160px;
+      width: 180px;
     }
-    #legend-gva {
-      bottom: 20px;
-      right: 20px;
+    .legend-title {
+      margin: 0 0 10px;
+      font-size: 14px;
+      font-weight: bold;
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+      padding-bottom: 6px;
     }
-    .legend-box .gradient-bar {
+    .legend-item {
+      display: flex;
+      align-items: center;
+      margin: 10px 0;
+      font-size: 13px;
+    }
+    
+    /* Europe Legend Styles */
+    .gradient-bar {
       width: 100%;
-      height: 10px;
+      height: 12px;
       background: linear-gradient(to right, #8dd3c7, #ffffb3, #fb8072);
-      margin: 4px 0;
+      margin: 10px 0;
+      border-radius: 3px;
     }
-    .legend-box .labels {
+    .legend-labels {
       display: flex;
       justify-content: space-between;
-      font-size: 11px;
+      font-size: 12px;
+      margin-top: -5px;
     }
-      .legend-gva .line-sample {
-  display: inline-block;
-  width: 40px;
-  height: 3px;
-  margin-right: 8px;
-  vertical-align: middle;
-}
-    .legend-gva label {
-      display: block;
-      margin: 5px 0;
+    
+    /* Geneva Legend Styles */
+    .line-sample {
+      width: 35px;
+      height: 3px;
+      margin-right: 12px;
+      border-radius: 2px;
     }
-    .legend-gva div {
-      margin: 5px 0;
-    }
-      .legend-item {
-  display: flex;
-  align-items: center;
-  margin: 5px 0;
-}
-
-.line-sample {
-  width: 40px;
-  height: 3px;
-  margin-right: 8px;
-  display: inline-block;
-}
-.line-sample.civil { background: #66c2a5; }
-.line-sample.private { background: #fc8d62; }
-.line-sample.private-500 { background: #ffff00; }
+    .line-sample.civil { background: #66c2a5; }
+    .line-sample.private { background: #fc8d62; }
+    .line-sample.private-500 { background: #ffff00; }
+    
+    /* Toggle Button */
     .toggle-view {
       position: absolute;
-      top: 60px;
+      top: 80px;
       right: 20px;
       z-index: 100;
-      background: #111;
+      background: rgba(40, 40, 40, 0.95);
       color: #fff;
-      padding: 10px;
-      border-radius: 8px;
+      padding: 8px 15px;
+      border-radius: 6px;
       cursor: pointer;
+      font-size: 14px;
+      border: none;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      transition: all 0.2s ease;
     }
-    .hidden {
-      display: none;
+    .toggle-view:hover {
+      background: rgba(60, 60, 60, 0.95);
+      transform: translateY(-1px);
+      box-shadow: 0 3px 10px rgba(0,0,0,0.4);
     }
-    .toggle-chart-btn {
-      background: #222;
+    
+    /* Button Styles */
+    .btn {
+      background: #444;
       color: #fff;
       border: none;
-      padding: 4px 8px;
-      margin-top: 8px;
+      padding: 8px 12px;
+      margin-top: 12px;
       border-radius: 4px;
       cursor: pointer;
       width: 100%;
+      transition: all 0.2s ease;
+      font-size: 13px;
+    }
+    .btn:hover {
+      background: #555;
+    }
+    
+    /* Chart Styles */
+    #bar-chart-europe, #bar-chart-gva {
+      width: 100%;
+      height: 320px;
+    }
+    .axis-label, .tick text { 
+      font-size: 11px; 
+      fill: #eee; 
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 900px) {
+      .chart-container {
+        width: calc(100% - 40px);
+        height: 360px;
+      }
+      .legend-container {
+        width: 160px;
+      }
+      .control-panel {
+        width: 220px;
+      }
+    }
+
+    /* Navbar Styles */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background-color: #1e2a35;
+      z-index: 1000;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: flex;
+      align-items: center;
+    }
+    .navbar li {
+      margin: 0 15px;
+    }
+    .navbar a {
+      color: white;
+      text-decoration: none;
+      font-size: 14px;
+    }
+    .navbar .logo {
+      margin-right: auto;
+      display: flex;
+      align-items: center;
+    }
+    .logo-image {
+      height: 30px;
+      margin-right: 10px;
+    }
+    .logo-text {
+      font-weight: bold;
+      font-size: 16px;
+    }
+
+    /* 精简版右侧结论面板 */
+    .conclusion-panel {
+      position: absolute;
+      bottom: 180px;  /* 在图例上方 */
+      right: 20px;
+      width: 180px;   /* 与图例同宽 */
+      background: rgba(30, 42, 53, 0.95);
+      color: white;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      line-height: 1.4;
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+
+    .conclusion-panel h4 {
+      margin: 0 0 8px;
+      font-size: 14px;
+      color: #a1c4fd;
+      padding-bottom: 6px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .conclusion-item {
+      display: flex;
+      align-items: center;
+      margin: 8px 0;
+      padding: 6px 0;
+      border-bottom: 1px dashed rgba(255,255,255,0.05);
+    }
+
+    .conclusion-item:last-child {
+      border-bottom: none;
+    }
+
+    .conclusion-icon {
+      font-size: 16px;
+      margin-right: 8px;
+      opacity: 0.8;
+    }
+
+    .conclusion-text {
+      flex: 1;
     }
   </style>
 </head>
 <body>
     <!-- Header Section with Title & Logo and Menu -->
-                <ul class="navbar">
-                <li class="logo">
-                    <a href="#Home">
-                        <img src="images/logo.svg" alt="Logo" class="logo-image">
-                        <span class="logo-text">AVIATION NETWORK</span>
-                    </a>
-                </li>
-                  <li><a href="index.html">Home</a></li>
-                  <li><a href="Tab1_3DGlobe.html">Global</a></li>
-                  <li><a href="Tab2_Europe.html">Continent</a></li>
-                  <li><a href="Tab3_City.html">City</a></li>
-                  <li><a href="Authors.html">Authors</a></li>
-                  <li><a href="Reference.html">Reference</a></li>
-            </ul>
-
+    <ul class="navbar">
+        <li class="logo">
+            <a href="#Home">
+                <img src="images/logo.svg" alt="Logo" class="logo-image">
+                <span class="logo-text">AVIATION NETWORK</span>
+            </a>
+        </li>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="Tab1_3DGlobe.html">Global</a></li>
+        <li><a href="Tab2_Europe.html">Continent</a></li>
+        <li><a href="Tab3_City.html">City</a></li>
+        <li><a href="Authors.html">Authors</a></li>
+        <li><a href="Reference.html">Reference</a></li>
+    </ul>
 
 <div id="map-container">
-  <!-- Europe Map View -->
-  <div id="map-europe"></div>
-  <div class="map-overlay" id="controls-europe">
-    <h3>CO₂ Emissions</h3>
-    <label>Year: <span id="yearLabel">2019</span></label>
-    <input type="range" id="yearSlider" min="2019" max="2024" value="2019">
-    <label><input type="checkbox" id="toggleHeat" checked> Show Heatmap</label>
-    <label><input type="radio" name="sizeby" value="co2" checked> Size by CO₂</label>
-    <label><input type="radio" name="sizeby" value="FLT_TOT_1"> Size by Flights</label>
-    <button class="toggle-chart-btn" onclick="toggleChart('europe')">Toggle Chart</button>
+  <div id="map"></div>
+
+  <!-- Europe Control Panel -->
+  <div id="controls-europe" class="ui-panel control-panel visible">
+    <h3>CO₂ Emissions Visualization</h3>
+    <label>
+      Year: <span id="yearLabel">2019</span>
+      <input type="range" id="yearSlider" min="2019" max="2024" value="2019">
+    </label>
+    <label><input type="radio" name="sizeby" value="co2" checked> Size by Emissions</label>
+    <label><input type="radio" name="sizeby" value="FLT_TOT_1"> Size by Flight Count</label>
+    <button class="btn" onclick="toggleChart('europe')">Toggle Chart</button>
   </div>
-  <div id="chart-europe" class="chart-container">
+
+  <!-- Geneva Control Panel -->
+  <div id="controls-gva" class="ui-panel control-panel hidden">
+    <h3>Geneva Airport Flights</h3>
+    <label><input type="checkbox" id="toggleCivil" checked> Show Commercial Flights</label>
+    <label><input type="checkbox" id="togglePrivate"> Show Private Flights</label>
+    <button class="btn" onclick="toggleChart('gva')">Toggle Chart</button>
+  </div>
+
+  <!-- Europe Chart -->
+  <div id="chart-europe" class="chart-container ui-panel visible">
     <select id="chart-selector-europe" class="chart-selector">
-      <option value="comm">Commercial CO₂</option>
-      <option value="priv">Private Jet CO₂</option>
+      <option value="comm">Top 10 Commercial Emissions</option>
+      <option value="priv">Top 10 Private Jet Emissions</option>
     </select>
     <div id="bar-chart-europe"></div>
   </div>
-  <div id="legend-europe" class="legend-box">
-    <b id="legend-title">Legend</b>
-    <div class="gradient-bar"></div>
-    <div class="labels">
-      <span>Low</span>
-      <span>High</span>
-    </div>
-  </div>
-
-  <!-- Geneva Airport View -->
-  <div id="map-gva" class="hidden"></div>
-  <div class="legend-box hidden" id="legend-gva">
-  <label><input type="checkbox" id="toggleCivil" checked> Civil Flights</label>
-  <label><input type="checkbox" id="togglePrivate"> Private Flights</label>
-  <button class="toggle-chart-btn" onclick="toggleChart('gva')">Toggle Chart</button>
-  <hr>
-  <div><b>Legend</b></div>
-  <div class="legend-item"><div class="line-sample civil"></div><span>Civil Route</span></div>
-  <div class="legend-item"><div class="line-sample private"></div><span>Private Jet</span></div>
-  <div class="legend-item"><div class="line-sample private-500"></div><span>Private > 500</span></div>
-</div>
     
-  <div id="chart-gva" class="chart-container hidden">
+  <!-- Geneva Chart -->
+  <div id="chart-gva" class="chart-container ui-panel hidden">
     <select id="chart-selector-gva" class="chart-selector">
       <option value="flight_count">Top 10 by Flight Count</option>
       <option value="total_emissions_kt">Top 10 by Emissions</option>
@@ -217,61 +334,123 @@
     <div id="bar-chart-gva"></div>
   </div>
 
-  <!-- Toggle Button -->
-  <div class="toggle-view" id="toggleView">Show Geneva Airport View</div>
+  <!-- Europe Legend -->
+  <div id="legend-europe" class="legend-container ui-panel visible">
+    <div class="legend-title">Emissions Legend</div>
+    <div class="gradient-bar"></div>
+    <div class="legend-labels">
+      <span>Low</span>
+      <span>High</span>
+    </div>
+  </div>
+
+  <!-- Conclusion Panel -->
+  <div id="conclusion-europe" class="conclusion-panel">
+    <h4>Key Findings</h4>
+    <div class="conclusion-item">
+      <div class="conclusion-icon">·</div>
+      <div class="conclusion-text">Top 3 airports contribute 42% of total emissions.</div>
+    </div>
+    <div class="conclusion-item">
+      <div class="conclusion-icon">·</div>
+      <div class="conclusion-text">Private jet emissions growing at 23% rate.</div>
+    </div>
+      <div class="conclusion-item">
+      <div class="conclusion-icon">·</div>
+      <div class="conclusion-text">Carbon emissions show core-periphery distribution pattern.</div>
+    </div>
+  </div>
+    
+  <!-- Geneva Legend -->
+  <div id="legend-gva" class="legend-container ui-panel hidden">
+    <div class="legend-title">Flight Types</div>
+    <div class="legend-item"><div class="line-sample civil"></div><span>Commercial</span></div>
+    <div class="legend-item"><div class="line-sample private"></div><span>Private Jet</span></div>
+    <div class="legend-item"><div class="line-sample private-500"></div><span>Frequent Private</span></div>
+  </div>
+
+  <!-- View Toggle Button -->
+  <button class="toggle-view" id="toggleView">Show Geneva Airport View</button>
 </div>
 
 <script>
 mapboxgl.accessToken = 'pk.eyJ1IjoiaWVtb24iLCJhIjoiY201eTJ5OHQ5MDI2azJzc2Myd2tqcjdkdyJ9.HnSzYpnN2ZdrauoEIHL-Pg';
 
-// Initialize both maps but only show one at a time
-const mapEurope = new mapboxgl.Map({
-  container: 'map-europe',
+// Initialize map
+const map = new mapboxgl.Map({
+  container: 'map',
   style: 'mapbox://styles/mapbox/dark-v11',
   center: [10, 50],
   zoom: 4
 });
 
-const mapGVA = new mapboxgl.Map({
-  container: 'map-gva',
-  style: 'mapbox://styles/mapbox/dark-v11',
-  center: [6.109, 46.238],
-  zoom: 4.5
-});
-
 let currentYear = 2019;
 let currentSizeField = 'co2';
+let isGVAMode = false;
+let isTransitioning = false;
+let gvaRoutesLoaded = false;
+let currentPopup = null; // Track current popup
+let hoverTimeout = null; // For hover delay
 
-// Europe Map Setup
-mapEurope.on('load', () => {
-  mapEurope.addSource('airports', {
+// Load Geneva routes data
+function loadGVARoutes() {
+  if (gvaRoutesLoaded) return;
+  
+  map.addSource('civil_routes', { type: 'vector', url: 'mapbox://iemon.bv34j20f' });
+  map.addLayer({
+    id: 'civil-lines',
+    type: 'line',
+    source: 'civil_routes',
+    'source-layer': 'gva_flight_routes-dbz7jr',
+    layout: { visibility: 'none' },
+    paint: {
+      'line-color': '#66c2a5',
+      'line-width': ['interpolate', ['linear'], ['get', 'flight_count'], 1, 0.5, 100, 5],
+      'line-opacity': 0.7
+    }
+  });
+  
+  map.addSource('private_routes', { type: 'vector', url: 'mapbox://iemon.cb9eylv1' });
+  map.addLayer({
+    id: 'private-lines',
+    type: 'line',
+    source: 'private_routes',
+    'source-layer': 'gva_filtered_routes-6ti85l',
+    layout: { visibility: 'none' },
+    filter: ['<', ['get', 'flight_count'], 500],
+    paint: {
+      'line-color': '#fc8d62',
+      'line-width': ['interpolate', ['linear'], ['get', 'flight_count'], 1, 0.5, 100, 6],
+      'line-opacity': 0.7
+    }
+  });
+  
+  map.addLayer({
+    id: 'private-lines-500plus',
+    type: 'line',
+    source: 'private_routes',
+    'source-layer': 'gva_filtered_routes-6ti85l',
+    layout: { visibility: 'none' },
+    filter: ['>=', ['get', 'flight_count'], 500],
+    paint: {
+      'line-color': '#ffff00',
+      'line-width': 6,
+      'line-opacity': 0.9
+    }
+  });
+
+  gvaRoutesLoaded = true;
+}
+
+// Initialize map after load
+map.on('load', () => {
+  // Load Europe airports data
+  map.addSource('airports', {
     type: 'vector',
     url: 'mapbox://iemon.25d7i68u'
   });
 
-  mapEurope.addLayer({
-    id: 'heat',
-    type: 'heatmap',
-    source: 'airports',
-    'source-layer': 'europe_airports_co2_verified-blzjja',
-    paint: {
-      'heatmap-weight': ['get', 'co2'],
-      'heatmap-radius': 30,
-      'heatmap-opacity': 0.6,
-      'heatmap-color': [
-        'interpolate', ['linear'], ['heatmap-density'],
-        0, 'rgba(0,0,0,0)',
-        0.2, '#1f78b4',
-        0.4, '#a6cee3',
-        0.6, '#fdbf6f',
-        0.8, '#fb9a99',
-        1, '#e31a1c'
-      ]
-    },
-    layout: { visibility: 'visible' }
-  });
-
-  mapEurope.addLayer({
+  map.addLayer({
     id: 'circles',
     type: 'circle',
     source: 'airports',
@@ -293,41 +472,122 @@ mapEurope.on('load', () => {
       'circle-stroke-width': 1.2,
       'circle-opacity': 0.25
     },
-    layout: { visibility: 'none' },
     filter: ['==', ['get', 'YEAR'], currentYear]
   });
 
-  mapEurope.on('click', 'circles', (e) => {
-    const props = e.features[0].properties;
-    new mapboxgl.Popup()
-      .setLngLat(e.lngLat)
-      .setHTML(`<strong>${props.APT_NAME}</strong><br>
-        Country: ${props.STATE_NAME}<br>
-        Year: ${props.YEAR}<br>
-        CO₂: ${props.co2} kt<br>
-        Flights: ${props.FLT_TOT_1}`)
-      .addTo(mapEurope);
+  // Preload Geneva data
+  loadGVARoutes();
+
+  // Set up event listeners
+  setupEventListeners();
+  drawEuropeChart(currentYear);
+});
+
+// Set up event listeners
+function setupEventListeners() {
+  // Airport hover events
+  map.on('mouseenter', 'circles', (e) => {
+    // Clear previous hover timeout
+    if (hoverTimeout) {
+      clearTimeout(hoverTimeout);
+      hoverTimeout = null;
+    }
+    
+    // Set new hover timeout (show after 300ms)
+    hoverTimeout = setTimeout(() => {
+      const props = e.features[0].properties;
+      // Remove previous popup
+      if (currentPopup) currentPopup.remove();
+      
+      currentPopup = new mapboxgl.Popup({
+        closeButton: false,
+        closeOnClick: false,
+        offset: [0, -15]
+      })
+        .setLngLat(e.lngLat)
+        .setHTML(`
+          <strong>${props.APT_NAME}</strong><br>
+          Country: ${props.STATE_NAME}<br>
+          Year: ${props.YEAR}<br>
+          CO₂: ${props.co2} kt<br>
+          Flights: ${props.FLT_TOT_1}
+        `)
+        .addTo(map);
+    }, 300);
   });
 
-  document.getElementById('toggleHeat').addEventListener('change', (e) => {
-    const visible = e.target.checked;
-    mapEurope.setPaintProperty('heat', 'heatmap-opacity', visible ? 0.6 : 0);
-    mapEurope.setLayoutProperty('circles', 'visibility', visible ? 'none' : 'visible');
+  // Remove popup when mouse leaves
+  map.on('mouseleave', 'circles', () => {
+    if (hoverTimeout) {
+      clearTimeout(hoverTimeout);
+      hoverTimeout = null;
+    }
+    if (currentPopup) {
+      currentPopup.remove();
+      currentPopup = null;
+    }
   });
 
+  // Route hover events
+  map.on('mouseenter', ['civil-lines', 'private-lines', 'private-lines-500plus'], (e) => {
+    if (hoverTimeout) {
+      clearTimeout(hoverTimeout);
+      hoverTimeout = null;
+    }
+    
+    hoverTimeout = setTimeout(() => {
+      const p = e.features[0].properties;
+      if (currentPopup) currentPopup.remove();
+      
+      currentPopup = new mapboxgl.Popup({
+        closeButton: false,
+        closeOnClick: false,
+        offset: [0, -15]
+      })
+        .setLngLat(e.lngLat)
+        .setHTML(`
+          <strong>${p.origin || 'Geneva'} → ${p.destination}</strong><br>
+          Flights: ${p.flight_count}
+        `)
+        .addTo(map);
+    }, 300);
+  });
+
+  map.on('mouseleave', ['civil-lines', 'private-lines', 'private-lines-500plus'], () => {
+    if (hoverTimeout) {
+      clearTimeout(hoverTimeout);
+      hoverTimeout = null;
+    }
+    if (currentPopup) {
+      currentPopup.remove();
+      currentPopup = null;
+    }
+  });
+
+  // Optional: Add hover animation for conclusion panel
+  document.querySelector('.conclusion-panel').addEventListener('mouseenter', function() {
+    this.style.transform = 'translateY(-5px)';
+    this.style.boxShadow = '0 4px 12px rgba(0,0,0,0.4)';
+  });
+  document.querySelector('.conclusion-panel').addEventListener('mouseleave', function() {
+    this.style.transform = '';
+    this.style.boxShadow = '0 2px 8px rgba(0,0,0,0.3)';
+  });
+    
+  // Year slider
   document.getElementById('yearSlider').addEventListener('input', (e) => {
     const year = +e.target.value;
     currentYear = year;
     document.getElementById('yearLabel').textContent = year;
     drawEuropeChart(year);
-    mapEurope.setFilter('heat', ['==', ['get', 'YEAR'], year]);
-    mapEurope.setFilter('circles', ['==', ['get', 'YEAR'], year]);
+    map.setFilter('circles', ['==', ['get', 'YEAR'], year]);
   });
 
+  // Size by radio buttons
   document.querySelectorAll('input[name="sizeby"]').forEach(radio => {
     radio.addEventListener('change', function(e) {
       currentSizeField = e.target.value;
-      mapEurope.setPaintProperty('circles', 'circle-radius',
+      map.setPaintProperty('circles', 'circle-radius',
         currentSizeField === 'FLT_TOT_1'
         ? ['interpolate', ['linear'], ['get', 'FLT_TOT_1'], 0, 6, 1000000, 60]
         : ['interpolate', ['linear'], ['get', 'co2'], 0, 8, 1000, 28]
@@ -335,84 +595,32 @@ mapEurope.on('load', () => {
     });
   });
 
+  // Chart selectors
   document.getElementById("chart-selector-europe").addEventListener("change", function() {
     drawEuropeChart(currentYear);
-  });
-
-  drawEuropeChart(currentYear);
-});
-
-// Geneva Airport Map Setup
-mapGVA.on('load', () => {
-  mapGVA.addSource('civil_routes', { type: 'vector', url: 'mapbox://iemon.bv34j20f' });
-  mapGVA.addLayer({
-    id: 'civil-lines',
-    type: 'line',
-    source: 'civil_routes',
-    'source-layer': 'gva_flight_routes-dbz7jr',
-    layout: { visibility: 'visible' },
-    paint: {
-      'line-color': '#66c2a5',
-      'line-width': ['interpolate', ['linear'], ['get', 'flight_count'], 1, 0.5, 100, 5],
-      'line-opacity': 0.7
-    }
-  });
-  
-  mapGVA.addSource('private_routes', { type: 'vector', url: 'mapbox://iemon.cb9eylv1' });
-  mapGVA.addLayer({
-    id: 'private-lines',
-    type: 'line',
-    source: 'private_routes',
-    'source-layer': 'gva_filtered_routes-6ti85l',
-    layout: { visibility: 'none' },
-    filter: ['<', ['get', 'flight_count'], 500],
-    paint: {
-      'line-color': '#fc8d62',
-      'line-width': ['interpolate', ['linear'], ['get', 'flight_count'], 1, 0.5, 100, 6],
-      'line-opacity': 0.7
-    }
-  });
-  
-  mapGVA.addLayer({
-    id: 'private-lines-500plus',
-    type: 'line',
-    source: 'private_routes',
-    'source-layer': 'gva_filtered_routes-6ti85l',
-    layout: { visibility: 'none' },
-    filter: ['>=', ['get', 'flight_count'], 500],
-    paint: {
-      'line-color': '#ffff00',
-      'line-width': 6,
-      'line-opacity': 0.9
-    }
-  });
-
-  mapGVA.on('click', ['civil-lines', 'private-lines', 'private-lines-500plus'], (e) => {
-    const p = e.features[0].properties;
-    new mapboxgl.Popup()
-      .setLngLat(e.lngLat)
-      .setHTML(`<strong>${p.origin || 'GVA'} → ${p.destination}</strong><br>Flights: ${p.flight_count}`)
-      .addTo(mapGVA);
-  });
-
-  document.getElementById('toggleCivil').addEventListener('change', e => {
-    mapGVA.setLayoutProperty('civil-lines', 'visibility', e.target.checked ? 'visible' : 'none');
-  });
-  
-  document.getElementById('togglePrivate').addEventListener('change', e => {
-    const vis = e.target.checked ? 'visible' : 'none';
-    mapGVA.setLayoutProperty('private-lines', 'visibility', vis);
-    mapGVA.setLayoutProperty('private-lines-500plus', 'visibility', vis);
   });
 
   document.getElementById("chart-selector-gva").addEventListener("change", function() {
     drawGVAChart(this.value);
   });
 
-  drawGVAChart('flight_count');
-});
+  // Flight visibility toggles
+  document.getElementById('toggleCivil').addEventListener('change', e => {
+    if (isGVAMode) {
+      map.setLayoutProperty('civil-lines', 'visibility', e.target.checked ? 'visible' : 'none');
+    }
+  });
+  
+  document.getElementById('togglePrivate').addEventListener('change', e => {
+    if (isGVAMode) {
+      const vis = e.target.checked ? 'visible' : 'none';
+      map.setLayoutProperty('private-lines', 'visibility', vis);
+      map.setLayoutProperty('private-lines-500plus', 'visibility', vis);
+    }
+  });
+}
 
-// Chart functions
+// Draw Europe chart with wider dimensions
 function drawEuropeChart(year) {
   const selected = document.getElementById('chart-selector-europe').value;
   const url = selected === 'comm'
@@ -425,10 +633,13 @@ function drawEuropeChart(year) {
     const sorted = filtered.sort((a, b) => +b[key] - +a[key]).slice(0, 10);
 
     d3.select("#bar-chart-europe").selectAll("svg").remove();
-    const svg = d3.select("#bar-chart-europe").append("svg"),
-          margin = {top: 20, right: 20, bottom: 50, left: 120},
-          width = 520 - margin.left - margin.right,
-          height = 300 - margin.top - margin.bottom;
+    const svg = d3.select("#bar-chart-europe").append("svg")
+          .attr("width", 600)
+          .attr("height", 320);
+
+    const margin = {top: 20, right: 30, bottom: 60, left: 150}, // Increased left margin
+          width = 600 - margin.left - margin.right,
+          height = 320 - margin.top - margin.bottom;
 
     const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
 
@@ -469,6 +680,7 @@ function drawEuropeChart(year) {
   });
 }
 
+// Draw Geneva chart with wider dimensions
 function drawGVAChart(metric) {
   d3.csv('https://raw.githubusercontent.com/SkyGarry/03vis/main/Standardized_GVA_Destinations.csv').then(data => {
     const top = data.map(d => ({
@@ -479,10 +691,13 @@ function drawGVAChart(metric) {
     const xLabel = metric === 'total_emissions_kt' ? 'CO₂ Emissions (kt)' : 'Flight Count';
 
     d3.select('#bar-chart-gva').selectAll('*').remove();
-    const svg = d3.select('#bar-chart-gva').append('svg'),
-          margin = {top: 20, right: 20, bottom: 40, left: 100},
-          width = 480 - margin.left - margin.right,
-          height = 300 - margin.top - margin.bottom,
+    const svg = d3.select('#bar-chart-gva').append('svg')
+          .attr('width', 600)
+          .attr('height', 320);
+
+    const margin = {top: 20, right: 30, bottom: 60, left: 150}, // Increased left margin
+          width = 600 - margin.left - margin.right,
+          height = 320 - margin.top - margin.bottom,
           g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`);
 
     const x = d3.scaleLinear().domain([0, d3.max(top, d => d.value)]).range([0, width]);
@@ -506,61 +721,106 @@ function drawGVAChart(metric) {
       .attr('y', d => y(d.destination_city))
       .attr('width', d => x(d.value))
       .attr('height', y.bandwidth())
-      .attr('fill', '#80b1d3');
+      .attr('fill', metric === 'total_emissions_kt' ? '#fb8072' : '#80b1d3');
   });
 }
 
 // View toggle functionality
 document.getElementById('toggleView').addEventListener('click', function() {
-  const isGVAVisible = document.getElementById('map-gva').classList.contains('hidden');
+  if (isTransitioning) return;
+  isTransitioning = true;
   
-  if (isGVAVisible) {
+  const btn = this;
+  
+  if (!isGVAMode) {
     // Switch to Geneva view
-    document.getElementById('map-europe').classList.add('hidden');
-    document.getElementById('controls-europe').classList.add('hidden');
-    document.getElementById('chart-europe').classList.add('hidden');
-    document.getElementById('legend-europe').classList.add('hidden');
+    btn.textContent = 'Show Europe View';
     
-    document.getElementById('map-gva').classList.remove('hidden');
-    document.getElementById('legend-gva').classList.remove('hidden');
-    document.getElementById('chart-gva').classList.remove('hidden');
+    // Fade out Europe UI
+    document.querySelectorAll('#controls-europe, #chart-europe, #legend-europe').forEach(el => {
+      el.classList.remove('visible');
+      el.classList.add('hidden');
+    });
     
-    this.textContent = 'Show Europe View';
+    // Fly to Geneva
+    map.flyTo({
+      center: [6.109, 46.238],
+      zoom: 4.5,
+      speed: 1.8,
+      curve: 1.2,
+      essential: true
+    });
     
-    // Resize map to fit container
     setTimeout(() => {
-      mapGVA.resize();
-      // Redraw GVA chart when switching to this view
+      // Hide Europe layer
+      map.setLayoutProperty('circles', 'visibility', 'none');
+      
+      // Show Geneva layers
+      const showCivil = document.getElementById('toggleCivil').checked;
+      const showPrivate = document.getElementById('togglePrivate').checked;
+      
+      map.setLayoutProperty('civil-lines', 'visibility', showCivil ? 'visible' : 'none');
+      map.setLayoutProperty('private-lines', 'visibility', showPrivate ? 'visible' : 'none');
+      map.setLayoutProperty('private-lines-500plus', 'visibility', showPrivate ? 'visible' : 'none');
+      
+      // Fade in Geneva UI
+      document.querySelectorAll('#controls-gva, #chart-gva, #legend-gva').forEach(el => {
+        el.classList.remove('hidden');
+        el.classList.add('visible');
+      });
+      
+      // Draw Geneva chart
       drawGVAChart(document.getElementById('chart-selector-gva').value);
-    }, 0);
+      
+      isGVAMode = true;
+      isTransitioning = false;
+    }, 300);
+    
   } else {
-    // Switch to Europe view
-    document.getElementById('map-europe').classList.remove('hidden');
-    document.getElementById('controls-europe').classList.remove('hidden');
-    document.getElementById('chart-europe').classList.remove('hidden');
-    document.getElementById('legend-europe').classList.remove('hidden');
+    // Switch back to Europe view
+    btn.textContent = 'Show Geneva Airport View';
     
-    document.getElementById('map-gva').classList.add('hidden');
-    document.getElementById('legend-gva').classList.add('hidden');
-    document.getElementById('chart-gva').classList.add('hidden');
+    // Fade out Geneva UI
+    document.querySelectorAll('#controls-gva, #chart-gva, #legend-gva').forEach(el => {
+      el.classList.remove('visible');
+      el.classList.add('hidden');
+    });
     
-    this.textContent = 'Show Geneva Airport View';
+    // Hide Geneva layers
+    map.setLayoutProperty('civil-lines', 'visibility', 'none');
+    map.setLayoutProperty('private-lines', 'visibility', 'none');
+    map.setLayoutProperty('private-lines-500plus', 'visibility', 'none');
     
-    // Resize map to fit container
+    // Fly back to Europe
+    map.flyTo({
+      center: [10, 50],
+      zoom: 4,
+      speed: 1.8,
+      curve: 1.2,
+      essential: true
+    });
+    
     setTimeout(() => {
-      mapEurope.resize();
-      // Redraw Europe chart when switching to this view
-      drawEuropeChart(currentYear);
-    }, 0);
+      // Show Europe layer
+      map.setLayoutProperty('circles', 'visibility', 'visible');
+      
+      // Fade in Europe UI
+      document.querySelectorAll('#controls-europe, #chart-europe, #legend-europe').forEach(el => {
+        el.classList.remove('hidden');
+        el.classList.add('visible');
+      });
+      
+      isGVAMode = false;
+      isTransitioning = false;
+    }, 300);
   }
 });
 
-// Toggle chart functionality
+// Toggle chart visibility
 function toggleChart(view) {
   const chart = document.getElementById(`chart-${view}`);
   chart.style.display = chart.style.display === 'none' ? 'block' : 'none';
 }
-
 </script>
 </body>
 </html>
