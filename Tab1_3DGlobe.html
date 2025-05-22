@@ -164,7 +164,7 @@
                     </a>
                 </li>
                   <li><a href="index.html">Home</a></li>
-                  <li><a href="Tab1_3DGlobe.html">Global</a></li>
+                  <li><a href="Tab1_3DGlobe.html">Globe</a></li>
                   <li><a href="Tab2_Europe.html">Continent</a></li>
                   <li><a href="Tab3_City.html">City</a></li>
                   <li><a href="Tab4_Conclusion.html">Conclusion</a></li>
@@ -177,7 +177,7 @@
 
     <div id="control-panel" style="
       position: absolute;
-      bottom: 10%;
+      bottom: 5%;
       left: 20px;
       z-index: 20;
       font-family: sans-serif;
@@ -193,8 +193,39 @@
       <aside id="sidebar">
 
 
+
+        <details  Open class="section">
+                    <summary>
+            <span class="step-title">INSTRUCTION</span>
+          </summary>
+              <div id="step-title" style="
+                background: rgba(255, 255, 255, 0.1);
+                padding: 12px;
+                border-radius: 8px;
+              ">            
+
+                <h3 style="margin-top: 0; margin-bottom: 8px; color: white">How to Read this Interactive Dashboard?</h3>
+                <p style="font-size: 14px; line-height: 1.5;">
+                  This interactive globe explores how public and private aviation contributes to global emissions, 
+                  who benefits most, and how its impact varies across regions and time.
+                  <br><br>
+                  Follow steps 1–5 below to explore how aviation CO₂ emissions, fleet distributions, route networks, 
+                  and year-on-year trends interconnect on the 3D globe.<br>
+                  
+                </p>
+              </div>
+        </details>
+
+
+
+
+
+
+
+
+
         <!-- Section 1: year slider -->
-        <details open class="section">
+        <details  class="section">
           <summary>
             <span class="step-title">1. Select the year</span>
           </summary>
@@ -205,7 +236,7 @@
         </details>
 
         <!-- Section 2: CO2 emission map -->
-        <details open class="section">
+        <details  class="section">
           <summary>
             <span class="step-title">2. Where emits the most from air?</span>
           </summary>
@@ -232,7 +263,7 @@
 
 
             <!-- Section 3: aircraft registered amount -->
-          <details open class="section">
+          <details  class="section">
             <summary>
               <span class="step-title">3. Where have the most airplane?</span>
             </summary>
@@ -264,7 +295,7 @@
             </details>
 
             <!-- Section 4: flight path -->
-            <details open class="section">
+            <details class="section">
             <summary>
               <span class="step-title">4. Where do people fly?</span>
             </summary>
@@ -284,10 +315,10 @@
             </div>
             </details>
 
-            <!-- Section 4: line chart -->
-            <details open class="section">
+            <!-- Section 5: line chart -->
+            <details class="section">
             <summary>
-              <span class="step-title">5. Emission Trend by Decade</span>
+              <span class="step-title">5. Whats the trend?</span>
             </summary>
             <div id="line-chart-section" style="
             background: rgba(255, 255, 255, 0.1);
@@ -322,22 +353,25 @@
     z-index: 20;
     font-family: sans-serif;
     color: white;
-    width: 340px;
+    width: 400px;
     display: flex;
     flex-direction: column;
     gap: 12px;">
 
-      <!-- Section 1: intro-story -->
+
+
+
       <div id="intro-story" style="
         background: rgba(255, 255, 255, 0.1);
         padding: 12px;
         border-radius: 8px;
       ">
-        <h3 style="margin-top: 0; margin-bottom: 8px; color: white">Why Private Jets Matter</h3>
+        <h3 style="margin-top: 0; margin-bottom: 8px; color: white">What can we see from here?</h3>
         <p style="font-size: 14px; line-height: 1.5;">
-          Though they account for a small portion of total flights, private jets emit disproportionately high levels of carbon per passenger.
-          <br><br>
-          This interactive dashboard explores how private aviation contributes to global emissions, who benefits most, and how its impact varies across regions and time.
+          The globe view reveals a strong correlation between fleet size and national aviation emissions, 
+          with a few countries (e.g., the US, China) responsible for the majority of CO₂. 
+          Overlaying top commercial and private routes highlights key corridors driving peaks, 
+          while trend lines show the sector’s rapid post-pandemic rebound.          
         </p>
       </div>
     </div>

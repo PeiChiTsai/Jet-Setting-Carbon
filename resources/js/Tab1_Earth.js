@@ -241,80 +241,76 @@ updateFlightPath: function () {
 
 
 // ============ WORLD COUNTRIES COMPONENT ============
-
 AFRAME.registerComponent('world-countries', {
   schema: {
-    globe: { type: 'selector' },
+    globe:   { type: 'selector' },
     dataUrl: { type: 'string' },
-    type: { type: 'string', default: 'total' }
+    type:    { type: 'string', default: 'total' }
   },
 
   init: function () {
-    const globeEn = this.data.globe;
-    const sceneEl = this.el.sceneEl;
-    const colorScale = d3.scaleLinear()
-    .domain([0, 1000000])
-    .range(["rgb(147, 206, 170)", "rgb(15, 85, 53)"])
-    .clamp(true);
+    const globeEn  = this.data.globe;
+    const sceneEl  = this.el.sceneEl;
+    const baseColorScale = d3.scaleLinear()
+      .domain([0, 1000000])
+      .range(["rgb(147, 206, 170)", "rgb(15, 85, 53)"])
+      .clamp(true);
 
+    // 等场景加载完毕，再加载 GeoJSON 并初始化
+    sceneEl.addEventListener('loaded', () => {
+      d3.json("./resources/ne_110m_admin_0_countries.geojson").then(geo => {
+        const features = geo.features;
+        globeEn.setAttribute('globe', {
+          polygonsData: features,
+          polygonsTransitionDuration: 1000,
+          polygonAltitude: feat => Math.max(0.1, Math.sqrt(+feat.properties.POP_EST) * 1e-10),
+          polygonCapColor: feat => {
+            const iso      = feat.properties.ISO_A3 || feat.properties.ISO_A2;
+            const yearData = co2EmissionByYear["2022"] || {};
+            const val      = yearData[iso];
+            if (val != null) {
+              const rgb = d3.color(baseColorScale(val)).formatRgb();
+              return rgb.replace("rgb", "rgba").replace(")", ", 0.7)");
+            }
+            return "rgba(33, 33, 33, 0.19)";
+          },
+          polygonSideColor:   () => 'rgba(0,0,0,0.14)',
+          polygonStrokeColor: () => '#111',
+          onHover: hoverObj => {
+            const year     = window.currentYear || "2022";
+            const tooltip  = document.getElementById("country-tooltip");
+            const switchOn = document.getElementById("toggle-emissions")?.checked;
+            let   label    = '';
 
-    
+            if (hoverObj && hoverObj.type === 'polygon') {
+              const d   = hoverObj.data.properties;
+              const iso = d.ISO_A3 || d.ISO_A2;
+              const val = co2EmissionByYear?.[year]?.[iso];
+              label = d.ADMIN;
 
-    // 設定 polygons
-    globeEn.setAttribute('globe', 'polygonsData', polygonsData);
+              tooltip.innerHTML = switchOn
+                ? `<strong>${label}</strong><br>Aviation CO₂: ` +
+                  `${val != null ? Math.round(val).toLocaleString() + ' t' : 'No data'}`
+                : `<strong>${label}</strong>`;
+              tooltip.style.opacity = 1;
 
-    setTimeout(() => globeEn.setAttribute('globe', {
-      polygonsTransitionDuration: 1000,
-      polygonAltitude: feat => Math.max(0.1, Math.sqrt(+feat.properties.POP_EST) * 1e-10)
-    }), 3000);
+              updateLineChart(d.ISO_A3, d.ADMIN);
+            } else {
+              tooltip.style.opacity = 0;
+              updateLineChart("OWID_WRL");
+            }
 
-    globeEn.setAttribute('globe', {
-      polygonCapColor: feat => {
-        const iso = feat.properties.ISO_A3 || feat.properties.ISO_A2;
-        const yearData = co2EmissionByYear["2022"] || {};
-        const val = yearData[iso];
-        if (val != null) {
-          const color = d3.color(colorScale(val)).formatRgb();
-          return color.replace("rgb", "rgba").replace(")", ", 0.7)");
-        } else {
-          return "rgba(33, 33, 33, 0.19)";
-        }
-      },
-      polygonSideColor: () => 'rgba(0,0,0,0.14)',
-      polygonStrokeColor: () => '#111',
+            const cameraPos = user?.getObject3D('camera')?.position;
+            if (cameraPos) ref.setAttribute('position', cameraPos);
 
-      onHover: hoverObj => {
-        const year = window.currentYear || "2022";
-        const tooltip = document.getElementById("country-tooltip");
-        const switchOn = document.getElementById("toggle-emissions")?.checked;
-
-        let label = '';
-        if (hoverObj && hoverObj.type === 'polygon') {
-          const d = hoverObj.data.properties;
-          const iso = d.ISO_A3 || d.ISO_A2;
-          const val = co2EmissionByYear?.[year]?.[iso];
-
-          label = `${d.ADMIN}`;
-          tooltip.innerHTML = switchOn
-            ? `<strong>${label}</strong><br>Aviation CO₂: ${val != null ? Math.round(val).toLocaleString() + ' t' : 'No data'}`
-            : `<strong>${label}</strong>`;
-          tooltip.style.opacity = 1;
-
-          updateLineChart(d.ISO_A3, d.ADMIN);
-        } else {
-          tooltip.style.opacity = 0;
-          updateLineChart("OWID_WRL");
-        }
-
-        const cameraPos = user?.getObject3D('camera')?.position;
-        if (cameraPos) ref.setAttribute('position', cameraPos);
-
-        globeEn.setAttribute('globe', 'polygonAltitude', d => (
-          hoverObj && d === hoverObj.data
-            ? (switchOn ? 0.04 : 0.005)
-            : 0.008
-        ));
-      }
+            globeEn.setAttribute('globe', 'polygonAltitude', d => (
+              hoverObj && d === hoverObj.data
+                ? (switchOn ? 0.04 : 0.005)
+                : 0.008
+            ));
+          }
+        });
+      });
     });
   },
 
@@ -322,43 +318,34 @@ AFRAME.registerComponent('world-countries', {
     return Math.min(0.02, 0.003 + value * 0.00002);
   },
 
+  updateMapByYear: function (year) {
+    const globeEn = this.data.globe;
+    const isOn   = document.getElementById('toggle-emissions')?.checked;
+    const colorScale = d3.scaleLinear()
+      .domain([0, 1000000])
+      .range(["rgb(147, 206, 170)", "rgb(15, 85, 53)"])
+      .clamp(true);
+    const yearData = co2EmissionByYear[year] || {};
 
+    if (!isOn) {
+      globeEn.setAttribute('globe', {
+        polygonCapColor: () => "rgba(255, 255, 255, 0.04)"
+      });
+      return;
+    }
 
-updateMapByYear: function (year) {
-  const globeEn = this.data.globe;
-
-  // 先抓 switch 狀態
-  const isEmissionOn = document.getElementById('toggle-emissions')?.checked;
-
-  const colorScale = d3.scaleLinear()
-    .domain([0, 1000000])
-    .range(["rgb(147, 206, 170)", "rgb(15, 85, 53)"])
-    .clamp(true);
-
-  const yearData = co2EmissionByYear[year] || {};
-
-  // 🌟 如果 switch 是關的，就上透明色
-  if (!isEmissionOn) {
     globeEn.setAttribute('globe', {
-      polygonCapColor: () => "rgba(255, 255, 255, 0.04)"  // 透明白
-    });
-    return;  // ⭐ 記得 return 不要再往下走
-  }
-
-  // 🌟 switch開啟時，正常根據數值上色
-  globeEn.setAttribute('globe', {
-    polygonCapColor: feat => {
-      const iso = feat.properties.ISO_A3 || feat.properties.ISO_A2;
-      const val = yearData[iso];
-      if (val != null) {
-        const color = d3.color(colorScale(val)).formatRgb();
-        return color.replace("rgb", "rgba").replace(")", ", 0.5)");
-      } else {
+      polygonCapColor: feat => {
+        const iso = feat.properties.ISO_A3 || feat.properties.ISO_A2;
+        const val = yearData[iso];
+        if (val != null) {
+          const rgb = d3.color(colorScale(val)).formatRgb();
+          return rgb.replace("rgb", "rgba").replace(")", ", 0.5)");
+        }
         return "rgba(77,77,77,0.77)";
       }
-    }
-  });
-}
+    });
+  }
 
 });
 
