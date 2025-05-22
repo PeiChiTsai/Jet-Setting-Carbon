@@ -251,10 +251,14 @@ AFRAME.registerComponent('world-countries', {
 
   init: function () {
     const globeEn = this.data.globe;
+    const sceneEl = this.el.sceneEl;
     const colorScale = d3.scaleLinear()
     .domain([0, 1000000])
-    .range(["#ffffb2", "#4d3b00"])
+    .range(["rgb(147, 206, 170)", "rgb(15, 85, 53)"])
     .clamp(true);
+
+
+    
 
     // 設定 polygons
     globeEn.setAttribute('globe', 'polygonsData', polygonsData);
@@ -262,7 +266,7 @@ AFRAME.registerComponent('world-countries', {
     setTimeout(() => globeEn.setAttribute('globe', {
       polygonsTransitionDuration: 1000,
       polygonAltitude: feat => Math.max(0.1, Math.sqrt(+feat.properties.POP_EST) * 1e-10)
-    }), 1000);
+    }), 3000);
 
     globeEn.setAttribute('globe', {
       polygonCapColor: feat => {
@@ -271,9 +275,9 @@ AFRAME.registerComponent('world-countries', {
         const val = yearData[iso];
         if (val != null) {
           const color = d3.color(colorScale(val)).formatRgb();
-          return color.replace("rgb", "rgba").replace(")", ", 0.5)");
+          return color.replace("rgb", "rgba").replace(")", ", 0.7)");
         } else {
-          return "rgba(77,77,77,0.77)";
+          return "rgba(33, 33, 33, 0.19)";
         }
       },
       polygonSideColor: () => 'rgba(0,0,0,0.14)',
@@ -328,7 +332,7 @@ updateMapByYear: function (year) {
 
   const colorScale = d3.scaleLinear()
     .domain([0, 1000000])
-    .range(["#ffffb2", "#4d3b00"])
+    .range(["rgb(147, 206, 170)", "rgb(15, 85, 53)"])
     .clamp(true);
 
   const yearData = co2EmissionByYear[year] || {};

@@ -129,6 +129,17 @@
         width: 55px;              /* ✅ 固定寬度，保持對齊 */
       }
 
+      #sidebar .section {
+  margin-bottom: 0.5em;
+  padding: 0.3em 0.5em;
+  background: rgba(0,0,0,0.4);
+  border-radius: 4px;
+}
+#sidebar summary {
+  cursor: pointer;
+  font-weight: bold;
+}
+
       </style>
 
 
@@ -177,114 +188,129 @@
       gap: 12px;
     ">
 
-      <!-- Section 1: year slider -->
-      <div id="slider" style="
-        background: rgba(255, 255, 255, 0.1);
-        padding: 12px;
-        border-radius: 8px;
-      ">
-        <label style="display: block; margin: 12px 0 8px 0; font-weight: bold;">
-          1. Select the year
-        </label>
 
-      </div>
 
-      <!-- Section 2: CO2 emission map -->
-      <div id="aviation-emission-toggle" style="
-      background: rgba(255, 255, 255, 0.1);
-      padding: 12px;
-      border-radius: 8px;
-      ">
-        <label style="display: block; margin-bottom: 6px; font-weight: bold;">
-          2. Where emit the most from aviation?
-        </label>
+      <aside id="sidebar">
 
-        <div class="row">
-          <span class="label-text">Annual CO₂ emissions from aviation</span>
-            <div class="switch-wrapper">
-              <label class="switch">
-                <input type="checkbox" id="toggle-emissions" checked>
-                <span class="slider round"></span>
+
+        <!-- Section 1: year slider -->
+        <details open class="section">
+          <summary>
+            <span class="step-title">1. Select the year</span>
+          </summary>
+            <div id="slider" style="
+              background: rgba(255, 255, 255, 0.1);
+              padding: 12px;
+              border-radius: 8px"></div>
+        </details>
+
+        <!-- Section 2: CO2 emission map -->
+        <details open class="section">
+          <summary>
+            <span class="step-title">2. Where emits the most from air?</span>
+          </summary>
+          <div id="aviation-emission-toggle" style="
+            background: rgba(255, 255, 255, 0.1);
+            padding: 12px;
+            border-radius: 8px;
+            ">
+              <label style="display: block; margin-bottom: 6px; font-weight: bold;">
+                2. Where emit the most from aviation?
               </label>
+
+              <div class="row">
+                <span class="label-text">Annual CO₂ emissions from aviation</span>
+                  <div class="switch-wrapper">
+                    <label class="switch">
+                      <input type="checkbox" id="toggle-emissions" checked>
+                      <span class="slider round"></span>
+                    </label>
+                  </div>
+              </div>
             </div>
-        </div>
-        
-      </div>
+          </details>
+
+
+            <!-- Section 3: aircraft registered amount -->
+          <details open class="section">
+            <summary>
+              <span class="step-title">3. Where have the most airplane?</span>
+            </summary>
+            <div id="aircraft-amount-toggle" style="
+              background: rgba(255, 255, 255, 0.1);
+              padding: 12px;
+              border-radius: 8px;">
+
+              <div class="row">
+                <span class="label-text">Top 15 aircraft registered countries</span>
+                  <div class="switch-wrapper">
+                    <label class="switch">
+                      <input type="checkbox" id="toggle-reg-1" >
+                      <span class="slider round"></span>
+                    </label>
+                  </div>          
+              </div>
+              
+              <div class="row">
+                <span class="label-text">Top 11 Private jet registered</span>
+                  <div class="switch-wrapper">
+                    <label class="switch">
+                      <input type="checkbox" id="toggle-reg-2" >
+                      <span class="slider round"></span>
+                    </label>
+                  </div>   
+              </div>      
+            </div>  
+            </details>
+
+            <!-- Section 4: flight path -->
+            <details open class="section">
+            <summary>
+              <span class="step-title">4. Where do people fly?</span>
+            </summary>
+            <div id="flight-path"style="
+              background: rgba(255, 255, 255, 0.1);
+              padding: 12px;
+              border-radius: 8px;">
+
+
+              <span class="label-text">Choose a Flight Type:</span>
+              
+              <select id="flightSelect">
+                <option value="">None</option>          
+                <option value="commercial">Top Popular Commercial Flight Path</option>
+                <option value="private">Top 2500 Popular Private Flight Path</option>
+              </select>
+            </div>
+            </details>
+
+            <!-- Section 4: line chart -->
+            <details open class="section">
+            <summary>
+              <span class="step-title">5. Emission Trend by Decade</span>
+            </summary>
+            <div id="line-chart-section" style="
+            background: rgba(255, 255, 255, 0.1);
+            padding: 12px;
+            border-radius: 8px;">
 
 
 
-      <!-- Section 3: aircraft registered amount -->
-      <div id="aircraft-amount-toggle" style="
-        background: rgba(255, 255, 255, 0.1);
-        padding: 12px;
-        border-radius: 8px;">
+              <p style="font-size: 14px; margin-bottom: 10px;">
+                Annual CO₂ emissions from aviation by year
+              </p>
+              <p id="line-chart-title" style="font-size: 14px; margin-bottom: 10px; font-style: italic;">
+                Country: <span id="chart-country-name">World</span>
+              </p>
 
-        <label style="display: block; margin-bottom: 6px; font-weight: bold;">
-          3. Which countries holds the most airplane?
-        </label>
-
-        <div class="row">
-          <span class="label-text">Top 15 aircraft registered countries (2020)</span>
-            <div class="switch-wrapper">
-              <label class="switch">
-                <input type="checkbox" id="toggle-reg-1" >
-                <span class="slider round"></span>
-              </label>
-            </div>          
-        </div>
-        
-        <div class="row">
-          <span class="label-text">Top 11 Private jet registered (2019)</span>
-            <div class="switch-wrapper">
-              <label class="switch">
-                <input type="checkbox" id="toggle-reg-2" >
-                <span class="slider round"></span>
-              </label>
-            </div>   
-        </div>      
-      </div>  
-
-      <!-- Section 4: flight path -->
-      <div id="flight-path"style="
-        background: rgba(255, 255, 255, 0.1);
-        padding: 12px;
-        border-radius: 8px;">
-
-        <label style="display: block; margin-bottom: 6px; font-weight: bold;">
-          4. Where do people fly?
-        </label>
-        <span class="label-text">Flight Type:</span>
-        
-        <select id="flightSelect">
-          <option value="">None</option>          
-          <option value="commercial">Top Popular Commercial Flight Path</option>
-          <option value="private">Top 2500 Popular Private Flight Path</option>
-        </select>
-      </div>
-
-      <!-- Section 4: line chart -->
-      <div id="line-chart-section" style="
-      background: rgba(255, 255, 255, 0.1);
-      padding: 12px;
-      border-radius: 8px;">
-
-        <label style="display: block; margin-bottom: 6px; font-weight: bold;">
-          5. What is the aerial emission trend?
-        </label>
-
-        <p style="font-size: 14px; margin-bottom: 10px;">
-          Annual CO₂ emissions from aviation by year
-        </p>
-        <p id="line-chart-title" style="font-size: 14px; margin-bottom: 10px; font-style: italic;">
-          Country: <span id="chart-country-name">World</span>
-        </p>
-
-        <!-- D3 將會 append svg 到這裡 -->
-        <div id="line-chart-container">
-          <svg width="300" height="160" style="background: rgba(255,255,255,0.05); border-radius: 4px;"></svg>
-        </div>
-      </div>
-
+              <!-- D3 將會 append svg 到這裡 -->
+              <div id="line-chart-container">
+                <svg width="300" height="160" style="background: rgba(255,255,255,0.05); border-radius: 4px;"></svg>
+              </div>
+            </div>
+            
+            </details>
+      </aside>
 
     </div>
 
@@ -338,8 +364,8 @@
         
         <div style="height: 12px; border-radius: 6px;
           background: linear-gradient(to right,
-            rgba(255, 255, 178, 0.4),
-            rgba(77, 59, 0, 0.571)
+            rgba(147, 206, 170,0.7),
+            rgba(15, 85, 53,0.7)
           );">
         </div>
 
