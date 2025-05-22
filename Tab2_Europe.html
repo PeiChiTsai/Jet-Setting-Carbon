@@ -6,7 +6,11 @@
   <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
   <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
   <script src="https://d3js.org/d3.v7.min.js"></script>
-  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com"
+<link rel="preconnect" href="https://fonts.gstatic.com"
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200;0,400;0,600;0,700;1,200;1,700&family=Cabin+Condensed:wght@400;500;600;700&family=Contrail+One&display=swap"
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap"
+<link href="https://api.tiles.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet" />
   <style>
     /* Base Styles */
     body { margin:0; padding:0; font-family: sans-serif; }
@@ -207,44 +211,8 @@
       }
     }
 
-    /* Navigation Bar */
-    .navbar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 60px;
-      background-color: #1e2a35;
-      z-index: 1000;
-      margin: 0;
-      padding: 0;
-      list-style: none;
-      display: flex;
-      align-items: center;
-    }
-    .navbar li {
-      margin: 0 15px;
-    }
-    .navbar a {
-      color: white;
-      text-decoration: none;
-      font-size: 14px;
-    }
-    .navbar .logo {
-      margin-right: auto;
-      display: flex;
-      align-items: center;
-    }
-    .logo-image {
-      height: 30px;
-      margin-right: 10px;
-    }
-    .logo-text {
-      font-weight: bold;
-      font-size: 16px;
-    }
-
-    /* Key Findings Panel */
+    
+/* Key Findings Panel */
     .conclusion-panel {
       position: absolute;
       bottom: 180px;
@@ -297,19 +265,19 @@
 <body>
   <!-- Navigation Bar -->
   <ul class="navbar">
-    <li class="logo">
-      <a href="#Home">
-        <img src="images/logo.svg" alt="Logo" class="logo-image">
-        <span class="logo-text">AVIATION NETWORK</span>
-      </a>
-    </li>
-    <li><a href="index.html">Home</a></li>
-    <li><a href="Tab1_3DGlobe.html">Global</a></li>
-    <li><a href="Tab2_Europe.html">Continent</a></li>
-    <li><a href="Tab3_City.html">City</a></li>
-    <li><a href="Authors.html">Authors</a></li>
-    <li><a href="Reference.html">Reference</a></li>
-  </ul>
+                <li class="logo">
+                    <a href="#Home">
+                        <img src="images/logo.svg" alt="Logo" class="logo-image">
+                        <span class="logo-text">AVIATION NETWORK</span>
+                    </a>
+                </li>
+                  <li><a href="index.html">Home</a></li>
+                  <li><a href="Tab1_3DGlobe.html">Global</a></li>
+                  <li><a href="Tab2_Europe.html">Continent</a></li>
+                  <li><a href="Tab3_City.html">City</a></li>
+                  <li><a href="Tab4_Conclusion.html">Conclusion</a></li>
+                  <li><a href="Tab5_Reference.html">Info</a></li>
+            </ul>
 
   <!-- Main Map Container -->
   <div id="map-container">
