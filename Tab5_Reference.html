@@ -756,6 +756,22 @@
                     display: none;
             }
         }
+
+        .author-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;    /* 垂直居中头像和文字 */
+            text-align: center;     /* 文字也居中 */
+            }
+
+        .author-photo {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin-bottom: 0.5rem;
+            }
+                    
     </style>
 
     </head>
@@ -770,12 +786,12 @@
                         <span class="logo-text">AVIATION NETWORK</span>
                     </a>
                 </li>
-                    <li><a href="index.html">Home</a></li>
-                    <li><a href="Tab1_3DGlobe.html">Global</a></li>
-                    <li><a href="Tab2_Europe.html">Continent</a></li>
-                    <li><a href="Tab3_City.html">City</a></li>
-                    <li><a href="Tab4_Conclusion.html">Conclusion</a></li>
-                    <li><a href="Tab5_Reference.html">Reference</a></li>
+                  <li><a href="index.html">Home</a></li>
+                  <li><a href="Tab1_3DGlobe.html">Global</a></li>
+                  <li><a href="Tab2_Europe.html">Continent</a></li>
+                  <li><a href="Tab3_City.html">City</a></li>
+                  <li><a href="Tab4_Conclusion.html">Conclusion</a></li>
+                  <li><a href="Tab5_Reference.html">Info</a></li>
             </ul>
 
             <!-- Animated airplanes -->
@@ -797,6 +813,48 @@
             <article>
  
                 <section class="reference-section">
+
+
+
+                    <div class="reference-container">
+                        <div class="reference-header">
+                            <span>
+                                Authors
+                            </span>
+                        </div>
+
+                        <div class="reference-content" style="display: flex;justify-content: space-between;  align-items: flex-start; gap: 2rem;">
+                            <div class="author-item">
+                                <img src="images/Authors/PeggyTsai.jpg" alt="Jiaqi Hu" class="author-photo">
+                                <h3>Jiaqi Hu</h3>
+                                <ul>
+                                    <li><em>MSc Urban Spatial Science, UCL CASA</em></li>
+                                </ul>
+                            </div>
+
+                            <div class="author-item">
+                                <img src="images/Authors/PeggyTsai.jpg" alt="Jiaqi Hu" class="author-photo">
+                                <h3>Yuanqing Zhang</h3>
+                                <ul>
+                                    <li><em>MSc Urban Spatial Science, UCL CASA</em></li>
+                                </ul>
+                            </div>
+
+                            <div class="author-item">
+                                <img src="images/Authors/PeggyTsai.jpg" alt="Jiaqi Hu" class="author-photo">
+                                <h3>Pei-Chi Tsai</h3>
+                                <ul>
+                                    <li><em>MRes Urban Spatial Science, UCL CASA</em></li>
+                                </ul>
+                            </div>
+                        </div>
+                    
+                    </div>
+
+
+
+
+
                     <div class="reference-container">
                         <div class="reference-header">
                             <span>
@@ -804,51 +862,58 @@
                             </span>
                         </div>
                         <div class="reference-content">
-                                        <h3>Story</h3>
-            <ul>
-                <li><em>10 figures about aviation and the climate</em></li>
-            </ul>
+                            <h3>Story</h3>
+                            <ul>
+                                <li><em>10 figures about aviation and the climate</em></li>
+                            </ul>
 
-            <h3>Data</h3>
-                            <ul class="reference-list">
-                                <li><i class="reference-icon">📊</i> World Resources Institute - Research for People &amp; Planet</li>
-                <li>
-                                <i class="reference-icon">✈️</i> OECD (2025) – processed by Our World in Data. 
-                                "<a href="https://ourworldindata.org/grapher/annual-co-emissions-from-aviation" target="_blank" rel="noopener noreferrer">Annual CO₂ emissions from aviation</a>" [dataset]. 
-                                OECD, "Air transport CO2 emissions (experimental)" [original data]. Retrieved May 8, 2025.
-                </li>
-                <li>
-                                <i class="reference-icon">🌍</i> <a href="https://www.nature.com/articles/s41560-022-01121-5" target="_blank" rel="noopener noreferrer">
-                    Large inequality in international and intranational energy footprints between income groups and across consumption categories</a> | Nature Energy
-                </li>
-                <li>
-                                <i class="reference-icon">🛩️</i> <a href="https://www.avbuyer.com/articles/private-jets/what-are-the-fastest-growing-registries-in-the-world-113282" target="_blank" rel="noopener noreferrer">
-                    What are the Fastest Growing Registries in the World?</a> | AvBuyer
-                </li>
-                                <li><i class="reference-icon">🛫</i> Private aviation path and their estimated emissions from 2019–2024 (by each flight)</li>
-                <li>
-                                <i class="reference-icon">🔍</i> <a href="https://github.com/ip2location/ip2location-iata-icao" target="_blank" rel="noopener noreferrer">
-                    GitHub - ip2location/ip2location-iata-icao</a>: IATA and ICAO airport codes with country and region metadata
-                </li>
-                <li>
-                                <i class="reference-icon">📈</i> <a href="https://www.eurocontrol.int/publication/eurocontrol-data-snapshot-49" target="_blank" rel="noopener noreferrer">
-                    EUROCONTROL Data Snapshot #49</a> | EUROCONTROL
-                </li>
-                <li>
-                                <i class="reference-icon">🌐</i> <a href="https://www.oag.com/busiest-routes" target="_blank" rel="noopener noreferrer">
-                    Busiest Flight Routes in the World 2024</a> | OAG
-                </li>
-            </ul>
+                            <h3>Data</h3>
+                                            <ul class="reference-list">
+                                                <li><i class="reference-icon">📊</i> World Resources Institute - Research for People &amp; Planet</li>
+                                <li>
+                                                <i class="reference-icon">✈️</i> OECD (2025) – processed by Our World in Data. 
+                                                "<a href="https://ourworldindata.org/grapher/annual-co-emissions-from-aviation" target="_blank" rel="noopener noreferrer">Annual CO₂ emissions from aviation</a>" [dataset]. 
+                                                OECD, "Air transport CO2 emissions (experimental)" [original data]. Retrieved May 8, 2025.
+                                </li>
+                                <li>
+                                                <i class="reference-icon">🌍</i> <a href="https://www.nature.com/articles/s41560-022-01121-5" target="_blank" rel="noopener noreferrer">
+                                    Large inequality in international and intranational energy footprints between income groups and across consumption categories</a> | Nature Energy
+                                </li>
+                                <li>
+                                                <i class="reference-icon">🛩️</i> <a href="https://www.avbuyer.com/articles/private-jets/what-are-the-fastest-growing-registries-in-the-world-113282" target="_blank" rel="noopener noreferrer">
+                                    What are the Fastest Growing Registries in the World?</a> | AvBuyer
+                                </li>
+                                                <li><i class="reference-icon">🛫</i> Private aviation path and their estimated emissions from 2019–2024 (by each flight)</li>
+                                <li>
+                                                <i class="reference-icon">🔍</i> <a href="https://github.com/ip2location/ip2location-iata-icao" target="_blank" rel="noopener noreferrer">
+                                    GitHub - ip2location/ip2location-iata-icao</a>: IATA and ICAO airport codes with country and region metadata
+                                </li>
+                                <li>
+                                                <i class="reference-icon">📈</i> <a href="https://www.eurocontrol.int/publication/eurocontrol-data-snapshot-49" target="_blank" rel="noopener noreferrer">
+                                    EUROCONTROL Data Snapshot #49</a> | EUROCONTROL
+                                </li>
+                                <li>
+                                                <i class="reference-icon">🌐</i> <a href="https://www.oag.com/busiest-routes" target="_blank" rel="noopener noreferrer">
+                                    Busiest Flight Routes in the World 2024</a> | OAG
+                                </li>
+                            </ul>
 
-            <h3>Icon / Texture Source</h3>
-                            <ul class="reference-list">
-                <li>
-                                <i class="reference-icon">🎨</i> <a href="https://www.vecteezy.com/" target="_blank" rel="noopener noreferrer">Vector Icons and Stickers</a> - PNG, SVG, EPS, PSD and CSS
-                </li>
-                <li>
-                                <i class="reference-icon">🌎</i> <a href="https://www.solarsystemscope.com/textures/" target="_blank" rel="noopener noreferrer">Solar Textures</a> | Solar System Scope
-                </li>
-            </ul>
+                            <h3>Icon / Texture Source</h3>
+                                            <ul class="reference-list">
+                                <li>
+                                                <i class="reference-icon">🎨</i> <a href="https://www.vecteezy.com/" target="_blank" rel="noopener noreferrer">Vector Icons and Stickers</a> - PNG, SVG, EPS, PSD and CSS
+                                </li>
+                                <li>
+                                                <i class="reference-icon">🌎</i> <a href="https://www.solarsystemscope.com/textures/" target="_blank" rel="noopener noreferrer">Solar Textures</a> | Solar System Scope
+                                </li>
+                                <h3>Template</h3>
+                                            <ul class="reference-list">
+                                <li>
+                                        <i class="reference-icon">🔗</i> <a href="https://www.tooplate.com/view/2137-barista-cafe" target="_blank" rel="noopener noreferrer">Barista Cafe</a> - Tooplate
+                                </li>
+                            </ul>
+
+                            </ul>
                         </div>
                     </div>
 
