@@ -8,15 +8,25 @@
   <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
-
   <style>
-    body { margin: 0; padding: 0; }
-    #map { position: absolute; top: 0; bottom: 0; left: 280px; right: 0; }
 
-    #sidebar {
-      position: absolute;
-      top: 0;
+    body { 
+      margin: 0; 
+      padding: 0; 
+      overflow: hidden;
+      font-family: sans-serif;
+    }
+    
+    #map-container {
+      position: fixed;
+      top: 60px;
       left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+    }
+    
+    #sidebar {
       width: 280px;
       height: 100%;
       background-color: #2f4f64;
@@ -25,30 +35,75 @@
       color: white;
       display: flex;
       flex-direction: column;
-      justify-content: flex-start;
-      font-family: sans-serif;
-      z-index: 1;
+      overflow-y: auto;
     }
+    
+    #map {
+      flex: 1;
+      height: 100%;
+    }
+
+
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background-color: #1e2a35;
+      z-index: 1000;
+      margin: 0;
+      padding: 0 20px;
+      list-style: none;
+      display: flex;
+      align-items: center;
+    }
+    
+    .navbar li {
+      margin: 0 15px;
+    }
+    
+    .navbar a {
+      color: white;
+      text-decoration: none;
+      font-size: 14px;
+    }
+    
+    .navbar .logo {
+      margin-right: auto;
+      display: flex;
+      align-items: center;
+    }
+    
+    .logo-image {
+      height: 30px;
+      margin-right: 10px;
+    }
+    
+    .logo-text {
+      font-weight: bold;
+      font-size: 16px;
+    }
+
 
     .info-box {
       background-color: #444;
       padding: 15px;
       border-radius: 4px;
-      margin-top: 60px;
       margin-bottom: 20px;
       color: #eee;
     }
-
+    
     .info-box h3 {
       margin: 0 0 10px;
       font-size: 18px;
     }
-
+    
     .info-box p {
       margin: 0;
       font-size: 14px;
     }
-
+    
     .event-buttons button {
       width: 100%;
       margin-bottom: 10px;
@@ -60,285 +115,392 @@
       border-radius: 3px;
       cursor: pointer;
     }
-
+    
     .event-buttons button:hover {
       background-color: #32688d;
     }
-
+    
     .legend-box {
-  margin-top: auto;
-  background-color: #2f3a48;
-  color: white;
-  text-align: left;
-  padding: 12px;
-  border-radius: 6px;
-  font-size: 13px;
-  line-height: 1.5;
-}
+      margin-top: auto;
+      background-color: #2f3a48;
+      color: white;
+      text-align: left;
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    
+    .legend-line {
+      display: inline-block;
+      width: 40px;
+      height: 3px;
+      margin-right: 10px;
+      vertical-align: middle;
+      border-radius: 2px;
+    }
+    
+    .chart-container {
+      margin: 10px 0 15px;
+      background-color: #1e2a35;
+      padding: 10px;
+      border-radius: 6px;
+    }
+    
+    .chart-container canvas {
+      display: block;
+      margin-bottom: 12px;
+    }
 
-.legend-line {
-  display: inline-block;
-  width: 40px;
-  margin-right: 10px;
-  vertical-align: middle;
-  border-radius: 2px;
-}
 
-.chart-container {
-    margin-top: 10px;
-    margin-bottom: 15px;
-    background-color: #1e2a35;
-    padding: 10px;
-    border-radius: 6px;
-  }
-  .chart-container canvas {
-    display: block;
-    margin-bottom: 12px;
-  }
+    .conclusion-panel {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      width: 220px;
+      background: rgba(30, 42, 53, 0.95);
+      color: white;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      line-height: 1.4;
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      z-index: 100;
+    }
+
+    .conclusion-panel h4 {
+      margin: 0 0 8px;
+      font-size: 14px;
+      color: #a1c4fd;
+      padding-bottom: 6px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .conclusion-item {
+      display: flex;
+      align-items: center;
+      margin: 8px 0;
+      padding: 6px 0;
+      border-bottom: 1px dashed rgba(255,255,255,0.05);
+    }
+
+    .conclusion-item:last-child {
+      border-bottom: none;
+    }
+
+    .conclusion-icon {
+      font-size: 16px;
+      margin-right: 8px;
+      opacity: 0.8;
+    }
+
+    .conclusion-text {
+      flex: 1;
+    }
   </style>
 </head>
 
 <body>
-      <!-- Header Section with Title & Logo and Menu -->
-                <ul class="navbar">
-                <li class="logo">
-                    <a href="#Home">
-                        <img src="images/logo.svg" alt="Logo" class="logo-image">
-                        <span class="logo-text">AVIATION NETWORK</span>
-                    </a>
-                </li>
-                  <li><a href="index.html">Home</a></li>
-                  <li><a href="Tab1_3DGlobe.html">Global</a></li>
-                  <li><a href="Tab2_Europe.html">Continent</a></li>
-                  <li><a href="Tab3_City.html">City</a></li>
-                  <li><a href="Authors.html">Authors</a></li>
-                  <li><a href="Reference.html">Reference</a></li>
-            </ul>
+
+  <ul class="navbar">
+    <li class="logo">
+      <a href="#Home">
+        <img src="images/logo.svg" alt="Logo" class="logo-image">
+        <span class="logo-text">AVIATION NETWORK</span>
+      </a>
+    </li>
+    <li><a href="index.html">Home</a></li>
+    <li><a href="Tab1_3DGlobe.html">Global</a></li>
+    <li><a href="Tab2_Europe.html">Continent</a></li>
+    <li><a href="Tab3_City.html">City</a></li>
+    <li><a href="Authors.html">Authors</a></li>
+    <li><a href="Reference.html">Reference</a></li>
+  </ul>
+
+  <div id="map-container">
+
+    <div id="sidebar">
+      <div class="info-box">
+        <h3 id="event-title">2022 FIFA World Cup</h3>
+        <p id="event-desc">Visualizing flights related to 2022 FIFA in Qatar.</p>
+      </div>
+
+      <div class="event-buttons">
+        <button onclick="switchEvent('fifa')">2022 FIFA</button>
+        <button onclick="switchEvent('wef')">2023 World Economic Forum</button>
+        <button onclick="switchEvent('paris')">2024 Paris Olympic</button>
+      </div>
+      
+      <div class="chart-container">
+        <canvas id="flightChart" height="170"></canvas>
+        <canvas id="co2Chart" height="170"></canvas>
+      </div>
+      
+      <div class="legend-box">
+        <strong>Legend</strong><br/>
+        <div><span class="legend-line" style="background:#e63946; height:2px;"></span>FIFA Flights</div>
+        <div><span class="legend-line" style="background:#4dabf7; height:2px;"></span>WEF Flights</div>
+        <div style="margin-top: 8px;">Paris Flight Volume:</div>
+        <div><span class="legend-line" style="background:#fcbf49; height:0.5px;"></span>> 1 flight</div>
+        <div><span class="legend-line" style="background:#fcbf49; height:3px;"></span>> 100 flights</div>
+        <div><span class="legend-line" style="background:#fcbf49; height:8px;"></span>> 500 flights</div>
+      </div>
+    </div>
 
 
-<div id="sidebar">
-  <div class="info-box">
-    <h3 id="event-title">2022 FIFA World Cup</h3>
-    <p id="event-desc">Visualizing flights related to 2022 FIFA in Qatar.</p>
+    <div id="map"></div>
+
+    <div id="conclusion-panel" class="conclusion-panel">
+  <h4>Key Insights</h4>
+  <div class="conclusion-item">
+    <div class="conclusion-icon">📌</div>
+    <div class="conclusion-text">
+      <strong>Private jet traffic exhibits event-driven spatial clustering</strong>: Each event led to a surge of arrivals at specific hub airports (e.g., Paris Le Bourget, Zurich, Doha), suggesting a strong spatial concentration in elite mobility patterns.
+    </div>
   </div>
-
-  <div class="event-buttons">
-    <button onclick="switchEvent('fifa')">2022 FIFA</button>
-    <button onclick="switchEvent('wef')">2023 World Economic Forum</button>
-    <button onclick="switchEvent('paris')">2024 Paris Olympic</button>
+  <div class="conclusion-item">
+    <div class="conclusion-icon">🌍</div>
+    <div class="conclusion-text">
+      <strong>Carbon emissions from private aviation are highly uneven</strong>: The Paris Olympics is projected to generate nearly 13kt CO₂, exceeding emissions from both the FIFA World Cup and the World Economic Forum combined.
+    </div>
   </div>
-  <div class="chart-container">
-   <canvas id="flightChart" height="170"></canvas>
-   <canvas id="co2Chart" height="170"></canvas>
+  <div class="conclusion-item">
+    <div class="conclusion-icon">🚨</div>
+    <div class="conclusion-text">
+      <strong>Private aviation underscores inequality in climate responsibility</strong>: While representing a small fraction of total air traffic, private jets contribute disproportionately to emissions, raising questions of climate justice during global gatherings.
+    </div>
   </div>
-  <div class="legend-box">
-  <strong>Legend</strong><br/>
-  <div><span class="legend-line" style="background:#e63946; height:2px;"></span>
-    FIFA Flights</div>
-
-  <div><span class="legend-line" style="background:#4dabf7; height:2px;"></span>
-    WEF Flights</div>
-
-  <div style="margin-top: 8px;">Paris Flight Volume:</div>
-  <div><span class="legend-line" style="background:#fcbf49; height:0.5px;"></span>
-    > 1 flight</div>
-  <div><span class="legend-line" style="background:#fcbf49; height:3px;"></span>
-    > 100 flights</div>
-  <div><span class="legend-line" style="background:#fcbf49; height:8px;"></span>
-    > 500 flights</div>
 </div>
-</div>
 
-<div id="map"></div>
 
-<script>
-  mapboxgl.accessToken = 'pk.eyJ1IjoiaWVtb24iLCJhIjoiY201eTJ5OHQ5MDI2azJzc2Myd2tqcjdkdyJ9.HnSzYpnN2ZdrauoEIHL-Pg'; 
+  <script>
+    mapboxgl.accessToken = 'pk.eyJ1IjoiaWVtb24iLCJhIjoiY201eTJ5OHQ5MDI2azJzc2Myd2tqcjdkdyJ9.HnSzYpnN2ZdrauoEIHL-Pg'; 
 
-  const map = new mapboxgl.Map({
-    container: 'map',
-    style: 'mapbox://styles/mapbox/dark-v11',
-    center: [10, 40],
-    zoom: 3,
-  });
-
-  map.on('load', () => {
-
-    map.addSource('fifa', {
-      type: 'vector',
-      url: 'mapbox://iemon.8xqjczmm'
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: 'mapbox://styles/mapbox/dark-v11',
+      center: [10, 40],
+      zoom: 3,
     });
 
-    map.addSource('wef', {
-      type: 'vector',
-      url: 'mapbox://iemon.d92gjakn'
-    });
-
-    map.addSource('paris', {
-      type: 'vector',
-      url: 'mapbox://iemon.dkrj7stg'
-    });
-
-    map.addLayer({
-      id: 'fifa-layer',
-      type: 'line',
-      source: 'fifa',
-      'source-layer': 'fifa_uniform_dest-1ys5vs',
-      paint: {
-        'line-color': '#e63946',
-        'line-width': 2
-      }
-    });
-
-    map.addLayer({
-      id: 'wef-layer',
-      type: 'line',
-      source: 'wef',
-      'source-layer': 'wef_uniform_dest-a00g62',
-      paint: {
-        'line-color': '#4dabf7',
-        'line-width': 2
-      },
-      layout: { visibility: 'none' }
-    });
-
-    map.addLayer({
-      id: 'paris-layer',
-      type: 'line',
-      source: 'paris',
-      'source-layer': 'paris_routes_grouped-76t684',
-      paint: {
-        'line-color': '#fcbf49',
-        'line-width': [
-          'interpolate',
-          ['linear'],
-          ['get', 'count'],
-          1, 0.5,
-          100, 3,
-          500, 8
-        ]
-      },
-      layout: { visibility: 'none' }
-    });
-  });
-
-function switchEvent(type) {
-  const layers = ['fifa-layer', 'wef-layer', 'paris-layer'];
-  layers.forEach(id => {
-    map.setLayoutProperty(id, 'visibility', id.includes(type) ? 'visible' : 'none');
-  });
-
-  const titles = {
-    fifa: '2022 FIFA World Cup',
-    wef: '2023 World Economic Forum',
-    paris: '2024 Paris Olympic'
-  };
-
-  const descriptions = {
-    fifa: 'Visualizing private flights related to 2022 FIFA in Qatar.',
-    wef: 'Visualizing private flights associated with 2023 WEF in Switzerland.',
-    paris: 'Aggregated commerical routes for the 2024 Paris Olympics.'
-  };
-
-  const centers = {
-    fifa: { center: [51.5310, 25.2854], zoom: 4.8 },
-    wef: { center: [8.5417, 47.3769], zoom: 5.5 },
-    paris: { center: [2.3522, 48.8566], zoom: 5.5 }
-  };
+const eventConclusions = {
+  fifa: [
+    { icon: '·', text: '<strong>Private jet traffic clusters around events</strong>: The FIFA World Cup drew jets mainly to Doha, showing elite travel concentration.' },
+    { icon: '·', text: '<strong>Carbon footprint</strong>: FIFA-related private flights emitted about 9.1 kilotons of CO₂.' },
+    { icon: '·', text: '<strong>Inequality indicator</strong>: A small group of private flyers caused a large share of emissions despite low overall attendance.' }
+  ],
+  wef: [
+    { icon: '·', text: '<strong>Private jet traffic clusters around events</strong>: WEF brought dense traffic to Zurich and nearby alpine airports.' },
+    { icon: '·', text: '<strong>Carbon footprint</strong>: WEF private jets generated around 5.24 kilotons of CO₂.' },
+    { icon: '·', text: '<strong>Inequality indicator</strong>: The use of private jets for a climate-focused forum reveals stark contradictions.' }
+  ],
+  paris: [
+    { icon: '·', text: '<strong>Private jet traffic clusters around events</strong>: The Paris Olympics will likely see peak traffic at Le Bourget airport.' },
+    { icon: '·', text: '<strong>Carbon footprint</strong>: Olympic flights are projected to emit nearly 13 kilotons of CO₂, surpassing FIFA and WEF combined.' },
+    { icon: '·', text: '<strong>Inequality indicator</strong>: The scale of elite air travel raises questions for sustainable event planning.' }
+  ]
+};
 
 
-  document.getElementById('event-title').innerText = titles[type];
-  document.getElementById('event-desc').innerText = descriptions[type];
+    function updateConclusions(type) {
+      const panel = document.getElementById('conclusion-panel');
+      panel.innerHTML = '<h4>Key Findings</h4>';
+      
+      eventConclusions[type].forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'conclusion-item';
+        div.innerHTML = `
+          <div class="conclusion-icon">${item.icon}</div>
+          <div class="conclusion-text">${item.text}</div>
+        `;
+        panel.appendChild(div);
+      });
+    }
 
+    map.on('load', () => {
+      map.addSource('fifa', {
+        type: 'vector',
+        url: 'mapbox://iemon.8xqjczmm'
+      });
 
-  map.flyTo({
-    center: centers[type].center,
-    zoom: centers[type].zoom,
-    essential: true
-  });
-}
+      map.addSource('wef', {
+        type: 'vector',
+        url: 'mapbox://iemon.d92gjakn'
+      });
 
-  const chartLabels = ['FIFA 2022', 'WEF 2023', 'Paris 2024'];
-  const flightCounts = [939, 655, 2007]; 
-  const co2Kilotons = [9.1, 5.24, 12.9];  
+      map.addSource('paris', {
+        type: 'vector',
+        url: 'mapbox://iemon.dkrj7stg'
+      });
 
- new Chart(document.getElementById('flightChart').getContext('2d'), {
-    type: 'bar',
-    data: {
-      labels: chartLabels,
-      datasets: [{
-        label: 'Number of Flights',
-        data: flightCounts,
-        backgroundColor: '#fcbf49'
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: { display: false },
-        title: {
-          display: true,
-          text: 'Private Flights Associated with Event',
-          color: '#fff'
+      map.addLayer({
+        id: 'fifa-layer',
+        type: 'line',
+        source: 'fifa',
+        'source-layer': 'fifa_uniform_dest-1ys5vs',
+        paint: {
+          'line-color': '#e63946',
+          'line-width': 2
         }
+      });
+
+      map.addLayer({
+        id: 'wef-layer',
+        type: 'line',
+        source: 'wef',
+        'source-layer': 'wef_uniform_dest-a00g62',
+        paint: {
+          'line-color': '#4dabf7',
+          'line-width': 2
+        },
+        layout: { visibility: 'none' }
+      });
+
+      map.addLayer({
+        id: 'paris-layer',
+        type: 'line',
+        source: 'paris',
+        'source-layer': 'paris_routes_grouped-76t684',
+        paint: {
+          'line-color': '#fcbf49',
+          'line-width': [
+            'interpolate',
+            ['linear'],
+            ['get', 'count'],
+            1, 0.5,
+            100, 3,
+            500, 8
+          ]
+        },
+        layout: { visibility: 'none' }
+      });
+
+
+      updateConclusions('fifa');
+    });
+
+    function switchEvent(type) {
+      const layers = ['fifa-layer', 'wef-layer', 'paris-layer'];
+      layers.forEach(id => {
+        map.setLayoutProperty(id, 'visibility', id.includes(type) ? 'visible' : 'none');
+      });
+
+      const titles = {
+        fifa: '2022 FIFA World Cup',
+        wef: '2023 World Economic Forum',
+        paris: '2024 Paris Olympic'
+      };
+
+      const descriptions = {
+        fifa: 'Visualizing private flights related to 2022 FIFA in Qatar.',
+        wef: 'Visualizing private flights associated with 2023 WEF in Switzerland.',
+        paris: 'Aggregated commerical routes for the 2024 Paris Olympics.'
+      };
+
+      const centers = {
+        fifa: { center: [51.5310, 25.2854], zoom: 4.8 },
+        wef: { center: [8.5417, 47.3769], zoom: 5.5 },
+        paris: { center: [2.3522, 48.8566], zoom: 5.5 }
+      };
+
+      document.getElementById('event-title').innerText = titles[type];
+      document.getElementById('event-desc').innerText = descriptions[type];
+
+      map.flyTo({
+        center: centers[type].center,
+        zoom: centers[type].zoom,
+        essential: true
+      });
+
+
+      updateConclusions(type);
+    }
+
+
+    const chartLabels = ['FIFA 2022', 'WEF 2023', 'Paris 2024'];
+    const flightCounts = [939, 655, 2007]; 
+    const co2Kilotons = [9.1, 5.24, 12.9];  
+
+
+    new Chart(document.getElementById('flightChart').getContext('2d'), {
+      type: 'bar',
+      data: {
+        labels: chartLabels,
+        datasets: [{
+          label: 'Number of Flights',
+          data: flightCounts,
+          backgroundColor: '#fcbf49'
+        }]
       },
-      scales: {
-        x: {
-          ticks: {
-            color: '#fff',
-            callback: function(value) {
-              return this.getLabelForValue(value);
-            },
-            maxRotation: 0,
-            minRotation: 0
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false },
+          title: {
+            display: true,
+            text: 'Private Flights Associated with Event',
+            color: '#fff'
           }
         },
-        y: {
-          beginAtZero: true,
-          ticks: { color: '#fff' }
+        scales: {
+          x: {
+            ticks: {
+              color: '#fff',
+              callback: function(value) {
+                return this.getLabelForValue(value);
+              },
+              maxRotation: 0,
+              minRotation: 0
+            }
+          },
+          y: {
+            beginAtZero: true,
+            ticks: { color: '#fff' }
+          }
         }
       }
-    }
-  });
+    });
 
-  new Chart(document.getElementById('co2Chart').getContext('2d'), {
-    type: 'bar',
-    data: {
-      labels: chartLabels,
-      datasets: [{
-        label: 'CO₂ Emissions (kt)',
-        data: co2Kilotons,
-        backgroundColor: '#e76f51'
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: { display: false },
-        title: {
-          display: true,
-          text: 'Total CO₂ Emissions (kiloton)',
-          color: '#fff'
-        }
+
+    new Chart(document.getElementById('co2Chart').getContext('2d'), {
+      type: 'bar',
+      data: {
+        labels: chartLabels,
+        datasets: [{
+          label: 'CO₂ Emissions (kt)',
+          data: co2Kilotons,
+          backgroundColor: '#e76f51'
+        }]
       },
-      scales: {
-        x: {
-          ticks: {
-            color: '#fff',
-            callback: function(value) {
-              return this.getLabelForValue(value);
-            },
-            maxRotation: 0,
-            minRotation: 0
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false },
+          title: {
+            display: true,
+            text: 'Total CO₂ Emissions (kiloton)',
+            color: '#fff'
           }
         },
-        y: {
-          beginAtZero: true,
-          ticks: { color: '#fff' }
+        scales: {
+          x: {
+            ticks: {
+              color: '#fff',
+              callback: function(value) {
+                return this.getLabelForValue(value);
+              },
+              maxRotation: 0,
+              minRotation: 0
+            }
+          },
+          y: {
+            beginAtZero: true,
+            ticks: { color: '#fff' }
+          }
         }
       }
-    }
-  });
-</script>
-
+    });
+  </script>
 </body>
 </html>
