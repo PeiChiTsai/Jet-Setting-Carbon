@@ -18,19 +18,18 @@ class World {
     this.innerW = this.width - this.margin.left - this.margin.right;
     this.innerH = this.height - this.margin.top - this.margin.bottom;
 
-  this.svg = div
-    .selectAll(".mysvg")
-    .data(["mysvg"])
-    .join("svg")
+    this.svg = div
+      .selectAll(".mysvg")
+      .data(["mysvg"])
+      .join("svg")
       .attr("class", "mysvg")
-      // 1. 定义内部坐标系为 [0,0] → [width,height]
+      // 1. Define internal coordinate system as [0,0] → [width,height]
       .attr("viewBox", `0 0 ${this.width} ${this.height}`)
-      // 2. 保持等比缩放，居中显示
+      // 2. Maintain aspect ratio, center display
       .attr("preserveAspectRatio", "xMidYMid meet")
-      // 3. 外围尺寸由 CSS / 容器来控制
+      // 3. Outer dimensions controlled by CSS / container
       .style("width", "100%")
       .style("height", "auto");
-
 
     this._initChartArea();
   }
@@ -61,32 +60,32 @@ class World {
       .attr("class", "d3-tip")
       .offset([0, 0])
       .html((e, d) => {
-        // 1. 国家名称：优先用 GeoJSON 的 admin 字段
+        // 1. Country name: prioritize GeoJSON admin field
         let countryName;
         if (d.properties && d.properties.admin) {
           countryName = d.properties.admin;
         } else if (d.country) {
           countryName = d.country;
         } else {
-          // 回退：把 slug 反转为人类可读名
+          // Fallback: convert slug to human-readable name
           countryName = d.slug
             .split("_")
             .map(w => w.charAt(0).toUpperCase() + w.slice(1))
             .join(" ");
         }
 
-        // 2. 年份：feature 上的 properties.year 或 d.year，否则回退成 2024
+        // 2. Year: use properties.year or d.year, fallback to 2024
         const year =
           (d.properties && d.properties.year) ||
           d.year ||
           2024;
-        // 如果是平均点（有 d.avg 且无 d.year），显示 "Average"
+        // If average point (has d.avg but no d.year), show "Average"
         const labelYear =
           (d.avg != null && d.year == null)
             ? "Average"
             : year;
 
-        // 3. 值：feature.properties.value、散点 d.val，或平均点用 d.avg
+        // 3. Value: use feature.properties.value, scatter d.val, or average point d.avg
         let rawVal;
         if (d.properties && d.properties.value != null) {
           rawVal = d.properties.value;
@@ -99,13 +98,13 @@ class World {
         }
         const val = rawVal;
 
-        // 4. 显示文字：val 为 0 显示 "No data"
+        // 4. Display text: show "No data" if val is 0
         const emissionText =
           val === 0
             ? "No data"
             : d3.format(".2f")(val) + " t";
 
-        // 5. 返回 HTML
+        // 5. Return HTML
         return `
           <div>${countryName}</div>
           <div>${labelYear} Arial Emission: ${emissionText}</div>
@@ -132,12 +131,12 @@ class Map extends World {
     this.color = d3.scaleThreshold()
       .domain([0,1e5, 1e6, 1e7, 1e8])
       .range([
-      "#f0f0f0",  // 灰白色（无数据）
-      "#e5f2ff",  // 极浅蓝色
-      "#a6d0ff",  // 浅蓝色
-      "#4a99ff",  // 中蓝色
-      "#0066cc",  // 深蓝色
-      "#003366",  // 极深蓝色
+      "#f0f0f0",  // Light gray (no data)
+      "#e5f2ff",  // Very light blue
+      "#a6d0ff",  // Light blue
+      "#4a99ff",  // Medium blue
+      "#0066cc",  // Dark blue
+      "#003366",  // Very dark blue
       ]);
 
     this.x = d3
@@ -195,7 +194,7 @@ class Map extends World {
 // scatter
 class Scatter extends World {
   constructor(id, data, title, map) {
-    super(id, data, title);  // 调用父类构造函数
+    super(id, data, title);  // Call parent constructor
     this.map = map;
     this.scatter_data = data.scatter_data_world;
     this.slug2admin = {};
@@ -203,47 +202,42 @@ class Scatter extends World {
       this.slug2admin[f.properties.admin_slug] = f.properties.admin;
     });
 
-    // 确保在初始化其他内容之前调用 tooltip 初始化
-    this._tips();  // 显式调用父类的 _tips 方法
+    // Ensure tooltip initialization before other content
+    this._tips();  // Explicitly call parent's _tips method
     this._initScale();
     this.initAxis();
 
     this.AxisX.call(d3.axisBottom(this.x).ticks(6, "~s"))
       .style("opacity", 0);
 
-    // 确保 svg 和 DrawArea 可以接收事件
+    // Ensure svg and DrawArea can receive events
     this.svg.style("pointer-events", "all");
     this.DrawArea.style("pointer-events", "all");
   }
 
-  // 重写 _tips 方法来自定义 scatter 的 tooltip 内容
-  _tips() {
-    this.tool_tip = d3
-      .tip()
-      .attr("class", "d3-tip")
-      .offset([0, 0])
-      .html((e, d) => {
-        // 获取国家名称
-        const countryName = this.slug2admin[d.slug] || d.slug;
-        
-        // 获取年份和值
-        let year, value;
-        if (d.year) {
-          year = d.year;
-          value = d.val;
-        } else if (d.avg) {
-          year = "Average";
-          value = d.avg;
-        }
+  _initScale() {
+    // 1. Copy threshold breakpoints and colors from map
+    const domain = this.map.color.domain();
+    const range = this.map.color.range();
 
-        return `
-          <div>${countryName}</div>
-          <div>${year} Arial Emission: ${d3.format(".2f")(value)} t</div>
-        `;
-      });
+    this.color = d3.scaleThreshold()
+      .domain(domain)
+      .range(range);
 
-    // 确保将 tooltip 绑定到正确的 SVG 元素上
-    this.svg.call(this.tool_tip);
+    // 2. X-axis uses same sqrt (or log) positioning, but color doesn't affect position
+    const maxVal = d3.max(
+      this.scatter_data,
+      d => d3.max(d[1], v => v[1])
+    );
+    this.x = d3.scaleSqrt()
+      .domain([0, maxVal])
+      .range([0, this.innerW]);
+
+    // 3. Y-axis remains unchanged
+    this.y = d3.scaleBand()
+      .range([0, this.innerH])
+      .domain(this.scatter_data.map(d => d[0]))
+      .padding(0.3);
   }
 
   initAxis() {
@@ -271,32 +265,6 @@ _addLabel() {
     .attr("x", 80).attr("y", 40)
     .text("");
 }
-
-
-  _initScale() {
-    // 1. 阈值断点和颜色，直接从 map 拷贝
-    const domain = this.map.color.domain();
-    const range  = this.map.color.range();
-
-    this.color = d3.scaleThreshold()
-      .domain(domain)
-      .range(range);
-
-    // 2. X 轴用同样的 sqrt（或 log）定位，但配色不影响位置
-    const maxVal = d3.max(
-      this.scatter_data,
-      d => d3.max(d[1], v => v[1])
-    );
-    this.x = d3.scaleSqrt()
-      .domain([0, maxVal])
-      .range([0, this.innerW]);
-
-    // 3. Y 轴不变
-    this.y = d3.scaleBand()
-      .range([0, this.innerH])
-      .domain(this.scatter_data.map(d => d[0]))
-      .padding(0.3);
-  }
 
   addLine() {
     this.line = this.DrawArea.selectAll(".line")
@@ -400,12 +368,12 @@ _addLabel() {
 
     // to normal
   applyLinearScale() {
-    // —— 1. 先拿旧的 this.x（log）、yScale 和 validSlugs
+    // 1. Get old this.x (log), yScale and validSlugs
     const oldX = this.x;
     const yScale = this.y;
     const validSlugs = new Set(yScale.domain());
 
-    // —— 2. 重建 this.x 为 √ 刻度
+    // 2. Rebuild this.x as sqrt scale
     const maxVal = d3.max(this.scatter_data, d => d3.max(d[1], v=>v[1]));
     const newX = d3.scaleSqrt()
       .domain([0, maxVal])
@@ -415,12 +383,13 @@ _addLabel() {
     this.AxisX
       .attr("transform", `translate(0,${this.innerH})`)
       .style("opacity", 1);
-    // —— 3. 更新 X 轴
+    
+    // 3. Update X axis
     this.AxisX
       .transition().duration(800)
       .call(d3.axisBottom(newX).ticks(6, "~s"));
 
-    // —— 4. 平滑过渡 year-point / avg-point 的 cx
+    // 4. Smoothly transition year-point / avg-point cx
     this.DrawArea.selectAll(".year-point")
       .transition().duration(800)
       .attr("cx", d => newX(d.val));
@@ -428,7 +397,7 @@ _addLabel() {
       .transition().duration(800)
       .attr("cx", d => newX(d.avg));
 
-    // —— 5. **关键**：对 morph 出来的 "2024 圆" 再来一次 flubber 过渡
+    // 5. Key: Apply another flubber transition to morphed "2024 circles"
     d3.selectAll(".worldPath")
       .filter(d => validSlugs.has(d.properties.admin_slug))
       .transition().duration(800)
@@ -446,20 +415,21 @@ _addLabel() {
     this.AxisX
       .attr("transform", `translate(0,${this.innerH})`)
       .style("opacity", 1);
-    // 1. 找到最小正值和最大值
+    
+    // 1. Find minimum positive value and maximum value
     const allVals = this.scatter_data
       .flatMap(d => d[1].map(v => v[1]))
       .filter(v => v > 0);
     const minPos = d3.min(allVals);
     const maxVal = d3.max(allVals);
 
-    // 2. 重建 this.x 为对数刻度
+    // 2. Rebuild this.x as log scale
     this.x = d3.scaleLog()
       .base(10)
       .domain([minPos, maxVal])
       .range([0, this.innerW]);
 
-    // 3. 更新 X 轴（保持显示原始排放量）
+    // 3. Update X axis (keep showing original emission values)
     this.AxisX
       .transition().duration(800)
       .call(
@@ -468,7 +438,7 @@ _addLabel() {
           .tickFormat(d3.format("~s"))
       );
 
-    // 4. 更新所有 "year-point" 和 "avg-point" 的 cx
+    // 4. Update all "year-point" and "avg-point" cx positions
     this.DrawArea.selectAll(".year-point")
       .transition().duration(800)
       .attr("cx", d => this.x(d.val));
@@ -476,18 +446,18 @@ _addLabel() {
       .transition().duration(800)
       .attr("cx", d => this.x(d.avg));
 
-    // —— 重点：flubber 也要用新的 this.x —— 
-    const newX   = this.x;
+    // Important: flubber also needs to use new this.x
+    const newX = this.x;
     const yScale = this.y;
-    const valid  = new Set(yScale.domain());
+    const valid = new Set(yScale.domain());
 
     d3.selectAll(".worldPath")
       .filter(d => valid.has(d.properties.admin_slug))
       .transition().duration(800)
       .attrTween("d", function(d) {
         const startD = d3.select(this).attr("d");
-        const cx     = newX(d.properties.value);
-        const cy     = yScale(d.properties.admin_slug) + yScale.bandwidth()/2;
+        const cx = newX(d.properties.value);
+        const cy = yScale(d.properties.admin_slug) + yScale.bandwidth()/2;
         return flubber.toCircle(startD, cx, cy, 5);
       });
   }
@@ -652,19 +622,19 @@ _addLabel() {
 
 
   _world_path_change_to_circle() {
-    const xScale    = this.x,
-          yScale    = this.y,
+    const xScale = this.x,
+          yScale = this.y,
           validSlugs = new Set(yScale.domain());
 
-    // 1. 隐藏掉所有 "无效" 国家
+    // 1. Hide all "invalid" countries
     d3.selectAll(".worldPath")
       .filter(d => !validSlugs.has(d.properties.admin_slug))
       .transition()
       .duration(300)
       .style("opacity", 0)
-      .attr("pointer-events", "none");  // 也一起禁用 hover
+      .attr("pointer-events", "none");  // Also disable hover
 
-    // 2. 对 "有效" 国家 做 morph
+    // 2. Morph "valid" countries
     d3.selectAll(".worldPath")
       .filter(d => validSlugs.has(d.properties.admin_slug))
       .transition()
@@ -673,35 +643,34 @@ _addLabel() {
       .style("opacity", 1)
       .attrTween("d", function(d) {
         const startD = d3.select(this).attr("d"),
-              cx     = xScale(d.properties.value),
-              // 加上 bandwidth()/2，圆心就对到图形中线
-              cy     = yScale(d.properties.admin_slug) + yScale.bandwidth() / 2;
+              cx = xScale(d.properties.value),
+              // Add bandwidth()/2 to align circle center with middle of band
+              cy = yScale(d.properties.admin_slug) + yScale.bandwidth() / 2;
         return flubber.toCircle(startD, cx, cy, 5);
       });
-
   }
 
 
   _circle_change_to_world_path() {
-    const pathFn    = this.data_path;
+    const pathFn = this.data_path;
     const validSlugs = new Set(this.y.domain());
-    const duration  = 1200;
-    const delayPer  = (d,i) => 10 + i*2;
+    const duration = 1200;
+    const delayPer = (d,i) => 10 + i*2;
 
-      // —— 新增：把所有年的散点先淡出并删掉 —— 
-  this.DrawArea.selectAll(".year-point")
-    .transition()
+    // First fade out and remove all year points
+    this.DrawArea.selectAll(".year-point")
+      .transition()
       .duration(duration / 2)
       .style("opacity", 0)
-    .remove();
+      .remove();
 
-      this.DrawArea.selectAll(".avg-point")
-    .transition()
+    this.DrawArea.selectAll(".avg-point")
+      .transition()
       .duration(duration / 2)
       .style("opacity", 0)
-    .remove();
+      .remove();
 
-    // 1. 先把能 morph 回去的国家做动画
+    // 1. First animate countries that can morph back
     d3.selectAll(".worldPath")
       .filter(d => validSlugs.has(d.properties.admin_slug))
       .transition()
@@ -710,17 +679,13 @@ _addLabel() {
       .attrTween("d", function(d) {
         const curD = d3.select(this).attr("d");
         return flubber.interpolate(curD, pathFn(d));
-      })
-      // （可选）在动画最后再做下一步
-      .on("end", function(d, i, nodes) {
-        // 只有最后一个结束时触发一次，或者直接用独立 transition
       });
 
-    // 2. 等 morph 完成后再把隐藏的国家放出来
+    // 2. After morph completes, show hidden countries
     d3.selectAll(".worldPath")
       .filter(d => !validSlugs.has(d.properties.admin_slug))
       .transition()
-      .delay(duration + 10)       // 稍微晚于 morph 动画结束
+      .delay(duration + 10)       // Slightly after morph animation ends
       .duration(300)
       .style("opacity", 1)
       .attr("pointer-events", null);
@@ -870,10 +835,10 @@ class ScrollMorph {
     this.transitioning = false;
     this.lastTransitionTime = 0;
 
-    // 监听滚动事件
+    // Listen for scroll events
     d3.select(selector).on("scroll", e => {
       const now = Date.now();
-      // 确保两次转换之间至少间隔 800ms
+      // Ensure at least 800ms between transitions
       if (!this.transitioning && now - this.lastTransitionTime > 800) {
         window.requestAnimationFrame(() => this.handelscroll(e));
       }
@@ -884,12 +849,12 @@ class ScrollMorph {
     const top = e.target.scrollTop;
     const h = e.target.scrollHeight;
     
-    // 调整触发点
+    // Adjust trigger points
     const t1 = h * 0.15;
     const t2 = h * 0.45;
     const t3 = h * 0.65;
 
-    // 如果已经是散点图模式，确保所有点都是可交互的
+    // If already in scatter plot mode, ensure all points are interactive
     if (this.phase > 0 && !this.transitioning) {
       this.scatter.drawAllPoints();
     }
@@ -961,60 +926,60 @@ class ScrollMorph {
   }
 
   toScatter(callback) {
-    // 中断所有正在进行的动画
+    // Interrupt all ongoing animations
     d3.selectAll(".worldPath").interrupt();
     
-    // 确保所有地图路径的事件被禁用
+    // Ensure all map paths' events are disabled
     d3.selectAll(".worldPath")
       .style("pointer-events", "none");
     
-    // 转换到散点图
+    // Transform to scatter plot
     this.scatter.worldPath_to_circle();
     
-    // 添加坐标轴
+    // Add coordinate axes
     this.scatter.addAxis();
     
-    // 应用线性比例尺
+    // Apply linear scale
     this.scatter.applyLinearScale();
     
-    // 立即绘制并激活所有点
+    // Immediately draw and activate all points
     this.scatter.drawAllPoints();
 
-    // 缩短延迟时间
+    // Shorten delay time
     setTimeout(() => {
-      // 再次确保所有点都是可交互的
+      // Ensure all points are interactive again
       this.scatter.drawAllPoints();
       if (callback) callback();
     }, 800);
   }
 
   toWorld(callback) {
-    // 中断所有正在进行的动画
+    // Interrupt all ongoing animations
     d3.selectAll(".worldPath").interrupt();
     
-    // 移除坐标轴
+    // Remove coordinate axes
     this.scatter.removeAxis();
     
-    // 转换回世界地图
+    // Transform back to world map
     this.scatter.circle_to_worldPath();
     
-    // 移除旧的图例
+    // Remove old legend
     this.scatter.svg.selectAll("g.legend").remove();
     
-    // 添加新的地图图例
+    // Add new map legend
     this.map._addLegend();
     
-    // 移除散点图标签
+    // Remove scatter plot labels
     this.scatter.ChartArea.selectAll(".scatter-label")
       .transition().duration(600)
       .style("opacity", 0)
       .remove();
       
-    // 恢复地图路径的事件
+    // Restore map path events
     d3.selectAll(".worldPath")
       .style("pointer-events", "all");
 
-    // 缩短延迟时间以使转换更快响应
+    // Shorten delay time for faster response
     setTimeout(() => {
       if (callback) callback();
     }, 800);
@@ -1039,76 +1004,72 @@ async function initData() {
   // 1. Load World map
   const world = await d3.json("./data/annual-co-emissions-from-aviation/world_with_emission.geojson");
 
+  // Process features to add slugs and 2024 values
   world.features.forEach(feature => {
-      const raw = feature.properties.admin;
-      const slug = raw
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "_")
-        .replace(/^_+|_+$/g, "");
-      feature.properties.admin_slug = slug;
-      feature.properties.value = feature.properties.aviation_emission_wide_C2024 ?? null;
-    });
+    const raw = feature.properties.admin;
+    const slug = raw
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "_")
+      .replace(/^_+|_+$/g, "");
+    feature.properties.admin_slug = slug;
+    feature.properties.value = feature.properties.aviation_emission_wide_C2024 ?? null;
+  });
 
-  // 3. 生成 scatter_data_world
-  //    按国家分组，每组里按年份取值，拼成 [year, value] 数对数组
+  // Generate scatter_data_world
+  // Group by country, for each group create year-value pairs
   const years = d3.range(2013, 2024); // 2013…2024
   let scatter_data_world = d3.rollups(
     world.features,
     group => years.map(year => {
-      // 注意属性名要和 JSON 里一致
+      // Note: property name must match JSON
       const key = `aviation_emission_wide_C${year}`;
-      const v   = group[0].properties[key];
+      const v = group[0].properties[key];
       return [year, v == null ? 0 : v];
     }),
     d => d.properties.admin_slug
-
   );
 
-  // **Filter 出 24 個國家**（名稱要跟 feature.properties.admin 一致）
+  // Filter to 24 countries (names must match feature.properties.admin)
   const selected = new Set([
-    "Netherlands","Saudi Arabia","Indonesia","Qatar","Singapore",
-    "Thailand","Mexico","Italy","Russia","South Korea",
-    "Brazil","Turkey","Canada","Australia","France",
-    "Germany","Spain","India","Oceania","United Arab Emirates",
-    "Japan","United Kingdom","China","United States of America"
+    "Netherlands", "Saudi Arabia", "Indonesia", "Qatar", "Singapore",
+    "Thailand", "Mexico", "Italy", "Russia", "South Korea",
+    "Brazil", "Turkey", "Canada", "Australia", "France",
+    "Germany", "Spain", "India", "Oceania", "United Arab Emirates",
+    "Japan", "United Kingdom", "China", "United States of America"
   ].map(raw =>
-    raw.toLowerCase().replace(/[^a-z0-9]+/g,"_").replace(/^_+|_+$/g,"")
+    raw.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "")
   ));
 
   scatter_data_world = scatter_data_world
     .filter(([countryName, _]) => selected.has(countryName));
 
-  
-
-  // 4. 按总排放量从高到低排序
+  // Sort by total emissions from high to low
   scatter_data_world.sort((a, b) => {
     const sumA = d3.sum(a[1], d => d[1]);
     const sumB = d3.sum(b[1], d => d[1]);
     return sumB - sumA;
   });
 
-  // 5. 返回准备好的数据
+  // Return prepared data
   return {
     world,
     scatter_data_world
   };
 }
 
-
-
 async function main() {
   let data = await initData();
 
-  // 地图部分保持不变
+  // Map section remains unchanged
   let map = new Map("map", data, "I am map");
   map.drawWorld();
   map._addLegend();
 
-  // 散点部分也保持不变
-  let scatter = new Scatter("map", data,"I am scatter", map);
+  // Scatter section also remains unchanged
+  let scatter = new Scatter("map", data, "I am scatter", map);
   
 
-  // 如果你还想保留鼠标进入自动滚动效果，这段可以留着：
+  // Keep auto-scroll on mouse enter if desired
   d3.select("#chartArea").on("mouseenter", (e) => {
     let navtop =
       e.target.getBoundingClientRect().top -
@@ -1121,7 +1082,7 @@ async function main() {
       .style("left", 0);
   });
 
-  // —— 新增：让 ScrollMorph 接管滚动触发
+  // Let ScrollMorph handle scroll triggers
   new ScrollMorph(scatter, map, "#chartArea");
 }
 
