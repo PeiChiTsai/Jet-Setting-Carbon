@@ -502,43 +502,48 @@ _addLabel() {
       series.map(([year, val]) => ({ slug, year, val }))
     );
 
-    // 确保 DrawArea 可以接收事件
-    this.DrawArea
-      .style("pointer-events", "all")
-      .style("z-index", "10");
+    // 先移除现有的点
+    this.DrawArea.selectAll(".year-point").remove();
 
-    this.DrawArea
+    // 创建新的点，并立即设置为可交互
+    const points = this.DrawArea
       .selectAll(".year-point")
-      .data(flat, d => d.slug + "-" + d.year)
+      .data(flat)
       .join("circle")
-        .attr("class", "year-point")
-        .attr("cx", d => this.x(d.val))
-        .attr("cy", d => this.y(d.slug) + this.y.bandwidth() / 2)
-        .attr("r", 5)
-        .attr("fill", d => this.color(d.val))
-        .attr("stroke", "#fff")
-        .attr("stroke-width", 1)
-        .style("cursor", "pointer")
-        .style("pointer-events", "all")
-        .style("z-index", "20")
-      .on("mouseover", (event, d) => {
-        event.stopPropagation();  // 阻止事件冒泡
-        d3.select(event.currentTarget)
-          .transition()
-          .duration(200)
-          .attr("r", 8)
-          .attr("stroke-width", 2);
-        self.tool_tip.show(event, d);
-      })
-      .on("mouseout", (event, d) => {
-        event.stopPropagation();  // 阻止事件冒泡
-        d3.select(event.currentTarget)
-          .transition()
-          .duration(200)
-          .attr("r", 5)
-          .attr("stroke-width", 1);
-        self.tool_tip.hide(event, d);
+      .attr("class", "year-point")
+      .attr("cx", d => this.x(d.val))
+      .attr("cy", d => this.y(d.slug) + this.y.bandwidth() / 2)
+      .attr("r", 5)
+      .attr("fill", d => this.color(d.val))
+      .attr("stroke", "#fff")
+      .attr("stroke-width", 1)
+      .style("cursor", "pointer")
+      .style("pointer-events", "all")
+      .style("z-index", "20")
+      .each(function(d) {
+        const point = d3.select(this);
+        point
+          .on("mouseover", function(event) {
+            event.stopPropagation();
+            point
+              .transition()
+              .duration(200)
+              .attr("r", 8)
+              .attr("stroke-width", 2);
+            self.tool_tip.show(event, d);
+          })
+          .on("mouseout", function(event) {
+            event.stopPropagation();
+            point
+              .transition()
+              .duration(200)
+              .attr("r", 5)
+              .attr("stroke-width", 1);
+            self.tool_tip.hide(event, d);
+          });
       });
+
+    return points;
   }
 
   _drawAveragePoints() {
@@ -554,117 +559,79 @@ _addLabel() {
     })
     .filter(d => d.avg > 0);
 
-    // 确保 DrawArea 可以接收事件
+    // 先移除现有的点
+    this.DrawArea.selectAll(".avg-point").remove();
+
+    // 创建新的点，并立即设置为可交互
+    const avgPoints = this.DrawArea
+      .selectAll(".avg-point")
+      .data(avgData)
+      .join("circle")
+      .attr("class", "avg-point")
+      .attr("cx", d => this.x(d.avg))
+      .attr("cy", d => this.y(d.slug) + this.y.bandwidth() / 2)
+      .attr("r", 8)
+      .attr("fill", "black")
+      .attr("stroke", "#fff")
+      .attr("stroke-width", 2)
+      .style("cursor", "pointer")
+      .style("pointer-events", "all")
+      .style("z-index", "20")
+      .each(function(d) {
+        const point = d3.select(this);
+        point
+          .on("mouseover", function(event) {
+            event.stopPropagation();
+            point
+              .transition()
+              .duration(200)
+              .attr("r", 12)
+              .attr("stroke-width", 3);
+            self.tool_tip.show(event, d);
+          })
+          .on("mouseout", function(event) {
+            event.stopPropagation();
+            point
+              .transition()
+              .duration(200)
+              .attr("r", 8)
+              .attr("stroke-width", 2);
+            self.tool_tip.hide(event, d);
+          });
+      });
+
+    return avgPoints;
+  }
+
+  // 添加新方法来一次性绘制所有数据点
+  drawAllPoints() {
+    this._drawAllYearPoints();
+    this._drawAveragePoints();
+    
+    // 确保所有点都在最上层且可交互
     this.DrawArea
+      .raise()
       .style("pointer-events", "all")
       .style("z-index", "10");
 
-    this.DrawArea
-      .selectAll(".avg-point")
-      .data(avgData, d => d.slug)
-      .join("circle")
-        .attr("class", "avg-point")
-        .attr("cx", d => this.x(d.avg))
-        .attr("cy", d => this.y(d.slug) + this.y.bandwidth() / 2)
-        .attr("r", 8)
-        .attr("fill", "black")
-        .attr("stroke", "#fff")
-        .attr("stroke-width", 2)
-        .style("cursor", "pointer")
-        .style("pointer-events", "all")
-        .style("z-index", "20")
-      .on("mouseover", (event, d) => {
-        event.stopPropagation();  // 阻止事件冒泡
-        d3.select(event.currentTarget)
-          .transition()
-          .duration(200)
-          .attr("r", 12)
-          .attr("stroke-width", 3);
-        self.tool_tip.show(event, d);
-      })
-      .on("mouseout", (event, d) => {
-        event.stopPropagation();  // 阻止事件冒泡
-        d3.select(event.currentTarget)
-          .transition()
-          .duration(200)
-          .attr("r", 8)
-          .attr("stroke-width", 2);
-        self.tool_tip.hide(event, d);
-      });
+    this.DrawArea.selectAll(".year-point, .avg-point")
+      .raise()
+      .style("pointer-events", "all")
+      .style("cursor", "pointer")
+      .style("z-index", "20");
+
+    // 确保tooltip正确绑定
+    this.svg.call(this.tool_tip);
   }
 
   showOverlay() {
-    // 1. 定义要遮罩的国家 slug 以及对应的"由深到浅"色值数组
-    const targets = [
-      "united_states_of_america",
-      "brazil",
-      "canada",
-      "mexico",
-      "germany",
-      "australia",
-      "china",
-      "united_kingdom",
-      "spain"
-    ];
-    const colors = [
-      "#003366",     // 极深蓝色
-      "#004080",
-      "#0059b3",
-      "#0066cc",
-      "#0073e6",
-      "#4a99ff",
-      "#80b3ff",
-      "#a6d0ff",
-      "#e5f2ff"      // 极浅蓝色
-    ];
-
-    // 2. 过滤出 y 轴上存在的那些 slug，并组装成 { slug, color } 的对象数组
-    const data = targets
-      .map((slug, i) => ({ slug, color: colors[i] }))
-      .filter(d => this.y.domain().includes(d.slug));
-
-    // 3. 绑定数据并绘制/更新矩形
-    this.DrawArea
-      .selectAll(".overlay")
-      .data(data, d => d.slug)
-      .join(
-        enter => enter.append("rect")
-          .attr("class", "overlay")
-          .attr("x", 0)
-          .attr("y", d => this.y(d.slug))
-          .attr("width", this.innerW)
-          .attr("height", this.y.bandwidth())
-          .attr("fill", d => d.color)
-          .attr("opacity", 0)
-          .lower()
-          .transition()
-            .duration(800)
-            .ease(d3.easeCubicInOut)
-            .attr("opacity", 0.5),
-        update => update
-          .transition()
-            .duration(800)
-            .ease(d3.easeCubicInOut)
-            .attr("fill", d => d.color)
-            .attr("y",   d => this.y(d.slug))
-            .attr("opacity", 0.5),
-        exit => exit
-          .transition()
-            .duration(800)
-            .ease(d3.easeCubicInOut)
-            .attr("opacity", 0)
-          .remove()
-      );
+    // 方法保留但不执行任何操作
+    return;
   }
 
   hideOverlay() {
-    this.DrawArea
-      .selectAll(".overlay")
-      .transition()                     // 直接对现有 rect 淡出
-        .duration(200)
-        .ease(d3.easeCubicInOut)
-        .attr("opacity", 0)
-      .remove();
+    // 方法保留但不执行任何操作
+    return;
   }
 
 
@@ -916,27 +883,16 @@ class ScrollMorph {
   handelscroll(e) {
     const top = e.target.scrollTop;
     const h = e.target.scrollHeight;
-    const vh = window.innerHeight;
     
-    // 调整触发点，使其在 subtitle 进入视口时就触发
-    const t1 = h * 0.15;  // 第一个转换点
-    const t2 = h * 0.45;  // 第二个转换点
-    const t3 = h * 0.65;  // 第三个转换点
+    // 调整触发点
+    const t1 = h * 0.15;
+    const t2 = h * 0.45;
+    const t3 = h * 0.65;
 
-    const ensureInteractivity = () => {
-      // 确保散点图元素可以交互
-      this.scatter.DrawArea
-        .style("pointer-events", "all")
-        .style("z-index", "10");
-
-      this.scatter.DrawArea.selectAll(".year-point, .avg-point")
-        .style("pointer-events", "all")
-        .style("cursor", "pointer")
-        .style("z-index", "20");
-
-      // 重新绑定 tooltip
-      this.scatter.svg.call(this.scatter.tool_tip);
-    };
+    // 如果已经是散点图模式，确保所有点都是可交互的
+    if (this.phase > 0 && !this.transitioning) {
+      this.scatter.drawAllPoints();
+    }
 
     if (top >= t3) {
       if (this.phase !== 3) {
@@ -946,12 +902,12 @@ class ScrollMorph {
         if (this.phase === 0) {
           this.toScatter(() => {
             this.scatter.showOverlay();
-            ensureInteractivity();
+            this.scatter.drawAllPoints();
             this.transitioning = false;
           });
         } else {
           this.scatter.showOverlay();
-          ensureInteractivity();
+          this.scatter.drawAllPoints();
           this.transitioning = false;
         }
         this.phase = 3;
@@ -965,12 +921,12 @@ class ScrollMorph {
         if (this.phase === 0) {
           this.toScatter(() => {
             this.scatter.applyLogScale();
-            ensureInteractivity();
+            this.scatter.drawAllPoints();
             this.transitioning = false;
           });
         } else {
           this.scatter.applyLogScale();
-          ensureInteractivity();
+          this.scatter.drawAllPoints();
           this.transitioning = false;
         }
         this.phase = 2;
@@ -983,7 +939,7 @@ class ScrollMorph {
         this.lastTransitionTime = Date.now();
         
         this.toScatter(() => {
-          ensureInteractivity();
+          this.scatter.drawAllPoints();
           this.transitioning = false;
         });
         this.phase = 1;
@@ -1001,11 +957,6 @@ class ScrollMorph {
         this.phase = 0;
       }
       this.scatter.hideOverlay();
-    }
-
-    // 每次滚动都确保交互性
-    if (!this.transitioning) {
-      ensureInteractivity();
     }
   }
 
@@ -1026,23 +977,13 @@ class ScrollMorph {
     // 应用线性比例尺
     this.scatter.applyLinearScale();
     
-    // 确保散点图区域在最上层并可以接收事件
-    this.scatter.DrawArea
-      .raise()
-      .style("pointer-events", "all")
-      .style("z-index", "10");
-    
-    // 确保所有点都可以接收事件
-    this.scatter.DrawArea.selectAll(".year-point, .avg-point")
-      .style("pointer-events", "all")
-      .style("cursor", "pointer")
-      .style("z-index", "20");
-    
-    // 重新绑定 tooltip
-    this.scatter.svg.call(this.scatter.tool_tip);
+    // 立即绘制并激活所有点
+    this.scatter.drawAllPoints();
 
-    // 缩短延迟时间以使转换更快响应
+    // 缩短延迟时间
     setTimeout(() => {
+      // 再次确保所有点都是可交互的
+      this.scatter.drawAllPoints();
       if (callback) callback();
     }, 800);
   }

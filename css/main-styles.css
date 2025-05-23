@@ -597,6 +597,12 @@ article > section {
   max-width: 1200px;
   width: 95%;
   padding: 8px;
+  pointer-events: none; /* 确保文本区域不会阻挡交互 */
+}
+
+.right-side-div .right-side-header,
+.right-side-div .right-text {
+  pointer-events: auto; /* 允许文本区域内的文字可以被选择 */
 }
 
 .right-side-header {
@@ -609,6 +615,7 @@ article > section {
   font-weight: bold;
   border-radius: 8px 8px 0 0;
   text-align: center;
+  z-index: 1; /* 确保标题在适当的层级 */
 }
 
 .right-text {
@@ -619,6 +626,7 @@ article > section {
   font-size: 20px;
   line-height: 1.6;
   color: #333;
+  z-index: 1; /* 确保文本在适当的层级 */
 }
 
 /* ======================================= 
