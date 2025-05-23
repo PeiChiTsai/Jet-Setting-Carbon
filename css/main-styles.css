@@ -98,6 +98,7 @@ ul.navbar > li:first-child .logo-text {
   font-size: 20px;
   font-weight: bold;
   color: white;
+  font-family: 'Montserrat',sans-serif;
 }
 
 ul.navbar li:first-child + li {
@@ -115,6 +116,7 @@ ul.navbar li:not(:first-child) a {
   padding: 14px 16px;
   font-weight: bold;
   font-size: 16px;
+  font-family: 'Montserrat',sans-serif;
 }
 
 ul.navbar li:not(:first-child) a:hover {

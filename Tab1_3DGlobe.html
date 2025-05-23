@@ -125,8 +125,19 @@
       }
 
       .switch-wrapper {
-        flex-shrink: 0;           /* 不被壓縮 */
-        width: 55px;              /* ✅ 固定寬度，保持對齊 */
+        flex-shrink: 0;           
+        width: 55px;              
+      }
+
+      #sidebar .section {
+        margin-bottom: 0.5em;
+        padding: 0.3em 0.5em;
+        background: rgba(0,0,0,0.4);
+        border-radius: 4px;
+      }
+      #sidebar summary {
+        cursor: pointer;
+        font-weight: bold;
       }
 
       </style>
@@ -153,11 +164,11 @@
                     </a>
                 </li>
                   <li><a href="index.html">Home</a></li>
-                  <li><a href="Tab1_3DGlobe.html">Global</a></li>
+                  <li><a href="Tab1_3DGlobe.html">Globe</a></li>
                   <li><a href="Tab2_Europe.html">Continent</a></li>
                   <li><a href="Tab3_City.html">City</a></li>
                   <li><a href="Tab4_Conclusion.html">Conclusion</a></li>
-                  <li><a href="Tab5_Reference.html">Reference</a></li>
+                  <li><a href="Tab5_Reference.html">Info</a></li>
             </ul>
 
 
@@ -166,7 +177,7 @@
 
     <div id="control-panel" style="
       position: absolute;
-      bottom: 10%;
+      bottom: 5%;
       left: 20px;
       z-index: 20;
       font-family: sans-serif;
@@ -177,114 +188,158 @@
       gap: 12px;
     ">
 
-      <!-- Section 1: year slider -->
-      <div id="slider" style="
-        background: rgba(255, 255, 255, 0.1);
-        padding: 12px;
-        border-radius: 8px;
-      ">
-        <label style="display: block; margin: 12px 0 8px 0; font-weight: bold;">
-          1. Select the year
-        </label>
 
-      </div>
 
-      <!-- Section 2: CO2 emission map -->
-      <div id="aviation-emission-toggle" style="
-      background: rgba(255, 255, 255, 0.1);
-      padding: 12px;
-      border-radius: 8px;
-      ">
-        <label style="display: block; margin-bottom: 6px; font-weight: bold;">
-          2. Where emit the most from aviation?
-        </label>
+      <aside id="sidebar">
 
-        <div class="row">
-          <span class="label-text">Annual CO₂ emissions from aviation</span>
-            <div class="switch-wrapper">
-              <label class="switch">
-                <input type="checkbox" id="toggle-emissions" checked>
-                <span class="slider round"></span>
-              </label>
+
+
+        <details  Open class="section">
+                    <summary>
+            <span class="step-title">INSTRUCTION</span>
+          </summary>
+              <div id="step-title" style="
+                background: rgba(255, 255, 255, 0.1);
+                padding: 12px;
+                border-radius: 8px;
+              ">            
+
+                <h3 style="margin-top: 0; margin-bottom: 8px; color: white">How to Read this Interactive Dashboard?</h3>
+                <p style="font-size: 14px; line-height: 1.5;">
+                  This interactive globe explores how public and private aviation contributes to global emissions, 
+                  who benefits most, and how its impact varies across regions and time.
+                  <br><br>
+                  Follow steps 1–5 below to explore how aviation CO₂ emissions, fleet distributions, route networks, 
+                  and year-on-year trends interconnect on the 3D globe.<br>
+                  
+                </p>
+              </div>
+        </details>
+
+
+
+
+
+
+
+
+
+        <!-- Section 1: year slider -->
+        <details  class="section">
+          <summary>
+            <span class="step-title">1. Select the year</span>
+          </summary>
+            <div id="slider" style="
+              background: rgba(255, 255, 255, 0.1);
+              padding: 12px;
+              border-radius: 8px"></div>
+        </details>
+
+        <!-- Section 2: CO2 emission map -->
+        <details  class="section">
+          <summary>
+            <span class="step-title">2. Where emits the most from air?</span>
+          </summary>
+          <div id="aviation-emission-toggle" style="
+            background: rgba(255, 255, 255, 0.1);
+            padding: 12px;
+            border-radius: 8px;
+            ">
+
+
+              <div class="row">
+                <span class="label-text">Annual CO₂ emissions from aviation</span>
+                  <div class="switch-wrapper">
+                    <label class="switch">
+                      <input type="checkbox" id="toggle-emissions" checked>
+                      <span class="slider round"></span>
+                    </label>
+                  </div>
+              </div>
             </div>
-        </div>
-        
-      </div>
+          </details>
+
+
+            <!-- Section 3: aircraft registered amount -->
+          <details  class="section">
+            <summary>
+              <span class="step-title">3. Where have the most airplane?</span>
+            </summary>
+            <div id="aircraft-amount-toggle" style="
+              background: rgba(255, 255, 255, 0.1);
+              padding: 12px;
+              border-radius: 8px;">
+
+              <div class="row">
+                <span class="label-text">Top 15 aircraft registered countries</span>
+                  <div class="switch-wrapper">
+                    <label class="switch">
+                      <input type="checkbox" id="toggle-reg-1" >
+                      <span class="slider round"></span>
+                    </label>
+                  </div>          
+              </div>
+              
+              <div class="row">
+                <span class="label-text">Top 11 Private jet registered</span>
+                  <div class="switch-wrapper">
+                    <label class="switch">
+                      <input type="checkbox" id="toggle-reg-2" >
+                      <span class="slider round"></span>
+                    </label>
+                  </div>   
+              </div>      
+            </div>  
+            </details>
+
+            <!-- Section 4: flight path -->
+            <details class="section">
+            <summary>
+              <span class="step-title">4. Where do people fly?</span>
+            </summary>
+            <div id="flight-path"style="
+              background: rgba(255, 255, 255, 0.1);
+              padding: 12px;
+              border-radius: 8px;">
+
+
+              <span class="label-text">Choose a Flight Type:</span>
+              
+              <select id="flightSelect">
+                <option value="">None</option>          
+                <option value="commercial">Top Popular Commercial Flight Path</option>
+                <option value="private">Top 2500 Popular Private Flight Path</option>
+              </select>
+            </div>
+            </details>
+
+            <!-- Section 5: line chart -->
+            <details class="section">
+            <summary>
+              <span class="step-title">5. Whats the trend?</span>
+            </summary>
+            <div id="line-chart-section" style="
+            background: rgba(255, 255, 255, 0.1);
+            padding: 12px;
+            border-radius: 8px;">
 
 
 
-      <!-- Section 3: aircraft registered amount -->
-      <div id="aircraft-amount-toggle" style="
-        background: rgba(255, 255, 255, 0.1);
-        padding: 12px;
-        border-radius: 8px;">
+              <p style="font-size: 14px; margin-bottom: 10px;">
+                Annual CO₂ emissions from aviation by year
+              </p>
+              <p id="line-chart-title" style="font-size: 14px; margin-bottom: 10px; font-style: italic;">
+                Country: <span id="chart-country-name">World</span>
+              </p>
 
-        <label style="display: block; margin-bottom: 6px; font-weight: bold;">
-          3. Which countries holds the most airplane?
-        </label>
 
-        <div class="row">
-          <span class="label-text">Top 15 aircraft registered countries (2020)</span>
-            <div class="switch-wrapper">
-              <label class="switch">
-                <input type="checkbox" id="toggle-reg-1" >
-                <span class="slider round"></span>
-              </label>
-            </div>          
-        </div>
-        
-        <div class="row">
-          <span class="label-text">Top 11 Private jet registered (2019)</span>
-            <div class="switch-wrapper">
-              <label class="switch">
-                <input type="checkbox" id="toggle-reg-2" >
-                <span class="slider round"></span>
-              </label>
-            </div>   
-        </div>      
-      </div>  
-
-      <!-- Section 4: flight path -->
-      <div id="flight-path"style="
-        background: rgba(255, 255, 255, 0.1);
-        padding: 12px;
-        border-radius: 8px;">
-
-        <label style="display: block; margin-bottom: 6px; font-weight: bold;">
-          4. Where do people fly?
-        </label>
-        <span class="label-text">Flight Type:</span>
-        
-        <select id="flightSelect">
-          <option value="">None</option>          
-          <option value="commercial">Top Popular Commercial Flight Path</option>
-          <option value="private">Top 2500 Popular Private Flight Path</option>
-        </select>
-      </div>
-
-      <!-- Section 4: line chart -->
-      <div id="line-chart-section" style="
-      background: rgba(255, 255, 255, 0.1);
-      padding: 12px;
-      border-radius: 8px;">
-
-        <label style="display: block; margin-bottom: 6px; font-weight: bold;">
-          5. What is the aerial emission trend?
-        </label>
-
-        <p style="font-size: 14px; margin-bottom: 10px;">
-          Annual CO₂ emissions from aviation by year
-        </p>
-        <p id="line-chart-title" style="font-size: 14px; margin-bottom: 10px; font-style: italic;">
-          Country: <span id="chart-country-name">World</span>
-        </p>
-
-        <!-- D3 將會 append svg 到這裡 -->
-        <div id="line-chart-container">
-          <svg width="300" height="160" style="background: rgba(255,255,255,0.05); border-radius: 4px;"></svg>
-        </div>
-      </div>
-
+              <div id="line-chart-container">
+                <svg width="300" height="160" style="background: rgba(255,255,255,0.05); border-radius: 4px;"></svg>
+              </div>
+            </div>
+            
+            </details>
+      </aside>
 
     </div>
 
@@ -296,22 +351,25 @@
     z-index: 20;
     font-family: sans-serif;
     color: white;
-    width: 340px;
+    width: 400px;
     display: flex;
     flex-direction: column;
     gap: 12px;">
 
-      <!-- Section 1: intro-story -->
+
+
+
       <div id="intro-story" style="
         background: rgba(255, 255, 255, 0.1);
         padding: 12px;
         border-radius: 8px;
       ">
-        <h3 style="margin-top: 0; margin-bottom: 8px; color: white">Why Private Jets Matter</h3>
+        <h3 style="margin-top: 0; margin-bottom: 8px; color: white">What can we see from here?</h3>
         <p style="font-size: 14px; line-height: 1.5;">
-          Though they account for a small portion of total flights, private jets emit disproportionately high levels of carbon per passenger.
-          <br><br>
-          This interactive dashboard explores how private aviation contributes to global emissions, who benefits most, and how its impact varies across regions and time.
+          The globe view reveals a strong correlation between fleet size and national aviation emissions, 
+          with a few countries (e.g., the US, China) responsible for the majority of CO₂. 
+          Overlaying top commercial and private routes highlights key corridors driving peaks, 
+          while trend lines show the sector’s rapid post-pandemic rebound.          
         </p>
       </div>
     </div>
@@ -338,8 +396,8 @@
         
         <div style="height: 12px; border-radius: 6px;
           background: linear-gradient(to right,
-            rgba(255, 255, 178, 0.4),
-            rgba(77, 59, 0, 0.571)
+            rgba(147, 206, 170,0.7),
+            rgba(15, 85, 53,0.7)
           );">
         </div>
 
@@ -379,7 +437,7 @@
       <!-- Flight Path Legend -->
       <div id="legend-flightpath" style="display: flex; flex-direction: column; gap: 6px; opacity: 0; transition: opacity 0.4s;">
 
-          <!-- 小字 -->
+
         <div id="legend-flightpath-label" style="font-size: 14px; margin-bottom: 4px; color: #ddd;">
           Private Flight Path Intensity
         </div>
@@ -527,7 +585,7 @@
           const flightComp = document.querySelector('[private-flight-path]')?.components['private-flight-path'];
           if (flightComp && flightComp.updateFlightPath) {
             flightComp.currentYear = val.toString(); 
-            flightComp.updateFlightPath();   // ✈ ✨ 加這行！！同步更新航線！！
+            flightComp.updateFlightPath();   
           }
         });
     
@@ -543,7 +601,7 @@
     </script>
 
     <script>
-      // 網站一開啟時自動觸發預設年份
+
       window.addEventListener("load", () => {
         const component = document.querySelector('[world-countries]').components['world-countries'];
         if (component && component.updateMapByYear) {
@@ -564,7 +622,7 @@
     </script>
 
     <script>
-      // 和 country-tooltip 同樣的滑鼠移動邏輯
+
       document.addEventListener('mousemove', e => {
         const tt = document.getElementById('marker-tooltip');
         if (tt.style.opacity !== '0') {
@@ -579,7 +637,7 @@
     <script>
       let emissionData = {};
       d3.csv("resources/dataset/01_CO2_emission_2013-2024/aviation_emission_wide.csv").then(rawData => {
-        // 整理成每個國家的資料：{ Code: [ {year: 2013, value: ...}, ... ] }
+        
         rawData.forEach(row => {
           const code = row.Code;
           const yearlyData = Object.entries(row)
@@ -591,7 +649,7 @@
           emissionData[code] = yearlyData;
         });
 
-        // 初始化折線圖：顯示 OWID_WRL
+        // show OWID_WRL
         updateLineChart("OWID_WRL");
       });
     </script>
@@ -605,7 +663,7 @@
 
 
         const svg = d3.select("#line-chart-container svg");
-        svg.selectAll("*").remove(); // 清空原圖
+        svg.selectAll("*").remove(); 
 
         const margin = {top: 10, right: 20, bottom: 25, left: 40},
               width = 300 - margin.left - margin.right,
@@ -630,8 +688,8 @@
         g.append("g").call(
         d3.axisLeft(y)
           .ticks(4)
-          .tickFormat(d => d3.format(".0s")(d).replace("k", "k t"))  // 保留 k, 可加自定義字尾
-          .tickFormat(d => d3.format(".0s")(d).replace("M", "M t"))  // 保留 k, 可加自定義字尾
+          .tickFormat(d => d3.format(".0s")(d).replace("k", "k t"))  
+          .tickFormat(d => d3.format(".0s")(d).replace("M", "M t")) 
         );
 
         g.append("path")
@@ -652,13 +710,13 @@
         if (!component || !globeEl) return;
 
         if (enabled) {
-          // 重新設定 polygon 資料並上色
+  
           d3.json("./resources/ne_110m_admin_0_countries.geojson").then(data => {
             globeEl.setAttribute('globe', 'polygonsData', data.features);
             component.updateMapByYear(window.currentYear || "2022");
           });
         } else {
-          // 移除所有 polygons（讓地圖不顯示任何色塊）
+   
           globeEl.setAttribute("globe", {
               polygonCapColor: () => "rgba(255, 255, 255, 0.04)"
             });
@@ -673,15 +731,15 @@
       const sw2 = document.getElementById('toggle-reg-2');
 
       function updateAircraft() {
-        let ds = '';             // 預設關閉
+        let ds = '';             
         if (sw1.checked) ds = 'total';
         else if (sw2.checked) ds = 'private';
 
-        // 一旦改 dataset，就會觸發 component.update() → updateMarkers()
+ 
         markersEl.setAttribute('aircraft-markers', 'dataset', ds);
       }
 
-      // 兩個 switch 都用同一個 handler
+
       sw1.addEventListener('change', () => {
         if (sw1.checked) sw2.checked = false;
         updateAircraft();
@@ -695,18 +753,18 @@
     <script>
       function setLegendVisibility(el, visible) {
         if (visible) {
-          el.style.display = 'flex'; // 顯示出來（flex 讓 layout保持）
+          el.style.display = 'flex'; 
           requestAnimationFrame(() => {
-            el.style.opacity = '1';  // 下一個 frame 再淡入，避免直接跳
+            el.style.opacity = '1';  
           });
         } else {
           el.style.opacity = '0';
-          // 等 transition 動畫跑完再隱藏
+
           setTimeout(() => {
             if (el.style.opacity === '0') {
               el.style.display = 'none';
             }
-          }, 400); // 和你的 CSS transition: opacity 0.4s 對齊
+          }, 400); 
         }
       }
 
@@ -738,14 +796,14 @@
     let autoRotateTimeout = null;
     let orbitControls = null;
 
-    // 初始化找到 orbit-controls
+
     window.addEventListener('load', () => {
       const userEntity = document.getElementById('user');
       orbitControls = userEntity.components['orbit-controls']?.controls;
 
       const toggleBtn = document.getElementById('toggle-rotation');
 
-      // ⭐ 點按鈕手動暫停/啟動
+
       toggleBtn.addEventListener('click', () => {
         if (!orbitControls) return;
         
@@ -754,7 +812,7 @@
         toggleBtn.textContent = autoRotatePausedByUser ? "Resume Rotation" : "Pause Rotation";
       });
 
-      // ⭐ 使用者滑鼠操作時暫停（10秒內恢復）
+
       function userInteracted() {
         if (!orbitControls) return;
 
@@ -764,11 +822,11 @@
         if (!autoRotatePausedByUser) {
           autoRotateTimeout = setTimeout(() => {
             orbitControls.autoRotate = true;
-          }, 10000); // 10秒後自動恢復
+          }, 10000); 
         }
       }
 
-      // 監聽滑鼠點擊和觸控
+
       document.addEventListener('mousedown', userInteracted);
       document.addEventListener('touchstart', userInteracted);
     });
@@ -781,9 +839,9 @@ document.querySelector('#flightSelect')?.addEventListener('change', e => {
 
   const legend = document.getElementById('legend-flightpath');
   const gradientBar = document.getElementById('legend-gradient');
-  const label = document.getElementById('legend-flightpath-label'); // ⭐ 小字
+  const label = document.getElementById('legend-flightpath-label'); 
 
-  if (!legend || !gradientBar || !label) return; // 保險
+  if (!legend || !gradientBar || !label) return; 
 
   if (selected === 'private') {
     legend.style.display = "flex";
@@ -791,21 +849,21 @@ document.querySelector('#flightSelect')?.addEventListener('change', e => {
     gradientBar.style.height = "3px";
     gradientBar.style.width = "100%";
     gradientBar.style.borderRadius = "7px";
-    label.textContent = "Private Flight Path Intensity"; // ⭐小字
+    label.textContent = "Private Flight Path Intensity"; 
   } else if (selected === 'commercial') {
     legend.style.display = "flex";
     gradientBar.style.background = "linear-gradient(to right, white, blue)";
     gradientBar.style.height = "3px";
     gradientBar.style.width = "100%";
     gradientBar.style.borderRadius = "7px";
-    label.textContent = "Commercial Flight Path Intensity"; // ⭐小字
+    label.textContent = "Commercial Flight Path Intensity"; 
   } else {
-    legend.style.display = "none"; // None時隱藏
+    legend.style.display = "none"; 
   }
 });
 
 
-// 🔥 監聽兩個開關 toggle-reg-1 / toggle-reg-2
+
 document.getElementById('toggle-reg-1')?.addEventListener('change', e => {
   updateAircraftLegend();
 });
@@ -813,25 +871,25 @@ document.getElementById('toggle-reg-2')?.addEventListener('change', e => {
   updateAircraftLegend();
 });
 
-// 🔥 實作 updateAircraftLegend
+
 function updateAircraftLegend() {
   const legend = document.getElementById('legend-aircraft');
   const gradientBar = document.getElementById('legend-aircraft-gradient');
-  const label = document.getElementById('legend-aircraft-label'); // ⭐️小字
+  const label = document.getElementById('legend-aircraft-label'); 
 
-  if (!legend || !gradientBar || !label) return; // 防錯
+  if (!legend || !gradientBar || !label) return; 
 
   const isTotalOn = document.getElementById('toggle-reg-1')?.checked;
   const isPrivateOn = document.getElementById('toggle-reg-2')?.checked;
 
   if (isTotalOn) {
     legend.style.display = "flex";
-    gradientBar.style.background = "linear-gradient(to right, white, rgb(53, 182, 230))"; // total藍色
-    label.textContent = "Total Registered Aircraft Amount"; // ⭐️小字改成total
+    gradientBar.style.background = "linear-gradient(to right, white, rgb(53, 182, 230))"; 
+    label.textContent = "Total Registered Aircraft Amount"; 
   } else if (isPrivateOn) {
     legend.style.display = "flex";
-    gradientBar.style.background = "linear-gradient(to right, white, red)"; // private紅色
-    label.textContent = "Registered Private Jets Amount"; // ⭐️小字改成private
+    gradientBar.style.background = "linear-gradient(to right, white, red)"; 
+    label.textContent = "Registered Private Jets Amount"; 
   } else {
     legend.style.display = "none";
   }
