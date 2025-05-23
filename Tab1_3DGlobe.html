@@ -125,8 +125,8 @@
       }
 
       .switch-wrapper {
-        flex-shrink: 0;           /* 不被壓縮 */
-        width: 55px;              /* ✅ 固定寬度，保持對齊 */
+        flex-shrink: 0;           
+        width: 55px;              
       }
 
       #sidebar .section {
@@ -332,7 +332,7 @@
                 Country: <span id="chart-country-name">World</span>
               </p>
 
-              <!-- D3 將會 append svg 到這裡 -->
+
               <div id="line-chart-container">
                 <svg width="300" height="160" style="background: rgba(255,255,255,0.05); border-radius: 4px;"></svg>
               </div>
@@ -437,7 +437,7 @@
       <!-- Flight Path Legend -->
       <div id="legend-flightpath" style="display: flex; flex-direction: column; gap: 6px; opacity: 0; transition: opacity 0.4s;">
 
-          <!-- 小字 -->
+
         <div id="legend-flightpath-label" style="font-size: 14px; margin-bottom: 4px; color: #ddd;">
           Private Flight Path Intensity
         </div>
@@ -585,7 +585,7 @@
           const flightComp = document.querySelector('[private-flight-path]')?.components['private-flight-path'];
           if (flightComp && flightComp.updateFlightPath) {
             flightComp.currentYear = val.toString(); 
-            flightComp.updateFlightPath();   // ✈ ✨ 加這行！！同步更新航線！！
+            flightComp.updateFlightPath();   
           }
         });
     
@@ -601,7 +601,7 @@
     </script>
 
     <script>
-      // 網站一開啟時自動觸發預設年份
+
       window.addEventListener("load", () => {
         const component = document.querySelector('[world-countries]').components['world-countries'];
         if (component && component.updateMapByYear) {
@@ -622,7 +622,7 @@
     </script>
 
     <script>
-      // 和 country-tooltip 同樣的滑鼠移動邏輯
+
       document.addEventListener('mousemove', e => {
         const tt = document.getElementById('marker-tooltip');
         if (tt.style.opacity !== '0') {
@@ -637,7 +637,7 @@
     <script>
       let emissionData = {};
       d3.csv("resources/dataset/01_CO2_emission_2013-2024/aviation_emission_wide.csv").then(rawData => {
-        // 整理成每個國家的資料：{ Code: [ {year: 2013, value: ...}, ... ] }
+        
         rawData.forEach(row => {
           const code = row.Code;
           const yearlyData = Object.entries(row)
@@ -649,7 +649,7 @@
           emissionData[code] = yearlyData;
         });
 
-        // 初始化折線圖：顯示 OWID_WRL
+        // show OWID_WRL
         updateLineChart("OWID_WRL");
       });
     </script>
@@ -663,7 +663,7 @@
 
 
         const svg = d3.select("#line-chart-container svg");
-        svg.selectAll("*").remove(); // 清空原圖
+        svg.selectAll("*").remove(); 
 
         const margin = {top: 10, right: 20, bottom: 25, left: 40},
               width = 300 - margin.left - margin.right,
@@ -688,8 +688,8 @@
         g.append("g").call(
         d3.axisLeft(y)
           .ticks(4)
-          .tickFormat(d => d3.format(".0s")(d).replace("k", "k t"))  // 保留 k, 可加自定義字尾
-          .tickFormat(d => d3.format(".0s")(d).replace("M", "M t"))  // 保留 k, 可加自定義字尾
+          .tickFormat(d => d3.format(".0s")(d).replace("k", "k t"))  
+          .tickFormat(d => d3.format(".0s")(d).replace("M", "M t")) 
         );
 
         g.append("path")
@@ -710,13 +710,13 @@
         if (!component || !globeEl) return;
 
         if (enabled) {
-          // 重新設定 polygon 資料並上色
+  
           d3.json("./resources/ne_110m_admin_0_countries.geojson").then(data => {
             globeEl.setAttribute('globe', 'polygonsData', data.features);
             component.updateMapByYear(window.currentYear || "2022");
           });
         } else {
-          // 移除所有 polygons（讓地圖不顯示任何色塊）
+   
           globeEl.setAttribute("globe", {
               polygonCapColor: () => "rgba(255, 255, 255, 0.04)"
             });
@@ -731,15 +731,15 @@
       const sw2 = document.getElementById('toggle-reg-2');
 
       function updateAircraft() {
-        let ds = '';             // 預設關閉
+        let ds = '';             
         if (sw1.checked) ds = 'total';
         else if (sw2.checked) ds = 'private';
 
-        // 一旦改 dataset，就會觸發 component.update() → updateMarkers()
+ 
         markersEl.setAttribute('aircraft-markers', 'dataset', ds);
       }
 
-      // 兩個 switch 都用同一個 handler
+
       sw1.addEventListener('change', () => {
         if (sw1.checked) sw2.checked = false;
         updateAircraft();
@@ -753,18 +753,18 @@
     <script>
       function setLegendVisibility(el, visible) {
         if (visible) {
-          el.style.display = 'flex'; // 顯示出來（flex 讓 layout保持）
+          el.style.display = 'flex'; 
           requestAnimationFrame(() => {
-            el.style.opacity = '1';  // 下一個 frame 再淡入，避免直接跳
+            el.style.opacity = '1';  
           });
         } else {
           el.style.opacity = '0';
-          // 等 transition 動畫跑完再隱藏
+
           setTimeout(() => {
             if (el.style.opacity === '0') {
               el.style.display = 'none';
             }
-          }, 400); // 和你的 CSS transition: opacity 0.4s 對齊
+          }, 400); 
         }
       }
 
@@ -796,14 +796,14 @@
     let autoRotateTimeout = null;
     let orbitControls = null;
 
-    // 初始化找到 orbit-controls
+
     window.addEventListener('load', () => {
       const userEntity = document.getElementById('user');
       orbitControls = userEntity.components['orbit-controls']?.controls;
 
       const toggleBtn = document.getElementById('toggle-rotation');
 
-      // ⭐ 點按鈕手動暫停/啟動
+
       toggleBtn.addEventListener('click', () => {
         if (!orbitControls) return;
         
@@ -812,7 +812,7 @@
         toggleBtn.textContent = autoRotatePausedByUser ? "Resume Rotation" : "Pause Rotation";
       });
 
-      // ⭐ 使用者滑鼠操作時暫停（10秒內恢復）
+
       function userInteracted() {
         if (!orbitControls) return;
 
@@ -822,11 +822,11 @@
         if (!autoRotatePausedByUser) {
           autoRotateTimeout = setTimeout(() => {
             orbitControls.autoRotate = true;
-          }, 10000); // 10秒後自動恢復
+          }, 10000); 
         }
       }
 
-      // 監聽滑鼠點擊和觸控
+
       document.addEventListener('mousedown', userInteracted);
       document.addEventListener('touchstart', userInteracted);
     });
@@ -839,9 +839,9 @@ document.querySelector('#flightSelect')?.addEventListener('change', e => {
 
   const legend = document.getElementById('legend-flightpath');
   const gradientBar = document.getElementById('legend-gradient');
-  const label = document.getElementById('legend-flightpath-label'); // ⭐ 小字
+  const label = document.getElementById('legend-flightpath-label'); 
 
-  if (!legend || !gradientBar || !label) return; // 保險
+  if (!legend || !gradientBar || !label) return; 
 
   if (selected === 'private') {
     legend.style.display = "flex";
@@ -849,21 +849,21 @@ document.querySelector('#flightSelect')?.addEventListener('change', e => {
     gradientBar.style.height = "3px";
     gradientBar.style.width = "100%";
     gradientBar.style.borderRadius = "7px";
-    label.textContent = "Private Flight Path Intensity"; // ⭐小字
+    label.textContent = "Private Flight Path Intensity"; 
   } else if (selected === 'commercial') {
     legend.style.display = "flex";
     gradientBar.style.background = "linear-gradient(to right, white, blue)";
     gradientBar.style.height = "3px";
     gradientBar.style.width = "100%";
     gradientBar.style.borderRadius = "7px";
-    label.textContent = "Commercial Flight Path Intensity"; // ⭐小字
+    label.textContent = "Commercial Flight Path Intensity"; 
   } else {
-    legend.style.display = "none"; // None時隱藏
+    legend.style.display = "none"; 
   }
 });
 
 
-// 🔥 監聽兩個開關 toggle-reg-1 / toggle-reg-2
+
 document.getElementById('toggle-reg-1')?.addEventListener('change', e => {
   updateAircraftLegend();
 });
@@ -871,25 +871,25 @@ document.getElementById('toggle-reg-2')?.addEventListener('change', e => {
   updateAircraftLegend();
 });
 
-// 🔥 實作 updateAircraftLegend
+
 function updateAircraftLegend() {
   const legend = document.getElementById('legend-aircraft');
   const gradientBar = document.getElementById('legend-aircraft-gradient');
-  const label = document.getElementById('legend-aircraft-label'); // ⭐️小字
+  const label = document.getElementById('legend-aircraft-label'); 
 
-  if (!legend || !gradientBar || !label) return; // 防錯
+  if (!legend || !gradientBar || !label) return; 
 
   const isTotalOn = document.getElementById('toggle-reg-1')?.checked;
   const isPrivateOn = document.getElementById('toggle-reg-2')?.checked;
 
   if (isTotalOn) {
     legend.style.display = "flex";
-    gradientBar.style.background = "linear-gradient(to right, white, rgb(53, 182, 230))"; // total藍色
-    label.textContent = "Total Registered Aircraft Amount"; // ⭐️小字改成total
+    gradientBar.style.background = "linear-gradient(to right, white, rgb(53, 182, 230))"; 
+    label.textContent = "Total Registered Aircraft Amount"; 
   } else if (isPrivateOn) {
     legend.style.display = "flex";
-    gradientBar.style.background = "linear-gradient(to right, white, red)"; // private紅色
-    label.textContent = "Registered Private Jets Amount"; // ⭐️小字改成private
+    gradientBar.style.background = "linear-gradient(to right, white, red)"; 
+    label.textContent = "Registered Private Jets Amount"; 
   } else {
     legend.style.display = "none";
   }

@@ -70,33 +70,33 @@
             overflow: visible;
             }
             
-            /* 1. 禁止 body/page 本身滚动，只由 article 来滚动 */
+       
             html, body {
             height: 100%;
             margin: 0;
             overflow: visible;
             }
 
-            /* 2. 让 article 顶在导航下方，并自己滚动 */
+      
             article {
             position: relative;
-            top: 50px;                   /* 导航高度，按实际改 */
-            height: calc(100vh - 50px);  /* 扣掉导航 */
+            top: 50px;                   
+            height: calc(100vh - 50px); 
             overflow-y: auto;
             scroll-behavior: smooth;
-            /* scroll-padding-top 只影响 snap 对齐，不推下初始位置 */
+         
             }
 
-            /* 3. 每个 section 都是一屏高，成为 snap 点 */
+       
             article > section {
-            height: 100%;                /* 刚好撑满 article */
+            height: 100%;              
             scroll-snap-align: start;
             box-sizing: border-box;
             }
 
-            /* 4. 如果需要给内容顶部一点内边距，防止紧贴 section 顶 */
+           
             article > section > * {
-            padding-top: 1rem;           /* 可选，看你想要留多少空隙 */
+            padding-top: 1rem;           
             }
 
 
@@ -142,17 +142,17 @@
             text-shadow: 0 2px 8px rgba(0,0,0,0.5);  
             }
 
-            /* —— 标题 —— */
+           
             .video-section .title {
-            font-size: 3rem;            /* 按需调大 */
+            font-size: 3rem;           
             margin-bottom: 0.5rem;
             line-height: 1.2;
             }
 
-            /* —— 副标题 —— */
+           
             .video-section .mid-text {
             font-size: 1.5rem;
-            max-width: 700px;           /* 最宽 700px，换行可读 */
+            max-width: 700px;         
             margin-bottom: 1.5rem;
             }
 
@@ -250,8 +250,8 @@
 
             .middleThings {
             display: grid;
-            grid-template-columns: 65% 30%;  /* 左 70% / 右 30% */
-            gap: 1.5rem;                     /* 栏间距，可按需调整 */
+            grid-template-columns: 65% 30%;  
+            gap: 1.5rem;                   
             width: 100%;
             margin: 0 auto;
             }
@@ -272,7 +272,6 @@
 
 
 
-            /* 响应式：窄屏时回退成单栏 */
             @media (max-width: 800px) {
             .middleThings {
                 grid-template-columns: 1fr;
@@ -333,12 +332,12 @@
             display: grid;
             grid-template-columns: 70% 25%;
             height: 99vh;
-            overflow-y: auto;    /* 保留纵向滚动 */
+            overflow-y: auto;   
             overflow-x: hidden;
             width: 100%;
             padding-right: 18px;
 
-            /* —— 以下三行隐藏滚动条 —— */
+        
             -ms-overflow-style: none;  /* IE & Edge */
             scrollbar-width: none;     /* Firefox */
             }
@@ -431,9 +430,9 @@
 
 
             /* ======================================
-            全局容器：三行竖直排列，行间留隙
+      
             ====================================== */
-            /* ── 全局：Flex 容器，3 行垂直排列 ── */
+     
             #chart-intro1 {
             padding-top: 0 ;
             }
@@ -441,7 +440,7 @@
             .chart-container {
             display: flex;
             flex-direction: column;
-            height: 90vh;       /* 占满整个视口高度 */
+            height: 90vh;     
             margin: 0; padding: 0;
             }
 
@@ -451,33 +450,33 @@
             justify-content: center;
             }
 
-            /* ── 第1行：饼图+图例 ── */
+    
             .pie-row {
             flex: 50%; 
             gap: 1rem; 
             }
 
             .chart-cell {
-            height: 100%;          /* 占满行高 */
+            height: 100%;         
             }
 
-            /* 左侧 饼图区 */
+    
             .chart-cell--chart {
-            flex: 5;               /* 占宽比：5  */
+            flex: 5;            
             
             
             }
 
-            /* 右侧 图例区 */
+      
             .chart-cell--legend {
-            flex: 4%;               /* 占宽比：2  */
+            flex: 4%;            
             display: flex;
             flex-direction: column;
-            justify-content: center;/* 图例列表垂直居中 */
+            justify-content: center;
             padding-left: 0.5rem;
             }
 
-            /* 图例列表样式 */
+        
             #legendPlacement ul {
             list-style: none;
             margin: 0; padding: 0;
@@ -493,9 +492,9 @@
             margin-right: 0.5rem;
             }
 
-            /* ── 第3行：面积图 ── */
+       
             .area-row {
-            flex: 50%;               /* 行高比：5 */
+            flex: 50%;             
             }
             .area-row .chart-cell--chart {
             width: 100%;
@@ -505,7 +504,7 @@
 
 
 
-            /* ── SVG 自适应填满容器 ── */
+
             #pieChart svg,
             #areaChart svg {
             width: 100%;
@@ -760,8 +759,8 @@
         .author-item {
             display: flex;
             flex-direction: column;
-            align-items: center;    /* 垂直居中头像和文字 */
-            text-align: center;     /* 文字也居中 */
+            align-items: center;    
+            text-align: center;  
             }
 
         .author-photo {
