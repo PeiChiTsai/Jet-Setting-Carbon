@@ -842,9 +842,9 @@ article > section {
 */
 
 /* 确保只有一个tooltip可见 */
-body > .d3-tip:not(:first-of-type) {
-  display: none !important;
-}
+/* body > .d3-tip:not(:first-of-type) {
+    display: none !important;
+} */
 
 /* Transport text highlight and animations */
 .highlight-text {
