@@ -803,26 +803,24 @@ article > section {
   fill: #333;
 }
 
-/* 工具提示样式 */
+/* ======================================= 
+   工具提示样式 
+======================================= */
+/* 这些样式已移至d3-tip.css，避免样式冲突 */
+/* 
 .d3-tip {
   line-height: 1.5;
-  font-size: 12px;
+  font-size: 14px;
   padding: 12px;
-  background: rgba(255, 255, 255, 0.96);
+  background: rgba(255, 255, 255, 0.97);
   color: #333;
   border-radius: 8px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-  z-index: 100;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
   pointer-events: none;
-  max-width: 250px;
-  border: 1px solid rgba(200, 200, 200, 0.5);
-  position: absolute;
-  font-family: 'Arial', sans-serif;
+  z-index: 1000;
   transition: opacity 0.2s;
-}
-
-.d3-tip.show {
-  opacity: 1;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  max-width: 250px;
 }
 
 .d3-tip:after {
@@ -831,7 +829,7 @@ article > section {
   font-size: 10px;
   width: 100%;
   line-height: 1;
-  color: rgba(255, 255, 255, 0.96);
+  color: rgba(255, 255, 255, 0.97);
   content: "\25BC";
   position: absolute;
   text-align: center;
@@ -839,8 +837,9 @@ article > section {
   left: 0;
   width: 100%;
 }
+*/
 
-/* Hide multiple tooltips - ensure only one visible */
+/* 确保只有一个tooltip可见 */
 body > .d3-tip:not(:first-of-type) {
   display: none !important;
 }

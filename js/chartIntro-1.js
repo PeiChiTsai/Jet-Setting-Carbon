@@ -195,6 +195,28 @@ function createSharedLegend(data, containerId = "legendContainer") {
   return legendContainer;
 }
 
+// 查找最接近鼠标位置的年份数据
+function findClosestYearData(event, xScale, data) {
+  // 获取鼠标x坐标
+  const [mouseX] = d3.pointer(event);
+  
+  // 反转比例尺找到日期
+  const date = xScale.invert(mouseX);
+  const year = date.getFullYear();
+  
+  // 在数据中找到最接近的年份
+  const years = data.map(d => +d.year);
+  const closestYear = years.reduce((prev, curr) => {
+    return Math.abs(curr - year) < Math.abs(prev - year) ? curr : prev;
+  }, years[0]);
+  
+  // 返回那一年的数据
+  return data.find(d => +d.year === closestYear);
+}
+
+// Make function available globally
+window.findClosestYearData = findClosestYearData;
+
 function drawPieChart(data) {
   try {
     if (!data || !data.length) {

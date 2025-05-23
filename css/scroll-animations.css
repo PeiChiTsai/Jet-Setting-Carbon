@@ -1,14 +1,19 @@
 /* 滚动触发动画效果的CSS样式 */
 
-/* 初始状态 - 所有section在开始时都隐藏 */
+/* 全局过渡效果 */
+* {
+    transition-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1.0);
+}
+
+/* 初始状态 - 不要隐藏整个section，只隐藏动画元素 */
 section:not(.animated) {
-    opacity: 0;
+    opacity: 1; /* 改为1，确保section本身可见 */
 }
 
 /* 动画后的状态 */
 section.animated {
     opacity: 1;
-    transition: opacity 0.5s ease-out;
+    transition: opacity 0.7s ease-out;
 }
 
 /* 淡入动画 */
@@ -25,7 +30,7 @@ section.animated {
 @keyframes fadeInUp {
     from {
         opacity: 0;
-        transform: translateY(30px);
+        transform: translateY(50px);
     }
     to {
         opacity: 1;
@@ -73,7 +78,7 @@ section.animated {
 @keyframes zoomInDown {
     from {
         opacity: 0;
-        transform: scale(1.1) translateY(-30px);
+        transform: scale(1.1) translateY(-50px);
     }
     to {
         opacity: 1;
@@ -83,27 +88,27 @@ section.animated {
 
 /* 动画预设 - 可以直接添加这些类到HTML元素 */
 .fade-in {
-    animation: fadeIn 0.8s ease-out forwards;
+    animation: fadeIn 1.2s ease-out forwards;
 }
 
 .fade-in-up {
-    animation: fadeInUp 0.8s ease-out forwards;
+    animation: fadeInUp 1.2s ease-out forwards;
 }
 
 .fade-in-left {
-    animation: fadeInLeft 0.8s ease-out forwards;
+    animation: fadeInLeft 1.2s ease-out forwards;
 }
 
 .fade-in-right {
-    animation: fadeInRight 0.8s ease-out forwards;
+    animation: fadeInRight 1.2s ease-out forwards;
 }
 
 .zoom-in {
-    animation: zoomIn 0.8s ease-out forwards;
+    animation: zoomIn 1.2s ease-out forwards;
 }
 
 .zoom-in-down {
-    animation: zoomInDown 0.8s ease-out forwards;
+    animation: zoomInDown 1.2s ease-out forwards;
 }
 
 /* 动画延迟类 */
@@ -112,6 +117,9 @@ section.animated {
 .delay-300 { animation-delay: 300ms; }
 .delay-400 { animation-delay: 400ms; }
 .delay-500 { animation-delay: 500ms; }
+.delay-600 { animation-delay: 600ms; }
+.delay-700 { animation-delay: 700ms; }
+.delay-800 { animation-delay: 800ms; }
 
 /* 确保动画完成后保持最终状态 */
 [class*="fade-"], [class*="zoom-"] {
@@ -124,17 +132,20 @@ section.animated {
 }
 
 section.animated .jet-title {
-    animation: fadeInUp 1s ease-out forwards;
+    animation: fadeInUp 1.5s ease-out forwards;
 }
 
 section.animated .jet-subtitle {
-    animation: fadeInUp 1s ease-out 0.3s forwards;
+    animation: fadeInUp 1.5s ease-out 0.3s forwards;
 }
 
 /* 针对不同部分的特定样式 */
+/* 设置初始状态为隐藏 */
 #Intro-1 .chart-cell, 
 #Intro-1 .right-col > * {
     opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
 }
 
 #Intro-2 .header,
@@ -142,19 +153,104 @@ section.animated .jet-subtitle {
 #Intro-2 .left-column,
 #Intro-2 .right-column {
     opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
 }
 
-#Intro-3 .left-col,
+#Intro-3 .left-col {
+    opacity: 0;
+    transform: translateX(-40px);
+    transition: opacity 1s ease-out, transform 1s ease-out;
+}
+
 #Intro-3 .right-col {
     opacity: 0;
+    transform: translateX(40px);
+    transition: opacity 1s ease-out, transform 1s ease-out;
 }
 
 #chartArea .chart,
 #chartArea .right-side-div {
     opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
 }
 
-/* 确保所有动画元素初始不可见 */
-.fade-in, .fade-in-up, .fade-in-left, .fade-in-right, .zoom-in, .zoom-in-down {
+#finalMenu .news-item {
     opacity: 0;
-} 
+    transform: translateY(50px);
+    transition: opacity 1s ease-out, transform 1s ease-out;
+}
+
+#finalMenu .title-box {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+/* 为动画元素添加动画完成后的状态 */
+section.animated .chart-cell,
+section.animated .right-col > *,
+section.animated .header,
+section.animated .year-selector,
+section.animated .left-column,
+section.animated .right-column,
+section.animated .left-col,
+section.animated .right-col,
+section.animated .chart,
+section.animated .right-side-div.visible,
+section.animated .news-item,
+section.animated .title-box {
+    opacity: 1;
+    transform: translate(0, 0);
+}
+
+/* 为chartArea添加特殊滚动效果 */
+#chartArea .right-side-div {
+    transition-delay: 0s; /* 默认没有延迟 */
+}
+
+#chartArea .right-side-div.visible {
+    transition-delay: 0.2s; /* 可见时添加一点延迟增强效果 */
+}
+
+/* Ensure smooth scrolling behavior */
+html {
+    scroll-behavior: smooth;
+}
+
+article {
+    scroll-behavior: smooth;
+    overflow-y: visible !important;
+    overflow-x: hidden;
+}
+
+/* Remove scroll snap properties for smooth continuous scrolling */
+article > section {
+    scroll-snap-align: none;
+    min-height: 100vh;
+    position: relative;
+    display: block;
+    overflow: visible;
+    padding-top: 50px;
+    transition: opacity 0.5s ease;
+    opacity: 1; /* 确保section可见 */
+}
+
+/* Adjust scrollbar for smoother experience */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #1A2A43;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #3498db;
+}html {}

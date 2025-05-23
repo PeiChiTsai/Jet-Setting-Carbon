@@ -1,0 +1,92 @@
+/* D3 Tooltip Styles */
+.d3-tip {
+  line-height: 1.5;
+  font-weight: 400;
+  font-family: 'Montserrat', sans-serif;
+  padding: 12px;
+  background: rgba(26, 42, 67, 0.95);
+  color: #fff;
+  border-radius: 4px;
+  pointer-events: none;
+  z-index: 9999 !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  max-width: 240px;
+  transition: opacity 0.2s;
+  position: absolute !important;
+  top: 0;
+  left: 0;
+  opacity: 1 !important;
+}
+
+/* Creates a small triangle extender for the tooltip */
+.d3-tip:after {
+  box-sizing: border-box;
+  display: inline;
+  font-size: 10px;
+  width: 100%;
+  line-height: 1;
+  color: rgba(26, 42, 67, 0.95);
+  position: absolute;
+  pointer-events: none;
+}
+
+/* Northward tooltips */
+.d3-tip.n:after {
+  content: "\25BC";
+  margin: -1px 0 0 0;
+  top: 100%;
+  left: 0;
+  text-align: center;
+}
+
+/* Eastward tooltips */
+.d3-tip.e:after {
+  content: "\25C0";
+  margin: -4px 0 0 0;
+  top: 50%;
+  left: -8px;
+}
+
+/* Southward tooltips */
+.d3-tip.s:after {
+  content: "\25B2";
+  margin: 0 0 1px 0;
+  top: -8px;
+  left: 0;
+  text-align: center;
+}
+
+/* Westward tooltips */
+.d3-tip.w:after {
+  content: "\25B6";
+  margin: -4px 0 0 -1px;
+  top: 50%;
+  left: 100%;
+}
+
+/* Format tooltip content */
+.d3-tip div {
+  margin-bottom: 5px;
+}
+
+.d3-tip div:first-child {
+  font-weight: bold;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.d3-tip div:last-child {
+  font-size: 13px;
+}
+
+/* 确保tooltip不会被其他元素遮挡 */
+body::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+  pointer-events: none;
+} 
